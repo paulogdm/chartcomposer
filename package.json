@@ -1,0 +1,20 @@
+{
+  "name": "muzik",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "Lindsey Simon <lindsey@quip.com> (https://quip.com/)",
+  "license": "ISC",
+  "dependencies": {
+    "chordprojs": "^0.1.1",
+    "next": "^5.0.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-dropbox-chooser": "0.0.5"
+  }
+}
