@@ -10,3 +10,9 @@ yarn dev
 
 3)
 Go to http://localhost:3000/
+
+4)
+```
+now
+now alias [paste] chartcomposer.com
+```

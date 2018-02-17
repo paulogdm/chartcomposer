@@ -5,7 +5,7 @@ import React from 'react'
 
 import Page from '../components/Page'
 
-const DROPBOX_APP_KEY = 'z6rx6iyd3ofb186'
+const DROPBOX_APP_KEY = 'mhwbhsacakthrrd'
 
 export default class IndexPage extends React.Component {
     constructor(props) {
