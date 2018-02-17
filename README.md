@@ -1,4 +1,4 @@
-# muzik
+# ChartComposer
 
 1) Download Now Desktop at https://zeit.co/download
 
