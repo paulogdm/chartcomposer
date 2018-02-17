@@ -12,9 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "chordprojs": "^0.1.1",
+    "isomorphic-fetch": "^2.2.1",
     "next": "^5.0.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-dropbox-chooser": "0.0.5"
+    "react-dropbox-chooser": "^0.0.5"
   }
 }

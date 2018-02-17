@@ -1,53 +1,103 @@
 
-import chordpro from 'chordprojs'
+import ChordProJS from 'chordprojs'
+import DropboxChooser from 'react-dropbox-chooser'
+import React from 'react'
 
-const sleepy = `{title:Sleepy Angel}
-{subtitle:When no one’s lookin}
-{key:G}
+const DROPBOX_APP_KEY = 'z6rx6iyd3ofb186'
 
-{c:Intro}
-[G]
+export default class IndexPage extends React.Component {
+    constructor(props) {
+        super()
+        this.state = {
+            songs: {},
+        }
+    }
 
-{c:Verse}
-[C]Sleepy Angel, Sleepy [G]Angel, We [Em]kept you up too [D]long.
-[C]Sleepy Angel, Sleepy [G]Angel, It's [Em]time to take you [D]home.
+    setSong = (song) => {
+        console.log("setSong", song)
+        this.setState({
+            songs: {
+                ...this.state.songs,
+                [song.id]: song,
+            },
+            songId: song.id,
+        })
+    }
 
-{c:Picking segue}
-[C]    [G]
-[C]    [G]
-[C]    [G]    [G]
+    onChange = e => {
+        console.log(e.currentTarget.value)
+    }
 
-{c:Verse}
-[C]Keep it coming, keep it [G]coming
-You'll [Em]be wrecked before [D]long
-[C]Keep it coming, keep it [G]coming
-With [Em]everyone led [D]on
+    render() {
+        const { songs, songId } = this.state
+        const song = songs[songId]
+        return (
+            <div>
+                <h1>ChartComposer</h1>
+                {song ?
+                    <SongEditor song={song} onChange={this.onChange} /> :
+                    <SongChooser setSong={this.setSong} />}
+            </div>
+        )
+    }
+}
 
-{c:VerseMod} You know you've [C]always been real good [Em]lookin, when no one's [D]lookin, are you doing [G]good?
+const SongEditor = ({song, onChange}) => {
+    const parsed = ChordProJS.parse(song.chordpro)
+    console.log("ChordProJS parsed", parsed)
+    return (
+        <textarea
+            value={song.chordpro}
+            onChange={onChange}
+            style={{
+                width: "100%",
+                height: 500,
+            }}
+        />
+    )
+}
 
-{c:Picking segue}
-[C]    [G]
-[C]    [G]
-[C]    [G]
-[C]    [G]    [G]
-
-{c:Verse}
-It's never been a [C]struggle, a toil, or [G]trouble You can [Em]see the state I'm [D]in
-My shadow [C]walks ten steps be[G]hind me waiting [Em]for to do us [D]in
-
-{c:VerseMod}
-Keeping [C]records, scores and [Em]letters  cause a writer's [D]heart is a writer's [G]home cause a writer's [D]heart is a writer's [C]home
-
-{c:Picking ending}
-[C]    [G]`
-
-export default () => {
-    const parsed = chordpro.parse(sleepy)
-    console.error("parsed", parsed)
+const SongChooser = ({setSong}) => {
     return (
         <div>
-            Welcome to next.js / muzik!<br/>
-            {JSON.stringify(parsed)}
+            <h2>Choose a file to edit:</h2>
+            <DropboxChooser
+                appKey={DROPBOX_APP_KEY}
+                className="dropbox_custom_class"
+                extensions={['.pro']}
+                linkType="direct"
+                folderselect={false}
+                multiselect={true}
+                cancel={() => { console.log("CANCEL") }}
+                success={fs => {
+                    console.log("DROPBOX! ", fs)
+                    const song = fs[0]
+                    fetch(song.link)
+                        .then(resp => resp.text())
+                        .then(chordpro => {
+                            setSong({
+                                ...song,
+                                chordpro,
+                            })
+                        })
+                }}
+            />
         </div>
     )
 }
+
+/*
+
+import 'isomorphic-fetch'
+import dropbox from 'dropbox'
+
+var Dropbox = require('dropbox').Dropbox;
+var dbx = new Dropbox({ accessToken: 'YOUR_ACCESS_TOKEN_HERE' });
+dbx.filesListFolder({path: ''})
+  .then(function(response) {
+    console.log(response);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+*/

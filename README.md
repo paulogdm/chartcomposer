@@ -4,8 +4,8 @@
 
 2)
 ```
-npm install
-npm start
+yarn install
+yarn dev
 ```
 
 3)
