@@ -13,6 +13,6 @@ Go to http://localhost:3000/
 
 4)
 ```
-now
+now --public
 now alias [paste] chartcomposer.com
 ```

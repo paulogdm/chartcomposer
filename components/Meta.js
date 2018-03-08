@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import Head from "next/head";
 export default () => (
   <div>
     <Head>
@@ -6,10 +6,10 @@ export default () => (
       <meta charSet="utf-8" />
     </Head>
     <style jsx global>{`
-      body { 
+      body {
         font: 13px menlo, sans-serif;
         margin: 0;
       }
     `}</style>
   </div>
-)
+);

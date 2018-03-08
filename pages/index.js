@@ -1,201 +1,324 @@
+import ChordProJS from "chordprojs";
+import React from "react";
+import dropbox from "../utils/Dropbox-sdk";
+import localforage from "localforage";
+import "whatwg-fetch";
+import blobToText from "../utils/blobToText";
 
-import ChordProJS from 'chordprojs'
-import DropboxChooser from 'react-dropbox-chooser'
-import React from 'react'
+import Page, { Sender, Receiver } from "../components/Page";
 
-import Page from '../components/Page'
-
-const DROPBOX_APP_KEY = 'mhwbhsacakthrrd'
-
+const Dropbox = dropbox.Dropbox;
 export default class IndexPage extends React.Component {
-    constructor(props) {
-        super()
-        this.state = {
-            songs: {},
-        }
-    }
+  constructor(props) {
+    super();
+    this.state = {
+      loading: false,
+      sharedLinkUrl:
+        "https://www.dropbox.com/sh/yo7nyau69q9tsno/AADlluMhsmzHG4ohEfeBbjHQa?dl=0",
+      songs: {},
+      songId: null,
+      chordPro: {},
+    };
+  }
 
-    componentDidMount() {
-        if (localStorage) {
-            const songs = JSON.parse(localStorage.getItem("songs") || "{}")
-            this.setState({songs})
-        }
+  componentDidMount() {
+    if (localStorage) {
+      const songs = JSON.parse(localStorage.getItem("songs") || "{}");
+      const dropboxAccessToken = localStorage.getItem("db-access-token");
+      const sharedLinkUrl =
+        localStorage.getItem("shared-link-url") || this.state.sharedLinkUrl;
+      this.setState({ dropboxAccessToken, sharedLinkUrl, songs });
     }
+  }
 
-    addSong = (song) => {
-        console.log("addSong", song)
-        const songs = {
-            ...this.state.songs,
-            [song.id]: song,
-        }
-        this.setState({ songs })
-        localStorage.setItem("songs", JSON.stringify(songs))
-        /*
+  loadFilesFromDropbox = () => {
+    const url = this.folderInput.value;
+    console.log({ url });
+    if (!url) {
+      return;
+    }
+    const { dropboxAccessToken } = this.state;
+    this.setState({ loading: true });
+    const dbx = new Dropbox({ accessToken: dropboxAccessToken });
+    dbx
+      .filesListFolder({ path: "", shared_link: { url } })
+      .then(response => {
+        console.log({ response });
+        let songs = { ...this.state.songs };
+        response.entries.forEach(entry => {
+          songs[entry.id] = entry;
+        });
+        console.log({ songs });
+        this.setState({ songs });
+        localStorage.setItem("songs", JSON.stringify(songs));
+      })
+      .catch(error => {
+        console.error({ error });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
+
+  addSong = song => {
+    console.log("addSong", song);
+    const songs = {
+      ...this.state.songs,
+      [song.id]: song,
+    };
+    this.setState({ songs });
+    localStorage.setItem("songs", JSON.stringify(songs));
+    /*
         if (Object.keys(songs) === 1) {
             this.setState({ songId: song.id})
         }
         */
-    }
+  };
 
-    setSongId = songId => {
-        console.log("setSongId", songId)
-        this.setState({ songId })
-    }
+  setSongId = songId => {
+    const { dropboxAccessToken, songs } = this.state;
+    console.log("setSongId", songId);
+    this.setState({ loading: true, songId });
+    const song = songs[songId];
+    const dbx = new Dropbox({ accessToken: dropboxAccessToken });
+    dbx
+      .filesDownload({ path: song.path_lower })
+      .then(async response => {
+        const songChordPro = await blobToText(response.fileBinary);
+        const chordPro = {
+          ...this.state.chordPro,
+          [songId]: songChordPro,
+        };
+        this.setState({ chordPro });
+        console.log({ chordPro });
+      })
+      .catch(error => {
+        console.error({ error });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
 
-    onChange = e => {
-        console.log(e.currentTarget.value)
-    }
+  onChange = e => {
+    const { songId } = this.state;
+    const songChordPro = e.target.value;
+    const chordPro = {
+      ...this.state.chordPro,
+      [songId]: songChordPro,
+    };
+    this.setState({ chordPro });
+  };
 
-    render() {
-        const { songs, songId } = this.state
-        const song = songs[songId]
-        return (
-            <Page>
-                <div style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100vh"
-                }}>
-                    <h1 style={{ paddingLeft: 10 }}>ChartComposer</h1>
-                    <div style={{ display: "flex", flex: 1 }}>
-                        <div style={{
-                            borderRight: "1px solid #ccc",
-                            display: "flex",
-                            flexDirection: "column",
-                            width: "30%",
-                        }}>
-                            <div>
-                                <SongChooser addSong={this.addSong} />
-                            </div>
-                            <div style={{
-                                background: "#eee",
-                                flex: 1
-                            }}>
-                                <SongList songs={songs}
-                                    setSongId={this.setSongId}
-                                />
-                            </div>
-                        </div>
-                        <div style={{
-                            background: "#fff",
-                            padding: 10,
-                            flex: 1,
-                        }}>
-                            {song ?
-                                <SongEditor song={song}
-                                    onChange={this.onChange}
-                                /> :
-                                null
-                            }
-                        </div>
-                    </div>
-                </div>
-            </Page>
-        )
-    }
-}
+  onSave = song => {
+    const { chordPro, dropboxAccessToken, songId, songs } = this.state;
+    const songChordPro = chordPro[songId];
+    console.log("onSave", songId, songChordPro);
+    this.setState({ loading: true });
+    const filesCommitInfo = {
+      contents: songChordPro,
+      path: songs[songId].path_lower,
+      mode: { ".tag": "overwrite" },
+      autorename: false,
+    };
+    const dbx = new Dropbox({ accessToken: dropboxAccessToken });
+    dbx
+      .filesUpload(filesCommitInfo)
+      .then(response => {
+        console.log({ response });
+        console.log("SAVED!");
+      })
+      .catch(error => {
+        console.error({ error });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
 
-const SongList = ({setSongId, songs}) => {
+  render() {
+    const {
+      chordPro,
+      dropboxAccessToken,
+      loading,
+      sharedLinkUrl,
+      songs,
+      songId,
+    } = this.state;
+    const song = songs[songId];
     return (
-        <ol
-            style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-            }}
-        >
-            {Object.keys(songs).map(songId =>
-                <li
-                    key={songId}
-                    onClick={() => {
-                        setSongId(songId)
-                    }}
-                    style={{
-                        background: "#fff",
-                        borderBottom: "1px solid #ccc",
-                        cursor: "pointer",
-                        padding: 10,
-                    }}
-                >
-                    {songs[songId].name}
-                </li>
-            )}
-        </ol>
-    )
-}
-
-const SongEditor = ({song, onChange}) => {
-    const parsed = ChordProJS.parse(song.chordpro)
-    console.log("ChordProJS parsed", parsed)
-    return (
-        <textarea
-            value={song.chordpro}
-            onChange={onChange}
-            style={{
-                border: "none",
-                width: "100%",
-                height: "100%",
-                padding: 0,
-            }}
-        />
-    )
-}
-
-const fetchFilesAndAddSong = (files, addSong) => {
-    files.forEach(song => {
-        fetch(song.link)
-            .then(resp => resp.text())
-            .then(chordpro => {
-                addSong({
-                    ...song,
-                    chordpro,
-                })
-            })
-        })
-}
-
-const SongChooser = ({addSong}) => {
-    return (
-        <div style={{
+      <Page>
+        <LoadingIndicator loading={loading} />
+        <div
+          style={{
             display: "flex",
-            padding: 10,
-            borderBottom: "1px solid #ccc",
-        }}>
-            <DropboxChooser
-                appKey={DROPBOX_APP_KEY}
-                className="dropbox_custom_class"
-                extensions={['.pro']}
-                linkType="direct"
-                folderselect={false}
-                multiselect={true}
-                cancel={() => { console.log("CANCEL") }}
-                success={files => {
-                    console.log("DROPBOX files! ", files)
-                    fetchFilesAndAddSong(files, addSong)
+            flexDirection: "column",
+            height: "100vh",
+          }}
+        >
+          <h1 style={{ padding: "20px 0 0 10px" }}>ChartComposer</h1>
+          <div style={{ display: "flex", flex: 1 }}>
+            <div
+              style={{
+                borderRight: "1px solid #ccc",
+                display: "flex",
+                flexDirection: "column",
+                width: "30%",
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    borderTop: "1px solid #ccc",
+                    padding: 10,
+                  }}
+                >
+                  {dropboxAccessToken ? (
+                    <div
+                      style={{
+                        display: "flex",
+                      }}
+                    >
+                      <input
+                        ref={el => (this.folderInput = el)}
+                        onChange={e =>
+                          this.setState({
+                            sharedLinkUrl: e.target.value,
+                          })
+                        }
+                        value={sharedLinkUrl}
+                        style={{
+                          flex: 1,
+                        }}
+                      />
+                      <button onClick={this.loadFilesFromDropbox}>Go</button>
+                    </div>
+                  ) : (
+                    <Sender
+                      state={{ to: "/" }}
+                      render={({ url }) => <a href={url}>Connect to Dropbox</a>}
+                    />
+                  )}
+                </div>
+              </div>
+              <div
+                style={{
+                  background: "#eee",
+                  flex: 1,
                 }}
-            />
-            <div style={{margin: 5}}>
-                or
+              >
+                <SongList songs={songs} setSongId={this.setSongId} />
+              </div>
             </div>
-            <div>
-                <input placeholder="Dropbox share link" />
+            <div
+              style={{
+                background: "#fff",
+                padding: 10,
+                flex: 1,
+              }}
+            >
+              {songId ? (
+                <SongEditor
+                  value={chordPro[songId]}
+                  onChange={this.onChange}
+                  onSave={this.onSave}
+                />
+              ) : null}
             </div>
+          </div>
         </div>
-    )
+      </Page>
+    );
+  }
 }
 
-/*
+const LoadingIndicator = ({ loading }) => {
+  return (
+    <div
+      style={{
+        background: "#eee",
+        display: loading ? "block" : "none",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        opacity: 0.7,
+        bottom: 0,
+        zIndex: 2,
+      }}
+    >
+      <div
+        style={{
+          background: "orange",
+          position: "fixed",
+          left: "50%",
+          top: "50%",
+          padding: "50px 100px",
+          color: "#000",
+          transform: "translate3d(-50%, -50%, 0)",
+        }}
+      >
+        Loading ...
+      </div>
+    </div>
+  );
+};
 
-import 'isomorphic-fetch'
-import dropbox from 'dropbox'
+const SongList = ({ setSongId, songs }) => {
+  return (
+    <ol
+      style={{
+        listStyle: "none",
+        padding: 0,
+        margin: 0,
+      }}
+    >
+      {Object.keys(songs).map(songId => (
+        <li
+          key={songId}
+          onClick={() => {
+            setSongId(songId);
+          }}
+          style={{
+            background: "#fff",
+            borderBottom: "1px solid #ccc",
+            cursor: "pointer",
+            padding: 10,
+          }}
+        >
+          {songs[songId].name}
+        </li>
+      ))}
+    </ol>
+  );
+};
 
-var Dropbox = require('dropbox').Dropbox;
-var dbx = new Dropbox({ accessToken: 'YOUR_ACCESS_TOKEN_HERE' });
-dbx.filesListFolder({path: ''})
-  .then(function(response) {
-    console.log(response);
-  })
-  .catch(function(error) {
-    console.log(error);
-  });
-*/
+const SongEditor = ({ value, onChange, onSave }) => {
+  if (!value) {
+    return null;
+  }
+  return (
+    <div style={{ position: "relative", height: "100%" }}>
+      <button
+        onClick={onSave}
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+        }}
+      >
+        Save
+      </button>
+      <textarea
+        value={value}
+        onChange={onChange}
+        style={{
+          border: "none",
+          width: "100%",
+          height: "100%",
+          padding: 0,
+        }}
+      />
+    </div>
+  );
+};
