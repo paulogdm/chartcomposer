@@ -6,6 +6,7 @@ import "whatwg-fetch";
 import blobToText from "../utils/blobToText";
 
 import Page, { Sender, Receiver } from "../components/Page";
+import SongEditor from "../components/SongEditor.jsx";
 
 const Dropbox = dropbox.Dropbox;
 export default class IndexPage extends React.Component {
@@ -290,35 +291,5 @@ const SongList = ({ setSongId, songs }) => {
         </li>
       ))}
     </ol>
-  );
-};
-
-const SongEditor = ({ value, onChange, onSave }) => {
-  if (!value) {
-    return null;
-  }
-  return (
-    <div style={{ position: "relative", height: "100%" }}>
-      <button
-        onClick={onSave}
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-        }}
-      >
-        Save
-      </button>
-      <textarea
-        value={value}
-        onChange={onChange}
-        style={{
-          border: "none",
-          width: "100%",
-          height: "100%",
-          padding: 0,
-        }}
-      />
-    </div>
   );
 };
