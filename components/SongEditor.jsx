@@ -1,3 +1,4 @@
+import chordProParse from "../utils/chordProParse.js";
 
 const SongEditor = ({ value, onChange, onSave }) => {
   if (!value) {
@@ -15,18 +16,30 @@ const SongEditor = ({ value, onChange, onSave }) => {
       >
         Save
       </button>
-      <textarea
-        value={value}
-        onChange={onChange}
+      <div
         style={{
-          border: "none",
-          width: "100%",
+          display: "flex",
           height: "100%",
-          padding: 0,
         }}
-      />
+      >
+        <textarea
+          value={value}
+          onChange={onChange}
+          style={{
+            border: "none",
+            width: "100%",
+            height: "100%",
+            padding: 0,
+          }}
+        />
+        <SongView value={value} />
+      </div>
     </div>
   );
+};
+
+const SongView = ({ value }) => {
+  return <div dangerouslySetInnerHTML={chordProParse(value)} />;
 };
 
 export default SongEditor;
