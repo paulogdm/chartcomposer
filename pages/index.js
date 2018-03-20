@@ -164,7 +164,7 @@ export default class IndexPage extends React.Component {
                 borderRight: "1px solid #ccc",
                 display: "flex",
                 flexDirection: "column",
-                width: "30%",
+                width: "300px",
               }}
             >
               <div>
