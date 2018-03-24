@@ -45,6 +45,9 @@ export default class IndexPage extends React.Component {
       .filesListFolder({ path: "", shared_link: { url } })
       .then(response => {
         console.log({ response });
+		// Clear out the current songs because they are no longer accessible
+		// when we switch to a new Dropbox folder.
+		//let songs = {};
         let songs = { ...this.state.songs };
         response.entries.forEach(entry => {
           songs[entry.id] = entry;
@@ -157,9 +160,9 @@ export default class IndexPage extends React.Component {
             height: "100vh",
           }}
         >
-          <h1 style={{ padding: "20px 0 0 10px" }}>ChartComposer</h1>
+	      <h1 id={"titleheader"} style={{ padding: "20px 0 0 10px" }}>ChartComposer</h1>
           <div style={{ display: "flex", flex: 1 }}>
-            <div
+	        <div id={"songlist"}
               style={{
                 borderRight: "1px solid #ccc",
                 display: "flex",
