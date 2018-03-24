@@ -1,20 +1,9 @@
 export default function chordProParse(value) {
+	addCssRules();
 	gSong = importChordPro(value);
 	var sHtml = exportHtml(gSong);
 	return { __html: "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif;'>" + sHtml + "</div>" }
 }
-
-const greeting = "hey ho: ";
-
-const getHi = () => {
-	return greeting;
-};
-
-var a = 1;
-function foo(x) {
-	return x + 1;
-}
-
 
 
 var gSong;   // the song object is a global
@@ -50,6 +39,15 @@ function importChordPro(text) {
     return gSong;
 }
 
+
+function addCssRules() {
+	var styleEl = document.createElement('style'), styleSheet;
+	styleEl.appendChild(document.createTextNode(''));  // Apparently some version of Safari needs the following line?                                                                                                    
+	document.head.appendChild(styleEl);
+	styleSheet = styleEl.sheet;
+	styleSheet.insertRule("@media print { #titleheader, #songeditor, #songlist { display: none !important; } }");
+	styleSheet.insertRule("@media print { #songview { width: 100% !important} }");
+}
 
 
 
