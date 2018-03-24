@@ -41,6 +41,8 @@ function importChordPro(text) {
 
 
 function addCssRules() {
+	document.title = "ChartComposer.com";
+
 	var styleEl = document.createElement('style'), styleSheet;
 	styleEl.appendChild(document.createTextNode(''));  // Apparently some version of Safari needs the following line?                                                                                                    
 	document.head.appendChild(styleEl);
