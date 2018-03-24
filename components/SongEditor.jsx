@@ -12,7 +12,7 @@ const SongEditor = ({ value, onChange, onSave }) => {
           height: "100%",
         }}
       >
-		<div style={{width: "40%"}}>
+		<div id={"songeditor"} style={{width: "40%"}}>
 	      <button
 			 onClick={onSave}
 			 style={{
@@ -40,7 +40,7 @@ const SongEditor = ({ value, onChange, onSave }) => {
 };
 
 const SongView = ({ value }) => {
-  return <div style={{width: "60%"}} dangerouslySetInnerHTML={chordProParse(value)} />;
+  return <div id={"songview"} style={{width: "60%"}} dangerouslySetInnerHTML={chordProParse(value)} />;
 };
 
 export default SongEditor;
