@@ -79,6 +79,20 @@ export default class IndexPage extends React.Component {
         */
   };
 
+  newSong  = () => {
+    console.log("new song");
+	const songId = Number(new Date());
+    console.log("setSongId", songId);
+    this.setState({ loading: true, songId });
+    //const song = songs[songId];
+	const chordPro = {
+		...this.state.chordPro,
+		[songId]: "{title: New Song}\n{artist: }\n\n{start_of_verse}\n{comment: Verse 1}\n[D]Row, row, row your boat\n[D]Gently down the stream\n{end_of_verse}\n{start_of_chorus}\n{comment: Chorus}\n{end_of_chorus}\n",
+	};
+	this.setState({ chordPro });
+	this.setState({ loading: false });
+  };
+
   setSongId = songId => {
     const { dropboxAccessToken, songs } = this.state;
     console.log("setSongId", songId);
@@ -118,6 +132,8 @@ export default class IndexPage extends React.Component {
     const { chordPro, dropboxAccessToken, songId, songs } = this.state;
     const songChordPro = chordPro[songId];
     console.log("onSave", songId, songChordPro);
+	// Getting this ready for when we save new songs.
+	const songTitle = ( songChordPro.match(/{title:(.*?)}/) ? songChordPro.match(/{title:(.*?)}/)[1].trim : "New Song" );
     this.setState({ loading: true });
     const filesCommitInfo = {
       contents: songChordPro,
@@ -196,6 +212,7 @@ export default class IndexPage extends React.Component {
                         }}
                       />
                       <button onClick={this.loadFilesFromDropbox}>Go</button>
+                      <button onClick={this.newSong}>New Song</button>
                     </div>
                   ) : (
                     <Sender
