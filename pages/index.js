@@ -47,8 +47,8 @@ export default class IndexPage extends React.Component {
         console.log({ response });
 		// Clear out the current songs because they are no longer accessible
 		// when we switch to a new Dropbox folder.
-		//let songs = {};
-        let songs = { ...this.state.songs };
+		let songs = {};
+        //let songs = { ...this.state.songs };
         response.entries.forEach(entry => {
           songs[entry.id] = entry;
         });
@@ -286,6 +286,14 @@ const LoadingIndicator = ({ loading }) => {
 };
 
 const SongList = ({ setSongId, songs }) => {
+  // sort by filename
+  // Array of [songId, filename] tuples
+  let aTuples = Object.keys(songs).map(songId => [ songId, songs[songId].name ]);
+  // sort the tuples
+  aTuples.sort(function(a,b) { return a[1] > b[1]; });
+  // Array of sorted songIds
+  let aSongIds = aTuples.map( tuple => tuple[0] );
+	
   return (
     <ol
       style={{
@@ -294,7 +302,7 @@ const SongList = ({ setSongId, songs }) => {
         margin: 0,
       }}
     >
-      {Object.keys(songs).map(songId => (
+		{aSongIds.map(songId => (
         <li
           key={songId}
           onClick={() => {
