@@ -133,15 +133,37 @@ export default class IndexPage extends React.Component {
     const { chordPro, dropboxAccessToken, songId, songs } = this.state;
     const songChordPro = chordPro[songId];
     console.log("onSave", songId, songChordPro);
-	// Getting this ready for when we save new songs.
-	const songTitle = ( songChordPro.match(/{title:(.*?)}/) ? songChordPro.match(/{title:(.*?)}/)[1].trim : "New Song" );
+	let path;
+	let bNewSong = false;
+	if ( ! songs[songId] ) {
+		// this is a new song - not in Dropbox yet
+		let songTitle = ( songChordPro.match(/{title:(.*?)}/) ? songChordPro.match(/{title:(.*?)}/)[1].trim() : "New Song" );
+		let filename = songTitle.toLowerCase().replace(' ', '_') + ".pro";
+		// We need the current path so we borrow it from an existing song - this is pretty hacky
+		for ( let tmpId in songs ) {
+			let tmpSong = songs[tmpId];
+			if ( tmpSong.path_lower ) {
+				path = tmpSong.path_lower.substring(0, tmpSong.path_lower.lastIndexOf("/")+1) + filename;
+				console.log("new song path: " + path);
+				bNewSong = true;
+				break;
+			}
+		}
+		if ( ! path ) {
+			// If they open an empty folder and create a new song this code breaks
+			console.log("ERROR: Could not find song path_lower.");
+		}
+	}
+	else {
+		path = songs[songId].path_lower;
+	}
+	const filesCommitInfo = {
+		contents: songChordPro,
+		path: path,
+		mode: { ".tag": "overwrite" },
+		autorename: false,
+	};
     this.setState({ loading: true });
-    const filesCommitInfo = {
-      contents: songChordPro,
-      path: songs[songId].path_lower,
-      mode: { ".tag": "overwrite" },
-      autorename: false,
-    };
     const dbx = new Dropbox({ accessToken: dropboxAccessToken });
     dbx
       .filesUpload(filesCommitInfo)
@@ -153,6 +175,7 @@ export default class IndexPage extends React.Component {
         console.error({ error });
       })
       .finally(() => {
+		if ( bNewSong ) { this.loadFilesFromDropbox(); };
         this.setState({ loading: false });
       });
   };
