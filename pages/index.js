@@ -38,6 +38,7 @@ export default class IndexPage extends React.Component {
     if (!url) {
       return;
     }
+	localStorage.setItem("shared-link-url", url); // save the most recent folder
     const { dropboxAccessToken } = this.state;
     this.setState({ loading: true });
     const dbx = new Dropbox({ accessToken: dropboxAccessToken });
