@@ -286,6 +286,21 @@ const LoadingIndicator = ({ loading }) => {
 };
 
 const SongList = ({ setSongId, songs }) => {
+  // remove non-Chordpro files
+  let songId;
+  for ( songId in songs ) {
+	  let song = songs[songId];
+	  let filename = song.name;
+	  if ( ! filename.match(/.pro$/) &&
+		   ! filename.match(/.chopro$/) &&
+		   ! filename.match(/.crd$/) &&
+		   ! filename.match(/.chordpro$/) &&
+		   ! filename.match(/.cho$/) &&
+		   ! filename.match(/.txt$/ ) ) {
+		  delete songs[songId];
+	  }
+  }
+
   // sort by filename
   // Array of [songId, filename] tuples
   let aTuples = Object.keys(songs).map(songId => [ songId, songs[songId].name ]);
