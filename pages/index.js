@@ -15,7 +15,7 @@ export default class IndexPage extends React.Component {
     this.state = {
       loading: false,
       sharedLinkUrl:
-        "https://www.dropbox.com/sh/yo7nyau69q9tsno/AADlluMhsmzHG4ohEfeBbjHQa?dl=0",
+        "<enter Dropbox folder URL here>",
       songs: {},
       songId: null,
       chordPro: {},
@@ -230,6 +230,7 @@ export default class IndexPage extends React.Component {
                             sharedLinkUrl: e.target.value,
                           })
                         }
+					    onClick={e => e.target.value = (-1 === e.target.value.indexOf('<enter') ? e.target.value : '')}
                         value={sharedLinkUrl}
                         style={{
                           flex: 1,
