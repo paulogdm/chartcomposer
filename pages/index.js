@@ -40,6 +40,13 @@ export default class IndexPage extends React.Component {
     }
 	localStorage.setItem("shared-link-url", url); // save the most recent folder
     const { dropboxAccessToken } = this.state;
+	
+	// clear out current song in editor
+	if ( document.getElementById('songeditor') ) {
+		document.getElementById('songeditor').innerHTML = '';
+		document.getElementById('songview').innerHTML = '';
+	}
+
     this.setState({ loading: true });
     const dbx = new Dropbox({ accessToken: dropboxAccessToken });
     dbx
@@ -81,11 +88,9 @@ export default class IndexPage extends React.Component {
   };
 
   newSong  = () => {
-    console.log("new song");
 	const songId = Number(new Date());
-    console.log("setSongId", songId);
+    console.log("newSong", songId);
     this.setState({ loading: true, songId });
-    //const song = songs[songId];
 	const chordPro = {
 		...this.state.chordPro,
 		[songId]: "{title: New Song}\n{artist: }\n\n{start_of_verse}\n{comment: Verse 1}\n[D]Row, row, row your boat\n[D]Gently down the stream\n{end_of_verse}\n{start_of_chorus}\n{comment: Chorus}\n{end_of_chorus}\n",
