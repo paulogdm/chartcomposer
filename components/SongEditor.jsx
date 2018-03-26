@@ -14,7 +14,7 @@ const SongEditor = ({ onChange, onSave, readOnly, value }) => {
       >
         <div id={"songeditor"} style={{ width: "40%" }}>
           {readOnly ? (
-            <div>read-only</div>
+            <div style={{ color: "red", marginBottom: 10 }}>READ ONLY</div>
           ) : (
             <button
               onClick={onSave}

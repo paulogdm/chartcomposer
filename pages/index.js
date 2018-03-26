@@ -7,6 +7,7 @@ import blobToText from "../utils/blobToText";
 
 import Page, { Sender, Receiver } from "../components/Page";
 import SongEditor from "../components/SongEditor.jsx";
+import SongList from "../components/SongList.jsx";
 
 const Dropbox = dropbox.Dropbox;
 export default class IndexPage extends React.Component {
@@ -38,7 +39,7 @@ export default class IndexPage extends React.Component {
     }
   }
 
-  loadFilesFromDropbox = () => {
+  loadDropboxLink = () => {
     const url = this.folderInput.value;
     console.log({ url });
     if (!url) {
@@ -49,15 +50,44 @@ export default class IndexPage extends React.Component {
     this.setState({ loading: true, song: null, songId: null });
 
     this.dbx_
+      .sharingGetSharedLinkMetadata({ url })
+      .then(response => {
+        console.log({ response });
+        const tag = response[".tag"];
+        if (tag === "folder") {
+          this.loadFilesFromDropboxFolder();
+        } else if (tag === "file") {
+          alert("todo");
+        }
+      })
+      .catch(error => {
+        console.error({ error });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
+
+  loadFilesFromDropboxFolder = () => {
+    const url = this.folderInput.value;
+    console.log({ url });
+    if (!url) {
+      return;
+    }
+    // clear out current song in editor
+    this.setState({ loading: true, song: null, songId: null });
+
+    this.dbx_
       .filesListFolder({ path: "", shared_link: { url } })
       .then(response => {
         console.log({ response });
         // Clear out the current songs because they are no longer accessible
         // when we switch to a new Dropbox folder.
         let songs = {};
-        //let songs = { ...this.state.songs };
         response.entries.forEach(entry => {
-          songs[entry.id] = entry;
+          if (entry[".tag"] === "file" && isChordProName(entry.name)) {
+            songs[entry.id] = entry;
+          }
         });
         console.log({ songs });
         this.setState({ songs });
@@ -181,7 +211,7 @@ export default class IndexPage extends React.Component {
       })
       .finally(() => {
         if (bNewSong) {
-          this.loadFilesFromDropbox();
+          this.loadDropboxLink();
         }
         this.setState({ loading: false });
       });
@@ -239,7 +269,7 @@ export default class IndexPage extends React.Component {
                           flex: 1,
                         }}
                       />
-                      <button onClick={this.loadFilesFromDropbox}>Go</button>
+                      <button onClick={this.loadDropboxLink}>Go</button>
                       <button onClick={this.newSong}>New Song</button>
                     </div>
                   ) : (
@@ -254,6 +284,7 @@ export default class IndexPage extends React.Component {
                 style={{
                   background: "#eee",
                   flex: 1,
+                  overflow: "scroll",
                 }}
               >
                 <SongList songs={songs} setSongId={this.setSongId} />
@@ -314,58 +345,13 @@ const LoadingIndicator = ({ loading }) => {
   );
 };
 
-const SongList = ({ setSongId, songs }) => {
-  // remove non-Chordpro files
-  let songId;
-  for (songId in songs) {
-    let song = songs[songId];
-    let filename = song.name;
-    if (
-      !filename.match(/.pro$/) &&
-      !filename.match(/.chopro$/) &&
-      !filename.match(/.crd$/) &&
-      !filename.match(/.chordpro$/) &&
-      !filename.match(/.cho$/) &&
-      !filename.match(/.txt$/)
-    ) {
-      delete songs[songId];
-    }
-  }
-
-  // sort by filename
-  // Array of [songId, filename] tuples
-  let aTuples = Object.keys(songs).map(songId => [songId, songs[songId].name]);
-  // sort the tuples
-  aTuples.sort(function(a, b) {
-    return a[1] > b[1];
-  });
-  // Array of sorted songIds
-  let aSongIds = aTuples.map(tuple => tuple[0]);
-
+const isChordProName = filename => {
   return (
-    <ol
-      style={{
-        listStyle: "none",
-        padding: 0,
-        margin: 0,
-      }}
-    >
-      {aSongIds.map(songId => (
-        <li
-          key={songId}
-          onClick={() => {
-            setSongId(songId);
-          }}
-          style={{
-            background: "#fff",
-            borderBottom: "1px solid #ccc",
-            cursor: "pointer",
-            padding: 10,
-          }}
-        >
-          {songs[songId].name}
-        </li>
-      ))}
-    </ol>
+    filename.match(/.pro$/) ||
+    filename.match(/.chopro$/) ||
+    filename.match(/.crd$/) ||
+    filename.match(/.chordpro$/) ||
+    filename.match(/.cho$/) ||
+    filename.match(/.txt$/)
   );
 };
