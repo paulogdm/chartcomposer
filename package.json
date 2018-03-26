@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next",
-    "build": "next build",
+    "dev": "DEV=DEV next",
+    "build": "build",
     "start": "next start"
   },
   "author": "Lindsey Simon <lindsey@quip.com> (https://quip.com/)",
