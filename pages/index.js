@@ -268,9 +268,10 @@ export default class IndexPage extends React.Component {
             >
               {songId ? (
                 <SongEditor
-                  value={chordPro[songId]}
                   onChange={this.onChange}
                   onSave={this.onSave}
+                  readOnly={songs[songId].sharing_info.read_only}
+                  value={chordPro[songId]}
                 />
               ) : null}
             </div>

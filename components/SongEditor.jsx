@@ -1,6 +1,6 @@
 import chordProParse from "../utils/chordProParse.js";
 
-const SongEditor = ({ value, onChange, onSave }) => {
+const SongEditor = ({ onChange, onSave, readOnly, value }) => {
   if (!value) {
     return null;
   }
@@ -12,35 +12,46 @@ const SongEditor = ({ value, onChange, onSave }) => {
           height: "100%",
         }}
       >
-		<div id={"songeditor"} style={{width: "40%"}}>
-	      <button
-			 onClick={onSave}
-			 style={{
-				     background: "#525",
-				     color: "#FFF"
-			       }}
-			 >
-			Save
-		  </button>
+        <div id={"songeditor"} style={{ width: "40%" }}>
+          {readOnly ? (
+            <div>read-only</div>
+          ) : (
+            <button
+              onClick={onSave}
+              style={{
+                background: "#525",
+                color: "#FFF",
+              }}
+            >
+              Save
+            </button>
+          )}
           <textarea
-			 value={value}
-			 onChange={onChange}
-			 style={{
-                     border: "none",
-                     width: "100%",
-                     height: "100%",
-                     padding: 0,
-			 }}
-			 />
-		</div>
-		<SongView value={value} />
+            value={value}
+            onChange={onChange}
+            readOnly={readOnly}
+            style={{
+              border: "none",
+              width: "100%",
+              height: "100%",
+              padding: 0,
+            }}
+          />
+        </div>
+        <SongView value={value} />
       </div>
     </div>
   );
 };
 
 const SongView = ({ value }) => {
-  return <div id={"songview"} style={{width: "60%"}} dangerouslySetInnerHTML={chordProParse(value)} />;
+  return (
+    <div
+      id={"songview"}
+      style={{ width: "60%" }}
+      dangerouslySetInnerHTML={chordProParse(value)}
+    />
+  );
 };
 
 export default SongEditor;
