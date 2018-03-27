@@ -87,7 +87,14 @@ export default class IndexPage extends React.Component {
           this.setState({ folders, closedFolders });
           this.loadFilesFromDropboxFolder(folderId);
         } else if (tag === "file") {
-          alert("todo");
+          const songId = response.id;
+          const songs = {
+            ...this.state.songs,
+            [songId]: {
+              ...response,
+            },
+          };
+          this.setState({ loading: false, songs });
         }
       })
       .catch(error => {
@@ -173,7 +180,7 @@ export default class IndexPage extends React.Component {
     this.dbx_
       .sharingGetSharedLinkFile({
         url: sharedLinkUrl,
-        path: `/${song.name}`,
+        path: song.sharing_info ? `/${song.name}` : null,
       })
       .then(async response => {
         const songChordPro = await blobToText(response.fileBinary);
@@ -202,13 +209,14 @@ export default class IndexPage extends React.Component {
     this.setState({ chordPro });
   };
 
-  onSave = song => {
+  onSave = () => {
     const { chordPro, songId, songs } = this.state;
     const songChordPro = chordPro[songId];
-    console.log("onSave", { songId, songChordPro });
+    const song = this.getSongById(songId);
+    console.log("onSave", { songId, song, songChordPro });
     let path;
     let bNewSong = false;
-    if (!this.getSongById(songId)) {
+    if (!song) {
       // this is a new song - not in Dropbox yet
       let songTitle = songChordPro.match(/{title:(.*?)}/)
         ? songChordPro.match(/{title:(.*?)}/)[1].trim()
@@ -241,6 +249,7 @@ export default class IndexPage extends React.Component {
       mode: { ".tag": "overwrite" },
       autorename: false,
     };
+    console.log({ filesCommitInfo });
     this.setState({ loading: true });
     this.dbx_
       .filesUpload(filesCommitInfo)
@@ -390,7 +399,7 @@ export default class IndexPage extends React.Component {
                 <SongEditor
                   onChange={this.onChange}
                   onSave={this.onSave}
-                  readOnly={song.sharing_info.read_only}
+                  readOnly={!song.path_lower}
                   value={chordPro[songId]}
                 />
               ) : null}

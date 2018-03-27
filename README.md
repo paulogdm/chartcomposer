@@ -11,8 +11,8 @@ yarn dev
 3)
 Go to http://localhost:3000/
 
-4)
+4) DEPLOY
 ```
-now --public
+now
 now alias [paste] chartcomposer.com
 ```

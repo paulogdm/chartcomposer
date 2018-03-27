@@ -1,4 +1,4 @@
-const { NOW_URL } = process.env;
+const { NODE_ENV } = process.env;
 import Router from "next/router";
 
 import Meta from "./Meta";
@@ -17,8 +17,9 @@ const { Sender, Receiver } = createOauthFlow({
   tokenUrl: "https://api.dropbox.com/oauth2/token",
   clientId: "mhwbhsacakthrrd",
   clientSecret: "h9wig47grq00igb",
-  redirectUri: NOW_URL
-    ? "https://chartcomposer.com/authreceiver"
-    : "http://localhost:3000/authreceiver",
+  redirectUri:
+    NODE_ENV == "development"
+      ? "http://localhost:3000/authreceiver"
+      : "https://chartcomposer.com/authreceiver",
 });
 export { Sender, Receiver };

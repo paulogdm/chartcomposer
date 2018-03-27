@@ -109,7 +109,7 @@ const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
           key={song.id}
           data-key={song.id}
           onClick={() => {
-            setSongId(song.id, folder.id);
+            setSongId(song.id, folder && folder.id);
           }}
           style={{
             background: "#fff",
