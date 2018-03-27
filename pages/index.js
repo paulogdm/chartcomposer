@@ -4,6 +4,7 @@ import dropbox from "../utils/Dropbox-sdk";
 import localforage from "localforage";
 import "whatwg-fetch";
 import blobToText from "../utils/blobToText";
+import _ from "lodash";
 
 import Page, { Sender, Receiver } from "../components/Page";
 import SongEditor from "../components/SongEditor.jsx";
@@ -17,7 +18,7 @@ export default class IndexPage extends React.Component {
       loading: false,
       sharedLinkUrl: "",
       folders: {},
-      openFolders: {},
+      closedFolders: {},
       songs: {},
       songId: null,
       chordPro: {},
@@ -35,8 +36,23 @@ export default class IndexPage extends React.Component {
         this.dbx_ = new Dropbox({ accessToken });
         if (window) {
           window.dbx = this.dbx_; // for console debugging
+          window.lodash = _;
         }
       }
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (!this.isNotFirstUpdate) {
+      this.isNotFirstUpdate = true;
+      return;
+    }
+    if (!_.isEqual(this.state.folders, nextState.folders)) {
+      const folders = nextState.folders;
+      localStorage.setItem("folders", JSON.stringify(nextState.folders));
+    }
+    if (!_.isEqual(this.state.songs, nextState.songs)) {
+      localStorage.setItem("songs", JSON.stringify(nextState.songs));
     }
   }
 
@@ -60,13 +76,15 @@ export default class IndexPage extends React.Component {
             ...this.state.folders,
             [folderId]: {
               ...response,
+              songs: {},
             },
           };
-          const openFolders = {
-            ...this.state.openFolders,
-            [folderId]: true,
+
+          const closedFolders = {
+            ...this.state.closedFolders,
+            [folderId]: false,
           };
-          this.setState({ folders, openFolders });
+          this.setState({ folders, closedFolders });
           this.loadFilesFromDropboxFolder(folderId);
         } else if (tag === "file") {
           alert("todo");
@@ -95,9 +113,10 @@ export default class IndexPage extends React.Component {
         console.log({ response });
         // Clear out the current songs because they are no longer accessible
         // when we switch to a new Dropbox folder.
-        let songs = this.state.folders[folderId].songs || {};
+        let songs = {};
         response.entries.forEach(entry => {
           if (entry[".tag"] === "file" && isChordProName(entry.name)) {
+            console.log("adding file", entry.name);
             songs[entry.id] = entry;
           }
         });
@@ -106,11 +125,13 @@ export default class IndexPage extends React.Component {
           ...this.state.folders,
           [folderId]: {
             ...this.state.folders[folderId],
-            songs,
+            songs: {
+              ...this.state.folders[folderId].songs,
+              ...songs,
+            },
           },
         };
         this.setState({ folders, sharedLinkUrl: "" });
-        localStorage.setItem("folders", JSON.stringify(folders));
       })
       .catch(error => {
         console.error({ error });
@@ -127,7 +148,6 @@ export default class IndexPage extends React.Component {
       [song.id]: song,
     };
     this.setState({ songs });
-    localStorage.setItem("songs", JSON.stringify(songs));
   };
 
   newSong = () => {
@@ -254,13 +274,18 @@ export default class IndexPage extends React.Component {
   }
 
   toggleFolderOpen = folderId => {
-    console.log("toggleFolderOpen", { folderId }, this.state.openFolders);
-    const openFolders = {
-      ...this.state.openFolders,
-      [folderId]: !this.state.openFolders[folderId],
+    console.log("toggleFolderOpen", { folderId }, this.state.closedFolders);
+    const closedFolders = {
+      ...this.state.closedFolders,
+      [folderId]: !this.state.closedFolders[folderId],
     };
-    console.log({ openFolders });
-    this.setState({ openFolders });
+    this.setState({ closedFolders });
+  };
+
+  removeFolder = folderId => {
+    let folders = { ...this.state.folders };
+    delete folders[folderId];
+    this.setState({ folders });
   };
 
   render() {
@@ -268,7 +293,7 @@ export default class IndexPage extends React.Component {
       chordPro,
       folders,
       loading,
-      openFolders,
+      closedFolders,
       sharedLinkUrl,
       songs,
       songId,
@@ -317,6 +342,11 @@ export default class IndexPage extends React.Component {
                             sharedLinkUrl: e.target.value,
                           })
                         }
+                        onKeyPress={e => {
+                          if (e.key === "Enter") {
+                            console.log(this.state.sharedLinkUrl);
+                          }
+                        }}
                         placeholder="Dropbox folder or song URL"
                         value={sharedLinkUrl}
                         style={{
@@ -343,7 +373,8 @@ export default class IndexPage extends React.Component {
               >
                 <SongList
                   folders={folders}
-                  openFolders={openFolders}
+                  closedFolders={closedFolders}
+                  removeFolder={this.removeFolder}
                   songs={songs}
                   songId={songId}
                   setSongId={this.setSongId}
