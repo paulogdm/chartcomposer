@@ -63,7 +63,7 @@ export default class IndexPage extends React.Component {
       return;
     }
 
-    this.setState({ loading: true, song: null, songId: null });
+    this.setState({ loading: true, songId: null });
 
     this.dbx_
       .sharingGetSharedLinkMetadata({ url })
@@ -92,8 +92,6 @@ export default class IndexPage extends React.Component {
       })
       .catch(error => {
         console.error({ error });
-      })
-      .finally(() => {
         this.setState({ loading: false });
       });
   };
@@ -163,15 +161,14 @@ export default class IndexPage extends React.Component {
   };
 
   setSongId = (songId, folderId) => {
+    if (this.state.songId === songId) {
+      this.setState({ songId: null });
+      return;
+    }
     const { folders, songs } = this.state;
     this.setState({ loading: true, songId });
     const song = this.getSongById(songId);
-    console.log("setSongId", {
-      songId,
-      song,
-      folderId,
-      folder: folders[folderId],
-    });
+    console.log("setSongId", { songId, folderId });
     const sharedLinkUrl = folderId ? folders[folderId].url : songs[songId].url;
     this.dbx_
       .sharingGetSharedLinkFile({
