@@ -1,29 +1,41 @@
 import chordProParse from "../utils/chordProParse.js";
 
-const SongEditor = ({ onChange, onSave, readOnly, value }) => {
+const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
   if (!value) {
     return null;
   }
   return (
-    <div style={{ position: "relative", height: "100%" }}>
+    <div
+      style={{
+        position: "relative",
+        height: "100%",
+      }}
+    >
       <div
         style={{
           display: "flex",
           height: "100%",
         }}
       >
-        <div id={"songeditor"} style={{ width: "40%" }}>
+        <div
+          id={"songeditor"}
+          style={{
+            borderRight: "1px solid #ccc",
+            width: "40%",
+          }}
+        >
           {readOnly ? (
             <div style={{ color: "red", marginBottom: 10 }}>READ ONLY</div>
           ) : (
             <button
+              disabled={saving}
               onClick={onSave}
               style={{
                 background: "#525",
                 color: "#FFF",
               }}
             >
-              Save
+              {saving ? "Saving ..." : "Save"}
             </button>
           )}
           <textarea
@@ -32,9 +44,10 @@ const SongEditor = ({ onChange, onSave, readOnly, value }) => {
             readOnly={readOnly}
             style={{
               border: "none",
-              width: "100%",
+              fontSize: 14,
               height: "100%",
               padding: 0,
+              width: "100%",
             }}
           />
         </div>

@@ -15,13 +15,15 @@ export default class IndexPage extends React.Component {
   constructor(props) {
     super();
     this.state = {
-      loading: false,
-      sharedLinkUrl: "",
-      folders: {},
-      closedFolders: {},
-      songs: {},
-      songId: null,
       chordPro: {},
+      closedFolders: {},
+      folders: {},
+      loading: false,
+      saving: false,
+      sharedLinkUrl: "",
+      sidebarClosed: false,
+      songId: null,
+      songs: {},
     };
     this.dbx_ = null;
   }
@@ -207,6 +209,11 @@ export default class IndexPage extends React.Component {
       [songId]: songChordPro,
     };
     this.setState({ chordPro });
+
+    if (this.saveTimeout_) {
+      clearTimeout(this.saveTimeout_);
+    }
+    this.saveTimeout_ = setTimeout(this.onSave, 1000);
   };
 
   onSave = () => {
@@ -250,7 +257,7 @@ export default class IndexPage extends React.Component {
       autorename: false,
     };
     console.log({ filesCommitInfo });
-    this.setState({ loading: true });
+    this.setState({ saving: true });
     this.dbx_
       .filesUpload(filesCommitInfo)
       .then(response => {
@@ -264,7 +271,7 @@ export default class IndexPage extends React.Component {
         if (bNewSong) {
           this.loadDropboxLink();
         }
-        this.setState({ loading: false });
+        this.setState({ saving: false });
       });
   };
 
@@ -288,6 +295,13 @@ export default class IndexPage extends React.Component {
     this.setState({ closedFolders });
   };
 
+  toggleSidebar = () => {
+    console.log("toggleSidebar");
+    this.setState({
+      sidebarClosed: !this.state.sidebarClosed,
+    });
+  };
+
   removeFolder = folderId => {
     let folders = { ...this.state.folders };
     delete folders[folderId];
@@ -300,7 +314,9 @@ export default class IndexPage extends React.Component {
       folders,
       loading,
       closedFolders,
+      saving,
       sharedLinkUrl,
+      sidebarClosed,
       songs,
       songId,
     } = this.state;
@@ -315,82 +331,126 @@ export default class IndexPage extends React.Component {
             height: "100vh",
           }}
         >
-          <h1 id={"titleheader"} style={{ padding: "20px 0 0 10px" }}>
-            ChartComposer
-          </h1>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <h1
+              id={"titleheader"}
+              style={{ fontSize: 20, margin: 0, padding: 10 }}
+            >
+              ChartComposer
+            </h1>
+            <div
+              style={{
+                padding: 10,
+              }}
+            >
+              {this.dbx_ ? (
+                <div
+                  style={{
+                    display: "flex",
+                  }}
+                >
+                  <input
+                    ref={el => (this.folderInput = el)}
+                    onChange={e =>
+                      this.setState({
+                        sharedLinkUrl: e.target.value,
+                      })
+                    }
+                    onKeyPress={e => {
+                      if (e.key === "Enter") {
+                        console.log(this.state.sharedLinkUrl);
+                      }
+                    }}
+                    placeholder="Dropbox folder or song URL"
+                    value={sharedLinkUrl}
+                    style={{
+                      flex: 1,
+                      fontSize: 14,
+                      maxWidth: 400,
+                      minWidth: 300,
+                    }}
+                  />
+                  <button onClick={this.loadDropboxLink}>Go</button>
+                  <button onClick={this.newSong}>New Song</button>
+                </div>
+              ) : (
+                <Sender
+                  state={{ to: "/" }}
+                  render={({ url }) => <a href={url}>Connect to Dropbox</a>}
+                />
+              )}
+            </div>
+          </div>
           <div style={{ display: "flex", flex: 1 }}>
             <div
               id={"songlist"}
               style={{
                 borderRight: "1px solid #ccc",
+                borderTop: "1px solid #ccc",
                 display: "flex",
                 flexDirection: "column",
-                width: "300px",
+                width: sidebarClosed ? null : "300px",
               }}
             >
-              <div>
-                <div
-                  style={{
-                    borderTop: "1px solid #ccc",
-                    padding: 10,
-                  }}
-                >
-                  {this.dbx_ ? (
-                    <div
-                      style={{
-                        display: "flex",
-                      }}
-                    >
-                      <input
-                        ref={el => (this.folderInput = el)}
-                        onChange={e =>
-                          this.setState({
-                            sharedLinkUrl: e.target.value,
-                          })
-                        }
-                        onKeyPress={e => {
-                          if (e.key === "Enter") {
-                            console.log(this.state.sharedLinkUrl);
-                          }
-                        }}
-                        placeholder="Dropbox folder or song URL"
-                        value={sharedLinkUrl}
-                        style={{
-                          flex: 1,
-                        }}
-                      />
-                      <button onClick={this.loadDropboxLink}>Go</button>
-                      <button onClick={this.newSong}>New Song</button>
-                    </div>
-                  ) : (
-                    <Sender
-                      state={{ to: "/" }}
-                      render={({ url }) => <a href={url}>Connect to Dropbox</a>}
-                    />
-                  )}
-                </div>
-              </div>
               <div
                 style={{
-                  background: "#eee",
-                  flex: 1,
-                  overflow: "scroll",
+                  color: "#666",
+                  fontWeight: 600,
                 }}
               >
-                <SongList
-                  folders={folders}
-                  closedFolders={closedFolders}
-                  removeFolder={this.removeFolder}
-                  songs={songs}
-                  songId={songId}
-                  setSongId={this.setSongId}
-                  toggleFolderOpen={this.toggleFolderOpen}
-                />
+                {sidebarClosed ? (
+                  <div
+                    onClick={this.toggleSidebar}
+                    style={{ cursor: "pointer", padding: 10 }}
+                  >
+                    ♫
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div style={{ padding: 10 }}>♫ Songs</div>
+                    <div
+                      onClick={this.toggleSidebar}
+                      style={{ cursor: "pointer", padding: 10 }}
+                    >
+                      ←
+                    </div>
+                  </div>
+                )}
               </div>
+              {sidebarClosed ? null : (
+                <div
+                  style={{
+                    background: "#eee",
+                    flex: 1,
+                    overflow: "auto",
+                  }}
+                >
+                  <SongList
+                    folders={folders}
+                    closedFolders={closedFolders}
+                    removeFolder={this.removeFolder}
+                    songs={songs}
+                    songId={songId}
+                    setSongId={this.setSongId}
+                    toggleFolderOpen={this.toggleFolderOpen}
+                  />
+                </div>
+              )}
             </div>
             <div
               style={{
                 background: "#fff",
+                borderTop: "1px solid #ccc",
                 padding: 10,
                 flex: 1,
               }}
@@ -400,6 +460,7 @@ export default class IndexPage extends React.Component {
                   onChange={this.onChange}
                   onSave={this.onSave}
                   readOnly={!song.path_lower}
+                  saving={saving}
                   value={chordPro[songId]}
                 />
               ) : null}
