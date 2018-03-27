@@ -16,6 +16,8 @@ export default class IndexPage extends React.Component {
     this.state = {
       loading: false,
       sharedLinkUrl: "",
+      folders: {},
+      openFolders: {},
       songs: {},
       songId: null,
       chordPro: {},
@@ -26,9 +28,8 @@ export default class IndexPage extends React.Component {
   componentDidMount() {
     if (localStorage) {
       const songs = JSON.parse(localStorage.getItem("songs") || "{}");
-      const sharedLinkUrl =
-        localStorage.getItem("shared-link-url") || this.state.sharedLinkUrl;
-      this.setState({ sharedLinkUrl, songs });
+      const folders = JSON.parse(localStorage.getItem("folders") || "{}");
+      this.setState({ folders, songs });
       const accessToken = localStorage.getItem("db-access-token");
       if (accessToken) {
         this.dbx_ = new Dropbox({ accessToken });
@@ -45,8 +46,7 @@ export default class IndexPage extends React.Component {
     if (!url) {
       return;
     }
-    localStorage.setItem("shared-link-url", url); // save the most recent folder
-    // clear out current song in editor
+
     this.setState({ loading: true, song: null, songId: null });
 
     this.dbx_
@@ -55,7 +55,19 @@ export default class IndexPage extends React.Component {
         console.log({ response });
         const tag = response[".tag"];
         if (tag === "folder") {
-          this.loadFilesFromDropboxFolder();
+          const folderId = response.id;
+          const folders = {
+            ...this.state.folders,
+            [folderId]: {
+              ...response,
+            },
+          };
+          const openFolders = {
+            ...this.state.openFolders,
+            [folderId]: true,
+          };
+          this.setState({ folders, openFolders });
+          this.loadFilesFromDropboxFolder(folderId);
         } else if (tag === "file") {
           alert("todo");
         }
@@ -68,9 +80,9 @@ export default class IndexPage extends React.Component {
       });
   };
 
-  loadFilesFromDropboxFolder = () => {
+  loadFilesFromDropboxFolder = folderId => {
     const url = this.folderInput.value;
-    console.log({ url });
+    console.log("loadFilesFromDropboxFolder", { url });
     if (!url) {
       return;
     }
@@ -83,15 +95,22 @@ export default class IndexPage extends React.Component {
         console.log({ response });
         // Clear out the current songs because they are no longer accessible
         // when we switch to a new Dropbox folder.
-        let songs = {};
+        let songs = this.state.folders[folderId].songs || {};
         response.entries.forEach(entry => {
           if (entry[".tag"] === "file" && isChordProName(entry.name)) {
             songs[entry.id] = entry;
           }
         });
         console.log({ songs });
-        this.setState({ songs });
-        localStorage.setItem("songs", JSON.stringify(songs));
+        const folders = {
+          ...this.state.folders,
+          [folderId]: {
+            ...this.state.folders[folderId],
+            songs,
+          },
+        };
+        this.setState({ folders, sharedLinkUrl: "" });
+        localStorage.setItem("folders", JSON.stringify(folders));
       })
       .catch(error => {
         console.error({ error });
@@ -123,11 +142,17 @@ export default class IndexPage extends React.Component {
     this.setState({ chordPro, loading: false });
   };
 
-  setSongId = songId => {
-    const { sharedLinkUrl, songs } = this.state;
-    console.log("setSongId", songId);
+  setSongId = (songId, folderId) => {
+    const { folders, songs } = this.state;
     this.setState({ loading: true, songId });
-    const song = songs[songId];
+    const song = this.getSongById(songId);
+    console.log("setSongId", {
+      songId,
+      song,
+      folderId,
+      folder: folders[folderId],
+    });
+    const sharedLinkUrl = folderId ? folders[folderId].url : songs[songId].url;
     this.dbx_
       .sharingGetSharedLinkFile({
         url: sharedLinkUrl,
@@ -163,10 +188,10 @@ export default class IndexPage extends React.Component {
   onSave = song => {
     const { chordPro, songId, songs } = this.state;
     const songChordPro = chordPro[songId];
-    console.log("onSave", songId, songChordPro);
+    console.log("onSave", { songId, songChordPro });
     let path;
     let bNewSong = false;
-    if (!songs[songId]) {
+    if (!this.getSongById(songId)) {
       // this is a new song - not in Dropbox yet
       let songTitle = songChordPro.match(/{title:(.*?)}/)
         ? songChordPro.match(/{title:(.*?)}/)[1].trim()
@@ -174,7 +199,7 @@ export default class IndexPage extends React.Component {
       let filename = songTitle.toLowerCase().replace(" ", "_") + ".pro";
       // We need the current path so we borrow it from an existing song - this is pretty hacky
       for (let tmpId in songs) {
-        let tmpSong = songs[tmpId];
+        let tmpSong = this.getSongById(tmpId);
         if (tmpSong.path_lower) {
           path =
             tmpSong.path_lower.substring(
@@ -191,11 +216,11 @@ export default class IndexPage extends React.Component {
         console.log("ERROR: Could not find song path_lower.");
       }
     } else {
-      path = songs[songId].path_lower;
+      path = song.path_lower;
     }
     const filesCommitInfo = {
       contents: songChordPro,
-      path: path,
+      path,
       mode: { ".tag": "overwrite" },
       autorename: false,
     };
@@ -217,9 +242,38 @@ export default class IndexPage extends React.Component {
       });
   };
 
+  getSongById(songId) {
+    const { folders, songs } = this.state;
+    const folderIds = Object.keys(folders);
+    for (var i = 0, folderId; (folderId = folderIds[i]); i++) {
+      if (folders[folderId].songs && folders[folderId].songs[songId]) {
+        return folders[folderId].songs[songId];
+      }
+    }
+    return songs[songId];
+  }
+
+  toggleFolderOpen = folderId => {
+    console.log("toggleFolderOpen", { folderId }, this.state.openFolders);
+    const openFolders = {
+      ...this.state.openFolders,
+      [folderId]: !this.state.openFolders[folderId],
+    };
+    console.log({ openFolders });
+    this.setState({ openFolders });
+  };
+
   render() {
-    const { chordPro, loading, sharedLinkUrl, songs, songId } = this.state;
-    const song = songs[songId];
+    const {
+      chordPro,
+      folders,
+      loading,
+      openFolders,
+      sharedLinkUrl,
+      songs,
+      songId,
+    } = this.state;
+    const song = this.getSongById(songId);
     return (
       <Page>
         <LoadingIndicator loading={loading} />
@@ -287,7 +341,14 @@ export default class IndexPage extends React.Component {
                   overflow: "scroll",
                 }}
               >
-                <SongList songs={songs} setSongId={this.setSongId} />
+                <SongList
+                  folders={folders}
+                  openFolders={openFolders}
+                  songs={songs}
+                  songId={songId}
+                  setSongId={this.setSongId}
+                  toggleFolderOpen={this.toggleFolderOpen}
+                />
               </div>
             </div>
             <div
@@ -301,7 +362,7 @@ export default class IndexPage extends React.Component {
                 <SongEditor
                   onChange={this.onChange}
                   onSave={this.onSave}
-                  readOnly={songs[songId].sharing_info.read_only}
+                  readOnly={song.sharing_info.read_only}
                   value={chordPro[songId]}
                 />
               ) : null}
