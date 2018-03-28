@@ -1,14 +1,13 @@
-import ChordProJS from "chordprojs";
 import React from "react";
 import dropbox from "../utils/Dropbox-sdk";
 import localforage from "localforage";
 import "whatwg-fetch";
-import blobToText from "../utils/blobToText";
 import _ from "lodash";
 
 import Page, { Sender, Receiver } from "../components/Page";
 import SongEditor from "../components/SongEditor.jsx";
 import SongList from "../components/SongList.jsx";
+import blobToText from "../utils/blobToText";
 
 const Dropbox = dropbox.Dropbox;
 export default class IndexPage extends React.Component {
@@ -37,7 +36,8 @@ export default class IndexPage extends React.Component {
       if (accessToken) {
         this.dbx_ = new Dropbox({ accessToken });
         if (window) {
-          window.dbx = this.dbx_; // for console debugging
+          // for console debugging
+          window.dbx = this.dbx_;
           window.lodash = _;
         }
       }

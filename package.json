@@ -1,20 +1,18 @@
 {
   "name": "chartcomposer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "DEV=DEV next",
+    "dev": "next",
     "build": "next build",
     "start": "next start"
   },
-  "author": "Lindsey Simon <lindsey@quip.com> (https://quip.com/)",
+  "author": "Lindsey Simon <elsigh@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "chordprojs": "^0.1",
     "create-next": "^0.1.4",
     "dropbox": "^4.0.1",
-    "isomorphic-fetch": "^2.2.1",
     "localforage": "^1.6.0",
     "lodash": "^4.17.5",
     "next": "^5.1.0",
@@ -24,7 +22,5 @@
     "react-oauth-flow": "^1.1.0",
     "whatwg-fetch": "^2.0.3"
   },
-  "devDependencies": {
-    "dotenv": "^5.0.1"
-  }
+  "devDependencies": {}
 }

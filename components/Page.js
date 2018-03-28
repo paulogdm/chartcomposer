@@ -1,11 +1,11 @@
-import secrets from "../secrets.json";
-import Router from "next/router";
+import getConfig from "next/config";
+import { createOauthFlow } from "react-oauth-flow";
 
 import Meta from "./Meta";
 import Footer from "./Footer";
-import { createOauthFlow } from "react-oauth-flow";
 
-const { NODE_ENV } = process.env;
+const { publicRuntimeConfig } = getConfig();
+const { DROPBOX_APP_KEY, DROPBOX_APP_SECRET, IS_DEV } = publicRuntimeConfig;
 
 export default ({ children }) => (
   <div>
@@ -17,11 +17,10 @@ export default ({ children }) => (
 const { Sender, Receiver } = createOauthFlow({
   authorizeUrl: "https://www.dropbox.com/oauth2/authorize",
   tokenUrl: "https://api.dropbox.com/oauth2/token",
-  clientId: secrets.DROPBOX_APP_KEY,
-  clientSecret: secrets.DROPBOX_APP_SECRET,
-  redirectUri:
-    NODE_ENV == "development"
-      ? "http://localhost:3000/authreceiver"
-      : "https://chartcomposer.com/authreceiver",
+  clientId: DROPBOX_APP_KEY,
+  clientSecret: DROPBOX_APP_SECRET,
+  redirectUri: IS_DEV
+    ? "http://localhost:3000/authreceiver"
+    : "https://chartcomposer.com/authreceiver",
 });
 export { Sender, Receiver };
