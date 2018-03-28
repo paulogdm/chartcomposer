@@ -308,6 +308,10 @@ export default class IndexPage extends React.Component {
     this.setState({ folders });
   };
 
+  signOut = () => {
+    localStorage.clear();
+  };
+
   render() {
     const {
       chordPro,
@@ -351,6 +355,7 @@ export default class IndexPage extends React.Component {
               {this.dbx_ ? (
                 <div
                   style={{
+                    alignItems: "center",
                     display: "flex",
                   }}
                 >
@@ -377,11 +382,18 @@ export default class IndexPage extends React.Component {
                   />
                   <button onClick={this.loadDropboxLink}>Go</button>
                   <button onClick={this.newSong}>New Song</button>
+                  <a
+                    href="/"
+                    onClick={this.signOut}
+                    style={{ paddingLeft: 10 }}
+                  >
+                    Sign out
+                  </a>
                 </div>
               ) : (
                 <Sender
                   state={{ to: "/" }}
-                  render={({ url }) => <a href={url}>Connect to Dropbox</a>}
+                  render={({ url }) => <a href={url}>Sign in to Dropbox</a>}
                 />
               )}
             </div>
