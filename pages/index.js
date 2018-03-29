@@ -182,7 +182,7 @@ export default class IndexPage extends React.Component {
     this.dbx_
       .sharingGetSharedLinkFile({
         url: sharedLinkUrl,
-        path: song.sharing_info ? `/${song.name}` : null,
+        path: song[".tag"] === "file" ? `/${song.name}` : null,
       })
       .then(async response => {
         const songChordPro = await blobToText(response.fileBinary);
