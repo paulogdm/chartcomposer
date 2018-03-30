@@ -4,12 +4,18 @@ import localforage from "localforage";
 import "whatwg-fetch";
 import _ from "lodash";
 
+import LoadingIndicator from "../components/LoadingIndicator";
 import Page, { Sender, Receiver } from "../components/Page";
-import SongEditor from "../components/SongEditor.jsx";
-import SongList from "../components/SongList.jsx";
+import Preferences, { defaultPreferences } from "../components/Preferences";
+import SongEditor from "../components/SongEditor";
+import SongList from "../components/SongList";
+import UserMenu from "../components/UserMenu";
 import blobToText from "../utils/blobToText";
+import isChordProFileName from "../utils/isChordProFileName";
 
 const Dropbox = dropbox.Dropbox;
+const PREFERENCES_PATH = "/.ChartComposer-preferences.json";
+
 export default class IndexPage extends React.Component {
   constructor(props) {
     super();
@@ -18,28 +24,45 @@ export default class IndexPage extends React.Component {
       closedFolders: {},
       folders: {},
       loading: false,
+      preferences: defaultPreferences,
+      preferencesOpen: false,
       saving: false,
       sharedLinkUrl: "",
       sidebarClosed: false,
       songId: null,
       songs: {},
+      user: {},
     };
-    this.dbx_ = null;
+    this.dbx = null;
   }
 
   componentDidMount() {
     if (localStorage) {
       const songs = JSON.parse(localStorage.getItem("songs") || "{}");
       const folders = JSON.parse(localStorage.getItem("folders") || "{}");
-      this.setState({ folders, songs });
+
+      let preferences = { ...this.state.preferences };
+      const localPreferences = localStorage.getItem("preferences");
+      if (localPreferences) {
+        preferences = localPreferences;
+      }
+
+      this.setState({ folders, preferences, songs });
       const accessToken = localStorage.getItem("db-access-token");
       if (accessToken) {
-        this.dbx_ = new Dropbox({ accessToken });
+        this.dbx = new Dropbox({ accessToken });
         if (window) {
           // for console debugging
-          window.dbx = this.dbx_;
+          window.dbx = this.dbx;
           window.lodash = _;
         }
+        this.dbx.usersGetCurrentAccount().then(user => {
+          console.log({ user });
+          this.setState({ user });
+        });
+
+        // Always try to load the latest user preferences file as well.
+        this.getPreferencesFromDropbox();
       }
     }
   }
@@ -56,7 +79,27 @@ export default class IndexPage extends React.Component {
     if (!_.isEqual(this.state.songs, nextState.songs)) {
       localStorage.setItem("songs", JSON.stringify(nextState.songs));
     }
+    if (!_.isEqual(this.state.preferences, nextState.preferences)) {
+      localStorage.setItem(
+        "preferences",
+        JSON.stringify(nextState.preferences),
+      );
+    }
   }
+
+  getPreferencesFromDropbox = () => {
+    this.dbx
+      .filesDownload({ path: PREFERENCES_PATH })
+      .then(async response => {
+        const preferencesStr = await blobToText(response.fileBinary);
+        const preferences = JSON.parse(preferencesStr);
+        this.setState({ preferences });
+        console.log({ preferences });
+      })
+      .catch(error => {
+        console.error("Error loading preferences", { error });
+      });
+  };
 
   loadDropboxLink = () => {
     const url = this.folderInput.value;
@@ -67,7 +110,7 @@ export default class IndexPage extends React.Component {
 
     this.setState({ loading: true, songId: null });
 
-    this.dbx_
+    this.dbx
       .sharingGetSharedLinkMetadata({ url })
       .then(response => {
         console.log({ response });
@@ -114,7 +157,7 @@ export default class IndexPage extends React.Component {
     // clear out current song in editor
     this.setState({ loading: true, song: null, songId: null });
 
-    this.dbx_
+    this.dbx
       .filesListFolder({ path: "", shared_link: { url } })
       .then(response => {
         console.log({ response });
@@ -122,7 +165,7 @@ export default class IndexPage extends React.Component {
         // when we switch to a new Dropbox folder.
         let songs = {};
         response.entries.forEach(entry => {
-          if (entry[".tag"] === "file" && isChordProName(entry.name)) {
+          if (entry[".tag"] === "file" && isChordProFileName(entry.name)) {
             console.log("adding file", entry.name);
             songs[entry.id] = entry;
           }
@@ -179,7 +222,7 @@ export default class IndexPage extends React.Component {
     const song = this.getSongById(songId);
     console.log("setSongId", { songId, folderId });
     const sharedLinkUrl = folderId ? folders[folderId].url : songs[songId].url;
-    this.dbx_
+    this.dbx
       .sharingGetSharedLinkFile({
         url: sharedLinkUrl,
         path: song[".tag"] === "file" ? `/${song.name}` : null,
@@ -258,7 +301,7 @@ export default class IndexPage extends React.Component {
     };
     console.log({ filesCommitInfo });
     this.setState({ saving: true });
-    this.dbx_
+    this.dbx
       .filesUpload(filesCommitInfo)
       .then(response => {
         console.log({ response });
@@ -295,8 +338,8 @@ export default class IndexPage extends React.Component {
     this.setState({ closedFolders });
   };
 
-  toggleSidebar = () => {
-    console.log("toggleSidebar");
+  toggleSidebarClosed = () => {
+    console.log("toggleSidebarClosed");
     this.setState({
       sidebarClosed: !this.state.sidebarClosed,
     });
@@ -308,8 +351,37 @@ export default class IndexPage extends React.Component {
     this.setState({ folders });
   };
 
+  togglePreferencesOpen = () => {
+    this.setState({ preferencesOpen: !this.state.preferencesOpen });
+  };
+
+  updatePreferences = preferences => {
+    const filesCommitInfo = {
+      contents: JSON.stringify(preferences),
+      path: PREFERENCES_PATH,
+      mode: { ".tag": "overwrite" },
+      autorename: false,
+    };
+    console.log("updatePreferences", { filesCommitInfo });
+    this.setState({ loading: true });
+    this.dbx
+      .filesUpload(filesCommitInfo)
+      .then(response => {
+        console.log({ response });
+        this.setState({ preferences });
+        console.log("SAVED PREFERENCES!");
+      })
+      .catch(error => {
+        console.error({ error });
+      })
+      .finally(() => {
+        this.setState({ loading: false });
+      });
+  };
+
   signOut = () => {
     localStorage.clear();
+    window.location.href = "/";
   };
 
   render() {
@@ -318,16 +390,34 @@ export default class IndexPage extends React.Component {
       folders,
       loading,
       closedFolders,
+      preferences,
+      preferencesOpen,
       saving,
       sharedLinkUrl,
       sidebarClosed,
       songs,
       songId,
+      user,
     } = this.state;
     const song = this.getSongById(songId);
     return (
       <Page>
-        <LoadingIndicator loading={loading} />
+        <style jsx>{`
+          @media print {
+            .header,
+            .songlist {
+              display: none !important;
+            }
+          }
+        `}</style>
+        {loading ? <LoadingIndicator /> : null}
+        {preferencesOpen ? (
+          <Preferences
+            preferences={preferences}
+            togglePreferencesOpen={this.togglePreferencesOpen}
+            updatePreferences={this.updatePreferences}
+          />
+        ) : null}
         <div
           style={{
             display: "flex",
@@ -336,14 +426,15 @@ export default class IndexPage extends React.Component {
           }}
         >
           <div
+            className="header"
             style={{
+              alignItems: "center",
               display: "flex",
               justifyContent: "space-between",
             }}
           >
             <h1
-              id={"titleheader"}
-              style={{ fontSize: 20, margin: 0, padding: 10 }}
+              style={{ fontSize: 20, margin: 0, padding: 0, paddingLeft: 10 }}
             >
               ChartComposer
             </h1>
@@ -352,7 +443,7 @@ export default class IndexPage extends React.Component {
                 padding: 10,
               }}
             >
-              {this.dbx_ ? (
+              {this.dbx ? (
                 <div
                   style={{
                     alignItems: "center",
@@ -368,7 +459,7 @@ export default class IndexPage extends React.Component {
                     }
                     onKeyPress={e => {
                       if (e.key === "Enter") {
-                        console.log(this.state.sharedLinkUrl);
+                        this.loadDropboxLink();
                       }
                     }}
                     placeholder="Dropbox folder or song URL"
@@ -382,13 +473,13 @@ export default class IndexPage extends React.Component {
                   />
                   <button onClick={this.loadDropboxLink}>Go</button>
                   <button onClick={this.newSong}>New Song</button>
-                  <a
-                    href="/"
-                    onClick={this.signOut}
-                    style={{ paddingLeft: 10 }}
-                  >
-                    Sign out
-                  </a>
+                  <div style={{ paddingLeft: 10 }}>
+                    <UserMenu
+                      user={user}
+                      signOut={this.signOut}
+                      togglePreferencesOpen={this.togglePreferencesOpen}
+                    />
+                  </div>
                 </div>
               ) : (
                 <Sender
@@ -400,7 +491,7 @@ export default class IndexPage extends React.Component {
           </div>
           <div style={{ display: "flex", flex: 1 }}>
             <div
-              id={"songlist"}
+              className="songlist"
               style={{
                 borderRight: "1px solid #ccc",
                 borderTop: "1px solid #ccc",
@@ -417,10 +508,10 @@ export default class IndexPage extends React.Component {
               >
                 {sidebarClosed ? (
                   <div
-                    onClick={this.toggleSidebar}
+                    onClick={this.toggleSidebarClosed}
                     style={{ cursor: "pointer", padding: 10 }}
                   >
-                    ♫
+                    ♫ ►
                   </div>
                 ) : (
                   <div
@@ -431,10 +522,10 @@ export default class IndexPage extends React.Component {
                   >
                     <div style={{ padding: 10 }}>♫ Songs</div>
                     <div
-                      onClick={this.toggleSidebar}
+                      onClick={this.toggleSidebarClosed}
                       style={{ cursor: "pointer", padding: 10 }}
                     >
-                      ←
+                      ◀
                     </div>
                   </div>
                 )}
@@ -463,7 +554,6 @@ export default class IndexPage extends React.Component {
               style={{
                 background: "#fff",
                 borderTop: "1px solid #ccc",
-                padding: 10,
                 flex: 1,
               }}
             >
@@ -471,6 +561,7 @@ export default class IndexPage extends React.Component {
                 <SongEditor
                   onChange={this.onChange}
                   onSave={this.onSave}
+                  preferences={preferences}
                   readOnly={!song.path_lower}
                   saving={saving}
                   value={chordPro[songId]}
@@ -483,46 +574,3 @@ export default class IndexPage extends React.Component {
     );
   }
 }
-
-const LoadingIndicator = ({ loading }) => {
-  return (
-    <div
-      style={{
-        background: "#eee",
-        display: loading ? "block" : "none",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        opacity: 0.7,
-        bottom: 0,
-        zIndex: 2,
-      }}
-    >
-      <div
-        style={{
-          background: "orange",
-          position: "fixed",
-          left: "50%",
-          top: "50%",
-          padding: "50px 100px",
-          color: "#000",
-          transform: "translate3d(-50%, -50%, 0)",
-        }}
-      >
-        Loading ...
-      </div>
-    </div>
-  );
-};
-
-const isChordProName = filename => {
-  return (
-    filename.match(/.pro$/) ||
-    filename.match(/.chopro$/) ||
-    filename.match(/.crd$/) ||
-    filename.match(/.chordpro$/) ||
-    filename.match(/.cho$/) ||
-    filename.match(/.txt$/)
-  );
-};
