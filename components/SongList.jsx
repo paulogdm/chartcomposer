@@ -44,27 +44,30 @@ const SongFolder = ({
   return (
     <div>
       <div
+        onClick={() => {
+          toggleFolderOpen(folder.id);
+        }}
         style={{
           alignItems: "center",
+          borderBottom: "1px solid #ccc",
+          borderTop: "1px solid #ccc",
+          cursor: "pointer",
           display: "flex",
           fontWeight: "bold",
-          padding: 10,
+          paddingLeft: 10,
         }}
+        title="Toggle folder"
       >
-        <div
-          onClick={() => {
-            toggleFolderOpen(folder.id);
-          }}
-          style={{ cursor: "pointer", marginRight: 5 }}
-        >
-          📁
-        </div>
+        <div style={{ marginRight: 5 }}>📁</div>
         <div style={{ flex: 1 }}>{folder.name}</div>
         <div
-          onClick={() => {
-            removeFolder(folder.id);
+          onClick={e => {
+            e.stopPropagation();
+            if (confirm("Remove this folder?")) {
+              removeFolder(folder.id);
+            }
           }}
-          style={{ cursor: "pointer", padding: 10 }}
+          style={{ padding: 10 }}
           title="Remove folder"
         >
           ×
