@@ -5,7 +5,7 @@
 2)
 ```
 yarn install
-yarn dev
+dev.sh
 ```
 
 3)
@@ -13,6 +13,6 @@ Go to http://localhost:3000/
 
 4) DEPLOY
 ```
-now
+deploy.sh
 now alias [paste] chartcomposer.com
 ```
