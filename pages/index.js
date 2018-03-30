@@ -73,6 +73,12 @@ export default class IndexPage extends React.Component {
     if (!_.isEqual(this.state.songs, nextState.songs)) {
       localStorage.setItem("songs", JSON.stringify(nextState.songs));
     }
+    if (!_.isEqual(this.state.preferences, nextState.preferences)) {
+      localStorage.setItem(
+        "preferences",
+        JSON.stringify(nextState.preferences),
+      );
+    }
   }
 
   loadDropboxLink = () => {
@@ -519,7 +525,6 @@ export default class IndexPage extends React.Component {
               style={{
                 background: "#fff",
                 borderTop: "1px solid #ccc",
-                padding: 10,
                 flex: 1,
               }}
             >
