@@ -69,7 +69,7 @@ const LoadingIndicator = () => {
           }}
         >
           {notes.map((note, i) => (
-            <li className={`note-${i}`} key={note}>
+            <li className={`note-${i}`} key={i}>
               {note}
             </li>
           ))}

@@ -54,7 +54,7 @@ export default class UserMenu extends React.Component {
           <img
             alt=""
             src={user.profile_photo_url}
-            style={{ borderRadius: "50%", width: 20, height: 20 }}
+            style={{ borderRadius: "50%", width: 30, height: 30 }}
           />
         </div>
         {isOpen ? (

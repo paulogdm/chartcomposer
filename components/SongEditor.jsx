@@ -11,6 +11,16 @@ const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
         height: "100%",
       }}
     >
+      <style jsx>{`
+        @media print {
+          .songeditor {
+            display: none !important;
+          }
+          .songview {
+            width: 100% !important;
+          }
+        }
+      `}</style>
       <div
         style={{
           display: "flex",
@@ -18,7 +28,7 @@ const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
         }}
       >
         <div
-          id={"songeditor"}
+          className="songeditor"
           style={{
             borderRight: "1px solid #ccc",
             display: "flex",
@@ -55,12 +65,14 @@ const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
                 fontSize: 14,
                 height: "100%",
                 padding: 0,
+                paddingRight: 10,
                 width: "100%",
               }}
             />
           </div>
         </div>
         <div
+          className="songview"
           style={{
             height: "100%",
             overflow: "auto",
@@ -76,7 +88,7 @@ const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
 };
 
 const SongView = ({ value }) => {
-  return <div id={"songview"} dangerouslySetInnerHTML={chordProParse(value)} />;
+  return <div dangerouslySetInnerHTML={chordProParse(value)} />;
 };
 
 export default SongEditor;

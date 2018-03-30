@@ -11,6 +11,7 @@ import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
 import UserMenu from "../components/UserMenu";
 import blobToText from "../utils/blobToText";
+import isChordProFileName from "../utils/isChordProFileName";
 
 const Dropbox = dropbox.Dropbox;
 export default class IndexPage extends React.Component {
@@ -145,7 +146,7 @@ export default class IndexPage extends React.Component {
         // when we switch to a new Dropbox folder.
         let songs = {};
         response.entries.forEach(entry => {
-          if (entry[".tag"] === "file" && isChordProName(entry.name)) {
+          if (entry[".tag"] === "file" && isChordProFileName(entry.name)) {
             console.log("adding file", entry.name);
             songs[entry.id] = entry;
           }
@@ -382,6 +383,14 @@ export default class IndexPage extends React.Component {
     const song = this.getSongById(songId);
     return (
       <Page>
+        <style jsx>{`
+          @media print {
+            .header,
+            .songlist {
+              display: none !important;
+            }
+          }
+        `}</style>
         {loading ? <LoadingIndicator /> : null}
         {preferencesOpen ? (
           <Preferences
@@ -398,14 +407,15 @@ export default class IndexPage extends React.Component {
           }}
         >
           <div
+            className="header"
             style={{
+              alignItems: "center",
               display: "flex",
               justifyContent: "space-between",
             }}
           >
             <h1
-              id={"titleheader"}
-              style={{ fontSize: 20, margin: 0, padding: 10 }}
+              style={{ fontSize: 20, margin: 0, padding: 0, paddingLeft: 10 }}
             >
               ChartComposer
             </h1>
@@ -462,7 +472,7 @@ export default class IndexPage extends React.Component {
           </div>
           <div style={{ display: "flex", flex: 1 }}>
             <div
-              id={"songlist"}
+              className="songlist"
               style={{
                 borderRight: "1px solid #ccc",
                 borderTop: "1px solid #ccc",
@@ -545,14 +555,3 @@ export default class IndexPage extends React.Component {
     );
   }
 }
-
-const isChordProName = filename => {
-  return (
-    filename.match(/.pro$/) ||
-    filename.match(/.chopro$/) ||
-    filename.match(/.crd$/) ||
-    filename.match(/.chordpro$/) ||
-    filename.match(/.cho$/) ||
-    filename.match(/.txt$/)
-  );
-};
