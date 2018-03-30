@@ -14,6 +14,8 @@ import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 
 const Dropbox = dropbox.Dropbox;
+const PREFERENCES_PATH = "/.ChartComposer-preferences.json";
+
 export default class IndexPage extends React.Component {
   constructor(props) {
     super();
@@ -58,6 +60,9 @@ export default class IndexPage extends React.Component {
           console.log({ user });
           this.setState({ user });
         });
+
+        // Always try to load the latest user preferences file as well.
+        this.getPreferencesFromDropbox();
       }
     }
   }
@@ -81,6 +86,20 @@ export default class IndexPage extends React.Component {
       );
     }
   }
+
+  getPreferencesFromDropbox = () => {
+    this.dbx
+      .filesDownload({ path: PREFERENCES_PATH })
+      .then(async response => {
+        const preferencesStr = await blobToText(response.fileBinary);
+        const preferences = JSON.parse(preferencesStr);
+        this.setState({ preferences });
+        console.log({ preferences });
+      })
+      .catch(error => {
+        console.error("Error loading preferences", { error });
+      });
+  };
 
   loadDropboxLink = () => {
     const url = this.folderInput.value;
@@ -339,7 +358,7 @@ export default class IndexPage extends React.Component {
   updatePreferences = preferences => {
     const filesCommitInfo = {
       contents: JSON.stringify(preferences),
-      path: "/.ChartComposer-preferences.json",
+      path: PREFERENCES_PATH,
       mode: { ".tag": "overwrite" },
       autorename: false,
     };
