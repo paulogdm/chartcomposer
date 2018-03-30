@@ -2,6 +2,12 @@ import React from "react";
 
 import Background from "./Background";
 
+export const defaultPreferences = {
+  color: "Red",
+  songs: {},
+  folders: {},
+};
+
 export default class Preferences extends React.Component {
   constructor(props) {
     super();
@@ -87,7 +93,3 @@ export default class Preferences extends React.Component {
     );
   }
 }
-
-export const defaultPreferences = {
-  color: "Red",
-};

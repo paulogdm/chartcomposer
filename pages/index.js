@@ -62,7 +62,7 @@ export default class IndexPage extends React.Component {
         });
 
         // Always try to load the latest user preferences file as well.
-        this.getPreferencesFromDropbox();
+        this.loadPreferencesFromDropbox();
       }
     }
   }
@@ -87,7 +87,7 @@ export default class IndexPage extends React.Component {
     }
   }
 
-  getPreferencesFromDropbox = () => {
+  loadPreferencesFromDropbox = () => {
     this.dbx
       .filesDownload({ path: PREFERENCES_PATH })
       .then(async response => {
@@ -95,6 +95,26 @@ export default class IndexPage extends React.Component {
         const preferences = JSON.parse(preferencesStr);
         this.setState({ preferences });
         console.log({ preferences });
+
+        if (
+          _.isEmpty(this.state.folders) &&
+          !_.isEqual(
+            Object.keys(preferences.folders),
+            Object.keys(this.state.folders),
+          )
+        ) {
+          console.log(
+            "UPDATE ME",
+            Object.keys(preferences.folders),
+            Object.keys(this.state.folders),
+          );
+          this.setState({ folders: preferences.folders });
+          Object.keys(preferences.folders).forEach(folderId => {
+            this.loadFilesFromDropboxFolder(folderId);
+          });
+        } else {
+          console.log("preferences and local state match");
+        }
       })
       .catch(error => {
         console.error("Error loading preferences", { error });
@@ -125,6 +145,15 @@ export default class IndexPage extends React.Component {
             },
           };
 
+          const preferences = {
+            ...this.state.preferences,
+            folders: {
+              ...this.state.preferences.folders,
+              ...folders,
+            },
+          };
+          this.updatePreferences(preferences);
+
           const closedFolders = {
             ...this.state.closedFolders,
             [folderId]: false,
@@ -149,7 +178,7 @@ export default class IndexPage extends React.Component {
   };
 
   loadFilesFromDropboxFolder = folderId => {
-    const url = this.folderInput.value;
+    const url = this.state.folders[folderId].url;
     console.log("loadFilesFromDropboxFolder", { url });
     if (!url) {
       return;
@@ -349,6 +378,11 @@ export default class IndexPage extends React.Component {
     let folders = { ...this.state.folders };
     delete folders[folderId];
     this.setState({ folders });
+
+    let preferences = { ...this.state.preferences };
+    delete preferences.folders[folderId];
+    this.setState({ preferences });
+    this.updatePreferences(preferences);
   };
 
   togglePreferencesOpen = () => {
@@ -356,6 +390,7 @@ export default class IndexPage extends React.Component {
   };
 
   updatePreferences = preferences => {
+    this.setState({ preferences });
     const filesCommitInfo = {
       contents: JSON.stringify(preferences),
       path: PREFERENCES_PATH,
@@ -368,7 +403,6 @@ export default class IndexPage extends React.Component {
       .filesUpload(filesCommitInfo)
       .then(response => {
         console.log({ response });
-        this.setState({ preferences });
         console.log("SAVED PREFERENCES!");
       })
       .catch(error => {
