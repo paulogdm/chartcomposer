@@ -4,6 +4,7 @@ import _ from "lodash";
 const SongList = ({
   folders,
   closedFolders,
+  newSong,
   removeFolder,
   setSongId,
   songId,
@@ -18,6 +19,7 @@ const SongList = ({
               key={folder.id}
               folder={folder}
               isOpen={!closedFolders[folder.id]}
+              newSong={newSong}
               removeFolder={removeFolder}
               setSongId={setSongId}
               songId={songId}
@@ -36,13 +38,21 @@ export default SongList;
 const SongFolder = ({
   folder,
   isOpen,
+  newSong,
   removeFolder,
   setSongId,
   songId,
   toggleFolderOpen,
 }) => {
+  const canCreateNewSong = !!folder.path_lower;
   return (
     <div>
+      <style jsx>{`
+        button {
+          background: rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+      `}</style>
       <div
         onClick={() => {
           toggleFolderOpen(folder.id);
@@ -60,7 +70,19 @@ const SongFolder = ({
       >
         <div style={{ marginRight: 5 }}>📁</div>
         <div style={{ flex: 1 }}>{folder.name}</div>
-        <div
+        {canCreateNewSong ? (
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              newSong(folder.id);
+            }}
+            style={{ padding: 10 }}
+            title="New song in folder"
+          >
+            +
+          </button>
+        ) : null}
+        <button
           onClick={e => {
             e.stopPropagation();
             if (confirm("Remove this folder?")) {
@@ -71,7 +93,7 @@ const SongFolder = ({
           title="Remove folder"
         >
           ×
-        </div>
+        </button>
       </div>
       {isOpen ? (
         <SongOrderedList
@@ -89,7 +111,8 @@ const SongFolder = ({
             paddingLeft: 35,
           }}
         >
-          {Object.keys(folder.songs).length} songs
+          {Object.keys(folder.songs).length}{" "}
+          {Object.keys(folder.songs).length === 1 ? "song" : "songs"}
         </div>
       )}
     </div>

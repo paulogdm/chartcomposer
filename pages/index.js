@@ -14,7 +14,10 @@ import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 
 const Dropbox = dropbox.Dropbox;
-const PREFERENCES_PATH = "/.ChartComposer-preferences.json";
+
+const DROPBOX_APP_DIR = "/Apps/ChartComposer";
+const PREFERENCES_PATH = `${DROPBOX_APP_DIR}/.preferences.json`;
+const NEW_SONG_NAME = "new_song.pro";
 
 export default class IndexPage extends React.Component {
   constructor(props) {
@@ -117,7 +120,7 @@ export default class IndexPage extends React.Component {
         }
       })
       .catch(error => {
-        console.error("Error loading preferences", { error });
+        console.warn("Error loading preferences", { error });
       });
   };
 
@@ -229,16 +232,30 @@ export default class IndexPage extends React.Component {
     this.setState({ songs });
   };
 
-  newSong = () => {
-    const songId = Number(new Date());
+  newSong = folderId => {
+    const songId = Date.now().toString();
     console.log("newSong", songId);
-    this.setState({ loading: true, songId });
     const chordPro = {
       ...this.state.chordPro,
       [songId]:
         "{title: New Song}\n{artist: }\n\n{start_of_verse}\n{comment: Verse 1}\n[D]Row, row, row your boat\n[D]Gently down the stream\n{end_of_verse}\n{start_of_chorus}\n{comment: Chorus}\n{end_of_chorus}\n",
     };
-    this.setState({ chordPro, loading: false });
+    const folders = {
+      ...this.state.folders,
+      [folderId]: {
+        ...this.state.folders[folderId],
+        songs: {
+          ...this.state.folders[folderId].songs,
+          [songId]: {
+            id: songId,
+            folderId,
+            path_lower: NEW_SONG_NAME,
+            name: NEW_SONG_NAME,
+          },
+        },
+      },
+    };
+    this.setState({ chordPro, folders, songId });
   };
 
   setSongId = (songId, folderId) => {
@@ -289,72 +306,81 @@ export default class IndexPage extends React.Component {
   };
 
   onSave = () => {
-    const { chordPro, songId, songs } = this.state;
+    const { chordPro, folders, songId } = this.state;
     const songChordPro = chordPro[songId];
     const song = this.getSongById(songId);
     console.log("onSave", { songId, song, songChordPro });
     let path;
-    let bNewSong = false;
-    if (!song) {
+    const isNewSong = song.name === NEW_SONG_NAME;
+    if (isNewSong) {
       // this is a new song - not in Dropbox yet
       let songTitle = songChordPro.match(/{title:(.*?)}/)
         ? songChordPro.match(/{title:(.*?)}/)[1].trim()
         : "New Song";
       let filename = songTitle.toLowerCase().replace(" ", "_") + ".pro";
-      // We need the current path so we borrow it from an existing song - this is pretty hacky
-      for (let tmpId in songs) {
-        let tmpSong = this.getSongById(tmpId);
-        if (tmpSong.path_lower) {
-          path =
-            tmpSong.path_lower.substring(
-              0,
-              tmpSong.path_lower.lastIndexOf("/") + 1,
-            ) + filename;
-          console.log("new song path: " + path);
-          bNewSong = true;
-          break;
-        }
-      }
-      if (!path) {
-        // If they open an empty folder and create a new song this code breaks
-        console.log("ERROR: Could not find song path_lower.");
-      }
+      path = `${folders[song.folderId].path_lower}/${filename}`;
     } else {
       path = song.path_lower;
     }
     const filesCommitInfo = {
-      contents: songChordPro,
-      path,
-      mode: { ".tag": "overwrite" },
       autorename: false,
+      contents: songChordPro,
+      mode: { ".tag": "overwrite" },
+      mute: true,
+      path,
     };
     console.log({ filesCommitInfo });
     this.setState({ saving: true });
     this.dbx
       .filesUpload(filesCommitInfo)
       .then(response => {
-        console.log({ response });
-        console.log("SAVED!");
+        console.log("SAVED song", { response });
+        if (isNewSong) {
+          console.log("SAVED NEW SONG!");
+          const newSongId = response.id;
+          const folderId = song.folderId;
+          // Replaces the old temporary id with the one from dropbox.
+          const folders = {
+            ...this.state.folders,
+            [folderId]: {
+              ...this.state.folders[folderId],
+              songs: {
+                ...this.state.folders[folderId].songs,
+                [newSongId]: response,
+              },
+            },
+          };
+          delete folders[folderId].songs[songId];
+
+          let chordPro = {
+            ...this.state.chordPro,
+            [newSongId]: songChordPro,
+          };
+          delete chordPro[songId];
+
+          this.setState({ chordPro, folders, songId: newSongId });
+        }
       })
       .catch(error => {
         console.error({ error });
       })
       .finally(() => {
-        if (bNewSong) {
-          this.loadDropboxLink();
-        }
         this.setState({ saving: false });
       });
   };
 
   getSongById(songId) {
     const { folders, songs } = this.state;
+    console.log("getSongById", { songId, folders, songs });
     const folderIds = Object.keys(folders);
     for (var i = 0, folderId; (folderId = folderIds[i]); i++) {
       if (folders[folderId].songs && folders[folderId].songs[songId]) {
         return folders[folderId].songs[songId];
       }
     }
+    console.log("getSongById", songId, "not found in folders, looking in", {
+      songs,
+    });
     return songs[songId];
   }
 
@@ -392,10 +418,11 @@ export default class IndexPage extends React.Component {
   updatePreferences = preferences => {
     this.setState({ preferences });
     const filesCommitInfo = {
-      contents: JSON.stringify(preferences),
-      path: PREFERENCES_PATH,
-      mode: { ".tag": "overwrite" },
       autorename: false,
+      contents: JSON.stringify(preferences),
+      mode: { ".tag": "overwrite" },
+      mute: true,
+      path: PREFERENCES_PATH,
     };
     console.log("updatePreferences", { filesCommitInfo });
     this.setState({ loading: true });
@@ -433,10 +460,25 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-    const song = this.getSongById(songId);
+    const song = songId && this.getSongById(songId);
     return (
       <Page>
         <style jsx>{`
+          .title-and-input {
+            align-items: center;
+          }
+          .title-and-input > h1 {
+            padding-right: 20px;
+          }
+          @media (max-width: 600px) {
+            .title-and-input {
+              align-items: left;
+              flex-direction: column;
+            }
+            .title-and-input > h1 {
+              padding-right: 0;
+            }
+          }
           @media print {
             .header,
             .songlist {
@@ -465,18 +507,25 @@ export default class IndexPage extends React.Component {
               alignItems: "center",
               display: "flex",
               justifyContent: "space-between",
+              padding: "5px 10px",
             }}
           >
-            <h1
-              style={{ fontSize: 20, margin: 0, padding: 0, paddingLeft: 10 }}
-            >
-              ChartComposer
-            </h1>
             <div
+              className="title-and-input"
               style={{
-                padding: 10,
+                display: "flex",
               }}
             >
+              <h1
+                style={{
+                  fontSize: 20,
+                  margin: 0,
+                  paddingBottom: 0,
+                  paddingTop: 0,
+                }}
+              >
+                ChartComposer
+              </h1>
               {this.dbx ? (
                 <div
                   style={{
@@ -501,20 +550,21 @@ export default class IndexPage extends React.Component {
                     style={{
                       flex: 1,
                       fontSize: 14,
-                      maxWidth: 400,
-                      minWidth: 300,
+                      width: 200,
                     }}
                   />
                   <button onClick={this.loadDropboxLink}>Go</button>
-                  <button onClick={this.newSong}>New Song</button>
-                  <div style={{ paddingLeft: 10 }}>
-                    <UserMenu
-                      user={user}
-                      signOut={this.signOut}
-                      togglePreferencesOpen={this.togglePreferencesOpen}
-                    />
-                  </div>
                 </div>
+              ) : null}
+            </div>
+
+            <div>
+              {this.dbx ? (
+                <UserMenu
+                  user={user}
+                  signOut={this.signOut}
+                  togglePreferencesOpen={this.togglePreferencesOpen}
+                />
               ) : (
                 <Sender
                   state={{ to: "/" }}
@@ -573,12 +623,13 @@ export default class IndexPage extends React.Component {
                   }}
                 >
                   <SongList
-                    folders={folders}
                     closedFolders={closedFolders}
+                    folders={folders}
+                    newSong={this.newSong}
                     removeFolder={this.removeFolder}
-                    songs={songs}
-                    songId={songId}
                     setSongId={this.setSongId}
+                    songId={songId}
+                    songs={songs}
                     toggleFolderOpen={this.toggleFolderOpen}
                   />
                 </div>
@@ -591,7 +642,7 @@ export default class IndexPage extends React.Component {
                 flex: 1,
               }}
             >
-              {songId ? (
+              {songId && song ? (
                 <SongEditor
                   onChange={this.onChange}
                   onSave={this.onSave}
