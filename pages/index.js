@@ -5,7 +5,7 @@ import "whatwg-fetch";
 import _ from "lodash";
 
 import LoadingIndicator from "../components/LoadingIndicator";
-import Page, { Sender, Receiver } from "../components/Page";
+import Page, { Sender, Receiver, SignInAsGuest } from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
@@ -568,7 +568,22 @@ export default class IndexPage extends React.Component {
               ) : (
                 <Sender
                   state={{ to: "/" }}
-                  render={({ url }) => <a href={url}>Sign in to Dropbox</a>}
+                  render={({ url }) => (
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <img
+                        src="/static/dropbox.png"
+                        height={20}
+                        width={20}
+                        alt=""
+                        style={{
+                          marginRight: 5,
+                        }}
+                      />
+                      <a href={url}>Sign in</a>
+                      <div style={{ margin: "0 5px" }}>|</div>
+                      <SignInAsGuest />
+                    </div>
+                  )}
                 />
               )}
             </div>

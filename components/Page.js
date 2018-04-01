@@ -5,7 +5,12 @@ import Meta from "./Meta";
 import Footer from "./Footer";
 
 const { publicRuntimeConfig } = getConfig();
-const { DROPBOX_APP_KEY, DROPBOX_APP_SECRET, IS_DEV } = publicRuntimeConfig;
+const {
+  DROPBOX_APP_KEY,
+  DROPBOX_APP_SECRET,
+  DROPBOX_PUBLIC_TOKEN,
+  IS_DEV,
+} = publicRuntimeConfig;
 
 export default ({ children }) => (
   <div>
@@ -23,4 +28,17 @@ const { Sender, Receiver } = createOauthFlow({
     ? "http://localhost:3000/authreceiver"
     : "https://chartcomposer.com/authreceiver",
 });
-export { Sender, Receiver };
+
+const SignInAsGuest = () => (
+  <a
+    href="/"
+    onClick={() => {
+      localStorage.setItem("db-access-token", DROPBOX_PUBLIC_TOKEN);
+      // href is "/" so letting default event go through here = refresh
+    }}
+  >
+    Guest
+  </a>
+);
+
+export { Sender, SignInAsGuest, Receiver };
