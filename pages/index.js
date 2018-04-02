@@ -1,4 +1,6 @@
 import React from "react";
+// elsigh-hacked version of the Dropbox-sdk to work on next where
+// the missing `window` ref doesn't mean we're in a web worker.
 import dropbox from "../utils/Dropbox-sdk";
 import localforage from "localforage";
 import "whatwg-fetch";
@@ -13,6 +15,7 @@ import SongList from "../components/SongList";
 import SongView from "../components/SongView";
 import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
+import getPathForSong from "../utils/getPathForSong";
 
 const Dropbox = dropbox.Dropbox;
 
@@ -316,7 +319,7 @@ export default class IndexPage extends React.Component {
       songId,
     });
     const song = this.getSongById(songId);
-    console.log("setSongId", { songId, folderId });
+    console.log("setSongId", { songId, song, folderId });
     const dropboxInputValue = folderId
       ? folders[folderId].url
       : songs[songId].url;
@@ -372,7 +375,7 @@ export default class IndexPage extends React.Component {
       let filename = songTitle.toLowerCase().replace(" ", "_") + ".pro";
       path = `${folders[song.folderId].path_lower}/${filename}`;
     } else {
-      path = song.path_lower;
+      path = getPathForSong(song);
     }
     const filesCommitInfo = {
       autorename: false,
@@ -423,7 +426,6 @@ export default class IndexPage extends React.Component {
 
   getSongById(songId) {
     const { folders, songs } = this.state;
-    console.log("getSongById", { songId, folders, songs });
     const folderIds = Object.keys(folders);
     for (var i = 0, folderId; (folderId = folderIds[i]); i++) {
       if (folders[folderId].songs && folders[folderId].songs[songId]) {
