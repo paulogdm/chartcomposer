@@ -74,6 +74,9 @@ export default class IndexPage extends React.Component {
         this.loadPreferencesFromDropbox();
       }
     }
+
+    const smallScreenMode = this.getDefaultSmallScreenMode();
+    this.setState({ smallScreenMode });
     window.addEventListener("resize", this.debouncedOnResize);
   }
 
@@ -139,12 +142,23 @@ export default class IndexPage extends React.Component {
       });
   };
 
+  getDefaultSmallScreenMode() {
+    return window.innerWidth <= 768 && this.state.smallScreenMode === null
+      ? "SongList"
+      : null;
+  }
+
+  setSmallScreenMode = smallScreenMode => {
+    this.setState({
+      smallScreenMode,
+      songId: smallScreenMode === "SongList" ? null : this.state.songId,
+    });
+  };
+
   onResize = e => {
-    if (window.innerWidth < 768 && this.state.smallScreenMode === null) {
-      this.setState({ smallScreenMode: "SongList" });
-    } else {
-      this.setState({ smallScreenMode: null });
-    }
+    const smallScreenMode = this.getDefaultSmallScreenMode();
+    console.log("onResize", window.innerWidth, smallScreenMode);
+    this.setState({ smallScreenMode });
   };
 
   onChangeDropboxInput = e =>
@@ -291,8 +305,16 @@ export default class IndexPage extends React.Component {
       this.setState({ songId: null });
       return;
     }
-    const { folders, songs } = this.state;
-    this.setState({ loading: true, songId });
+    const { folders, smallScreenMode, songs } = this.state;
+    let nextSmallScreenMode = null;
+    if (smallScreenMode === "SongList") {
+      nextSmallScreenMode = "SongView";
+    }
+    this.setState({
+      loading: true,
+      smallScreenMode: nextSmallScreenMode,
+      songId,
+    });
     const song = this.getSongById(songId);
     console.log("setSongId", { songId, folderId });
     const dropboxInputValue = folderId
@@ -491,25 +513,21 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
+    console.log("smallScreenMode", smallScreenMode);
     const song = songId && this.getSongById(songId);
+    const readOnly = song && !song.path_lower;
     return (
       <Page>
         <style jsx>{`
           @media print {
             .header,
-            .songlist,
-            .songeditor {
+            .panel-song-list,
+            .panel-song-editor {
               display: none !important;
             }
-            .songview {
+            .panel-song-view {
               width: 100% !important;
             }
-          }
-          .smallScreenMode-SongList {
-          }
-          .smallScreenMode-SongView {
-          }
-          .smallScreenMode-SongEditor {
           }
         `}</style>
         {loading ? <LoadingIndicator /> : null}
@@ -535,19 +553,29 @@ export default class IndexPage extends React.Component {
             dropboxInputValue={dropboxInputValue}
             loadDropboxLink={this.loadDropboxLink}
             onChangeDropboxInput={this.onChangeDropboxInput}
+            readOnly={readOnly}
+            setSmallScreenMode={this.setSmallScreenMode}
             signOut={this.signOut}
+            smallScreenMode={smallScreenMode}
             togglePreferencesOpen={this.togglePreferencesOpen}
             user={user}
           />
           <div style={{ display: "flex", flex: 1 }}>
             <div
-              className="songlist"
+              className="panel-song-list"
               style={{
                 borderRight: "1px solid #ccc",
                 borderTop: "1px solid #ccc",
-                display: "flex",
+                display:
+                  smallScreenMode === "SongList" || smallScreenMode === null
+                    ? "flex"
+                    : "none",
+                flex: smallScreenMode === "SongList" ? 1 : null,
                 flexDirection: "column",
-                width: sidebarClosed ? null : "300px",
+                width:
+                  sidebarClosed || smallScreenMode === "SongList"
+                    ? null
+                    : "300px",
               }}
             >
               <div
@@ -571,18 +599,19 @@ export default class IndexPage extends React.Component {
                     }}
                   >
                     <div style={{ padding: 10 }}>♫ Songs</div>
-                    <div
-                      onClick={this.toggleSidebarClosed}
-                      style={{ cursor: "pointer", padding: 10 }}
-                    >
-                      ◀
-                    </div>
+                    {smallScreenMode === null ? (
+                      <div
+                        onClick={this.toggleSidebarClosed}
+                        style={{ cursor: "pointer", padding: 10 }}
+                      >
+                        ◀
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </div>
               {sidebarClosed ? null : (
                 <div
-                  className="songlist"
                   style={{
                     background: "#eee",
                     flex: 1,
@@ -595,6 +624,7 @@ export default class IndexPage extends React.Component {
                     newSong={this.newSong}
                     removeFolder={this.removeFolder}
                     setSongId={this.setSongId}
+                    smallScreenMode={smallScreenMode}
                     songId={songId}
                     songs={songs}
                     toggleFolderOpen={this.toggleFolderOpen}
@@ -607,39 +637,42 @@ export default class IndexPage extends React.Component {
                 background: "#fff",
                 borderTop: "1px solid #ccc",
                 flex: 1,
-                display: "flex",
+                display: smallScreenMode === "SongList" ? "none" : "flex",
                 height: "100%",
               }}
             >
-              {songId && song ? (
+              {songId &&
+              song &&
+              (smallScreenMode === "SongEditor" || smallScreenMode === null) ? (
                 <div
-                  className="songeditor"
+                  className="panel-song-editor"
                   style={{
                     borderRight: "1px solid #ccc",
                     height: "100%",
                     overflow: "auto",
                     padding: 10,
-                    width: "40%",
+                    width: smallScreenMode === "SongEditor" ? "100%" : "40%",
                   }}
                 >
                   <SongEditor
                     onChange={this.onChange}
                     onSave={this.onSave}
                     preferences={preferences}
-                    readOnly={!song.path_lower}
+                    readOnly={readOnly}
                     saving={saving}
                     value={chordPro[songId]}
                   />
                 </div>
               ) : null}
-              {chordPro[songId] ? (
+              {chordPro[songId] &&
+              (smallScreenMode === "SongView" || smallScreenMode === null) ? (
                 <div
-                  className="songview"
+                  className="panel-song-view"
                   style={{
                     height: "100%",
                     overflow: "auto",
                     padding: 10,
-                    width: "60%",
+                    width: smallScreenMode === "SongView" ? "100%" : "60%",
                   }}
                 >
                   <SongView value={chordPro[songId]} />

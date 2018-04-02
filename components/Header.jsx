@@ -6,7 +6,10 @@ const Header = ({
   dropboxInputValue,
   loadDropboxLink,
   onChangeDropboxInput,
+  readOnly,
+  setSmallScreenMode,
   signOut,
+  smallScreenMode,
   togglePreferencesOpen,
   user,
 }) => (
@@ -48,6 +51,16 @@ const Header = ({
         display: "flex",
       }}
     >
+      {smallScreenMode !== null && smallScreenMode !== "SongList" ? (
+        <div
+          onClick={() => {
+            setSmallScreenMode("SongList");
+          }}
+          style={{ cursor: "pointer", padding: 10 }}
+        >
+          ◀
+        </div>
+      ) : null}
       <h1
         style={{
           fontSize: 20,
@@ -85,7 +98,22 @@ const Header = ({
       ) : null}
     </div>
 
-    <div>
+    <div style={{ display: "flex" }}>
+      {smallScreenMode !== null &&
+      smallScreenMode !== "SongList" &&
+      !readOnly ? (
+        <button
+          onClick={() => {
+            setSmallScreenMode(
+              smallScreenMode == "SongView" ? "SongEditor" : "SongView",
+            );
+          }}
+          style={{ marginRight: 10 }}
+        >
+          {smallScreenMode == "SongView" ? "Edit" : "View"}
+        </button>
+      ) : null}
+
       {user ? (
         <UserMenu
           user={user}
