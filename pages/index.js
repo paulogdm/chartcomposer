@@ -5,11 +5,11 @@ import "whatwg-fetch";
 import _ from "lodash";
 
 import LoadingIndicator from "../components/LoadingIndicator";
-import Page, { Sender, Receiver, SignInAsGuest } from "../components/Page";
+import Header from "../components/Header";
+import Page from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
-import UserMenu from "../components/UserMenu";
 import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 
@@ -30,7 +30,7 @@ export default class IndexPage extends React.Component {
       preferences: defaultPreferences,
       preferencesOpen: false,
       saving: false,
-      sharedLinkUrl: "",
+      dropboxInputValue: "",
       sidebarClosed: false,
       songId: null,
       songs: {},
@@ -124,8 +124,13 @@ export default class IndexPage extends React.Component {
       });
   };
 
+  onChangeDropboxInput = e =>
+    this.setState({
+      dropboxInputValue: e.target.value,
+    });
+
   loadDropboxLink = () => {
-    const url = this.folderInput.value;
+    const url = this.state.dropboxInputValue;
     console.log({ url });
     if (!url) {
       return;
@@ -213,7 +218,7 @@ export default class IndexPage extends React.Component {
             },
           },
         };
-        this.setState({ folders, sharedLinkUrl: "" });
+        this.setState({ folders, dropboxInputValue: "" });
       })
       .catch(error => {
         console.error({ error });
@@ -267,10 +272,12 @@ export default class IndexPage extends React.Component {
     this.setState({ loading: true, songId });
     const song = this.getSongById(songId);
     console.log("setSongId", { songId, folderId });
-    const sharedLinkUrl = folderId ? folders[folderId].url : songs[songId].url;
+    const dropboxInputValue = folderId
+      ? folders[folderId].url
+      : songs[songId].url;
     this.dbx
       .sharingGetSharedLinkFile({
-        url: sharedLinkUrl,
+        url: dropboxInputValue,
         path: song[".tag"] === "file" ? `/${song.name}` : null,
       })
       .then(async response => {
@@ -454,7 +461,7 @@ export default class IndexPage extends React.Component {
       preferences,
       preferencesOpen,
       saving,
-      sharedLinkUrl,
+      dropboxInputValue,
       sidebarClosed,
       songs,
       songId,
@@ -464,21 +471,6 @@ export default class IndexPage extends React.Component {
     return (
       <Page>
         <style jsx>{`
-          .title-and-input {
-            align-items: center;
-          }
-          .title-and-input > h1 {
-            padding-right: 20px;
-          }
-          @media (max-width: 600px) {
-            .title-and-input {
-              align-items: left;
-              flex-direction: column;
-            }
-            .title-and-input > h1 {
-              padding-right: 0;
-            }
-          }
           @media print {
             .header,
             .songlist {
@@ -501,93 +493,15 @@ export default class IndexPage extends React.Component {
             height: "100vh",
           }}
         >
-          <div
+          <Header
             className="header"
-            style={{
-              alignItems: "center",
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "5px 10px",
-            }}
-          >
-            <div
-              className="title-and-input"
-              style={{
-                display: "flex",
-              }}
-            >
-              <h1
-                style={{
-                  fontSize: 20,
-                  margin: 0,
-                  paddingBottom: 0,
-                  paddingTop: 0,
-                }}
-              >
-                ChartComposer
-              </h1>
-              {this.dbx ? (
-                <div
-                  style={{
-                    alignItems: "center",
-                    display: "flex",
-                  }}
-                >
-                  <input
-                    ref={el => (this.folderInput = el)}
-                    onChange={e =>
-                      this.setState({
-                        sharedLinkUrl: e.target.value,
-                      })
-                    }
-                    onKeyPress={e => {
-                      if (e.key === "Enter") {
-                        this.loadDropboxLink();
-                      }
-                    }}
-                    placeholder="Dropbox folder or song URL"
-                    value={sharedLinkUrl}
-                    style={{
-                      flex: 1,
-                      fontSize: 14,
-                      width: 200,
-                    }}
-                  />
-                  <button onClick={this.loadDropboxLink}>Go</button>
-                </div>
-              ) : null}
-            </div>
-
-            <div>
-              {this.dbx ? (
-                <UserMenu
-                  user={user}
-                  signOut={this.signOut}
-                  togglePreferencesOpen={this.togglePreferencesOpen}
-                />
-              ) : (
-                <Sender
-                  state={{ to: "/" }}
-                  render={({ url }) => (
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <img
-                        src="/static/dropbox.png"
-                        height={20}
-                        width={20}
-                        alt=""
-                        style={{
-                          marginRight: 5,
-                        }}
-                      />
-                      <a href={url}>Sign in</a>
-                      <div style={{ margin: "0 5px" }}>|</div>
-                      <SignInAsGuest />
-                    </div>
-                  )}
-                />
-              )}
-            </div>
-          </div>
+            dropboxInputValue={dropboxInputValue}
+            loadDropboxLink={this.loadDropboxLink}
+            onChangeDropboxInput={this.onChangeDropboxInput}
+            signOut={this.signOut}
+            togglePreferencesOpen={this.togglePreferencesOpen}
+            user={user}
+          />
           <div style={{ display: "flex", flex: 1 }}>
             <div
               className="songlist"
