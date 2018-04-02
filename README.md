@@ -14,5 +14,5 @@ Go to http://localhost:3000/
 4) DEPLOY
 ```
 deploy.sh
-now alias [paste] chartcomposer.com
+now alias 
 ```
