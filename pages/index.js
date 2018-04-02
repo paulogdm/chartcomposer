@@ -146,9 +146,13 @@ export default class IndexPage extends React.Component {
   };
 
   getDefaultSmallScreenMode() {
-    return window.innerWidth <= 768 && this.state.smallScreenMode === null
-      ? "SongList"
-      : null;
+    let smallScreenMode = this.state.smallScreenMode;
+    if (window.innerWidth <= 768 && smallScreenMode === null) {
+      smallScreenMode = "SongList";
+    } else if (window.innerWidth > 768 && smallScreenMode !== null) {
+      smallScreenMode = null;
+    }
+    return smallScreenMode;
   }
 
   setSmallScreenMode = smallScreenMode => {
@@ -515,7 +519,6 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-    console.log("smallScreenMode", smallScreenMode);
     const song = songId && this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     return (
