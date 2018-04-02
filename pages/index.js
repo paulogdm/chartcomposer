@@ -10,6 +10,7 @@ import Page from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
+import SongView from "../components/SongView";
 import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 
@@ -30,13 +31,15 @@ export default class IndexPage extends React.Component {
       preferences: defaultPreferences,
       preferencesOpen: false,
       saving: false,
+      smallScreenMode: null,
       dropboxInputValue: "",
       sidebarClosed: false,
       songId: null,
       songs: {},
-      user: {},
+      user: null,
     };
     this.dbx = null;
+    this.debouncedOnResize = _.debounce(this.onResize, 300);
   }
 
   componentDidMount() {
@@ -44,13 +47,16 @@ export default class IndexPage extends React.Component {
       const songs = JSON.parse(localStorage.getItem("songs") || "{}");
       const folders = JSON.parse(localStorage.getItem("folders") || "{}");
 
+      const localUser = localStorage.getItem("user");
+      const user = localUser ? JSON.parse(localUser) : null;
+
       let preferences = { ...this.state.preferences };
       const localPreferences = localStorage.getItem("preferences");
       if (localPreferences) {
         preferences = localPreferences;
       }
 
-      this.setState({ folders, preferences, songs });
+      this.setState({ folders, preferences, songs, user });
       const accessToken = localStorage.getItem("db-access-token");
       if (accessToken) {
         this.dbx = new Dropbox({ accessToken });
@@ -68,6 +74,12 @@ export default class IndexPage extends React.Component {
         this.loadPreferencesFromDropbox();
       }
     }
+    window.addEventListener("resize", this.debouncedOnResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.debouncedOnResize);
+    this.dbx = null;
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -81,6 +93,9 @@ export default class IndexPage extends React.Component {
     }
     if (!_.isEqual(this.state.songs, nextState.songs)) {
       localStorage.setItem("songs", JSON.stringify(nextState.songs));
+    }
+    if (!_.isEqual(this.state.user, nextState.user)) {
+      localStorage.setItem("user", JSON.stringify(nextState.user));
     }
     if (!_.isEqual(this.state.preferences, nextState.preferences)) {
       localStorage.setItem(
@@ -122,6 +137,14 @@ export default class IndexPage extends React.Component {
       .catch(error => {
         console.warn("Error loading preferences", { error });
       });
+  };
+
+  onResize = e => {
+    if (window.innerWidth < 768 && this.state.smallScreenMode === null) {
+      this.setState({ smallScreenMode: "SongList" });
+    } else {
+      this.setState({ smallScreenMode: null });
+    }
   };
 
   onChangeDropboxInput = e =>
@@ -463,6 +486,7 @@ export default class IndexPage extends React.Component {
       saving,
       dropboxInputValue,
       sidebarClosed,
+      smallScreenMode,
       songs,
       songId,
       user,
@@ -473,9 +497,19 @@ export default class IndexPage extends React.Component {
         <style jsx>{`
           @media print {
             .header,
-            .songlist {
+            .songlist,
+            .songeditor {
               display: none !important;
             }
+            .songview {
+              width: 100% !important;
+            }
+          }
+          .smallScreenMode-SongList {
+          }
+          .smallScreenMode-SongView {
+          }
+          .smallScreenMode-SongEditor {
           }
         `}</style>
         {loading ? <LoadingIndicator /> : null}
@@ -487,6 +521,9 @@ export default class IndexPage extends React.Component {
           />
         ) : null}
         <div
+          className={
+            smallScreenMode ? `smallScreenMode-${smallScreenMode}` : null
+          }
           style={{
             display: "flex",
             flexDirection: "column",
@@ -545,6 +582,7 @@ export default class IndexPage extends React.Component {
               </div>
               {sidebarClosed ? null : (
                 <div
+                  className="songlist"
                   style={{
                     background: "#eee",
                     flex: 1,
@@ -569,17 +607,43 @@ export default class IndexPage extends React.Component {
                 background: "#fff",
                 borderTop: "1px solid #ccc",
                 flex: 1,
+                display: "flex",
+                height: "100%",
               }}
             >
               {songId && song ? (
-                <SongEditor
-                  onChange={this.onChange}
-                  onSave={this.onSave}
-                  preferences={preferences}
-                  readOnly={!song.path_lower}
-                  saving={saving}
-                  value={chordPro[songId]}
-                />
+                <div
+                  className="songeditor"
+                  style={{
+                    borderRight: "1px solid #ccc",
+                    height: "100%",
+                    overflow: "auto",
+                    padding: 10,
+                    width: "40%",
+                  }}
+                >
+                  <SongEditor
+                    onChange={this.onChange}
+                    onSave={this.onSave}
+                    preferences={preferences}
+                    readOnly={!song.path_lower}
+                    saving={saving}
+                    value={chordPro[songId]}
+                  />
+                </div>
+              ) : null}
+              {chordPro[songId] ? (
+                <div
+                  className="songview"
+                  style={{
+                    height: "100%",
+                    overflow: "auto",
+                    padding: 10,
+                    width: "60%",
+                  }}
+                >
+                  <SongView value={chordPro[songId]} />
+                </div>
               ) : null}
             </div>
           </div>
