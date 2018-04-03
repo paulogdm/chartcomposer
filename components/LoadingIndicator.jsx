@@ -4,7 +4,9 @@ import Background from "./Background";
 
 const notes = ["♪", "♫", "♬", "♩", "♪", "♫", "♬"];
 
-const LoadingIndicator = () => {
+const LoadingIndicator = ({ hasBackground, style }) => {
+  hasBackground = hasBackground !== false;
+  style = style || {};
   return (
     <div>
       <style jsx>{`
@@ -47,18 +49,15 @@ const LoadingIndicator = () => {
           }
         }
       `}</style>
-      <Background />
+      {hasBackground && <Background />}
       <div
         style={{
           background: "#fff",
           borderRadius: 7,
-          position: "fixed",
-          left: "50%",
-          top: "50%",
           padding: "10px 30px 20px 30px",
           color: "#000",
-          transform: "translate3d(-50%, -50%, 0)",
-          zIndex: 2,
+          whiteSpace: "nowrap",
+          ...style,
         }}
       >
         <ul

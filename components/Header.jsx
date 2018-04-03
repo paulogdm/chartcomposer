@@ -82,7 +82,7 @@ const Header = ({
             onChange={onChangeDropboxInput}
             onKeyPress={e => {
               if (e.key === "Enter") {
-                loadDropboxLink();
+                loadDropboxLink(dropboxInputValue);
               }
             }}
             placeholder="Dropbox folder or song URL"
@@ -93,7 +93,13 @@ const Header = ({
               width: 200,
             }}
           />
-          <button onClick={loadDropboxLink}>Go</button>
+          <button
+            onClick={() => {
+              loadDropboxLink(dropboxInputValue);
+            }}
+          >
+            Go
+          </button>
         </div>
       ) : null}
     </div>

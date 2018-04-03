@@ -1,8 +1,11 @@
+import moment from "moment";
+import LoadingIndicator from "./LoadingIndicator";
 
-const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
+const SongEditor = ({ onChange, readOnly, saving, server_modified, value }) => {
   if (!value) {
     return null;
   }
+  console.log({ server_modified });
   return (
     <div
       style={{
@@ -11,23 +14,24 @@ const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
         height: "100%",
       }}
     >
-      <div>
+      <div
+        style={{
+          display: "flex",
+          fontSize: 10,
+          justifyContent: "space-between",
+        }}
+      >
         {readOnly ? (
           <div style={{ color: "red", marginBottom: 10 }}>READ ONLY</div>
+        ) : saving ? (
+          <div>Saving ...</div>
         ) : (
-          <button
-            disabled={saving}
-            onClick={onSave}
-            style={{
-              background: "#525",
-              color: "#FFF",
-            }}
-          >
-            {saving ? "Saving ..." : "Save"}
-          </button>
+          <div />
         )}
+
+        <LastSaved timestamp={server_modified} />
       </div>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, position: "relative" }}>
         <textarea
           value={value}
           onChange={onChange}
@@ -47,3 +51,20 @@ const SongEditor = ({ onChange, onSave, readOnly, saving, value }) => {
 };
 
 export default SongEditor;
+
+const LastSaved = ({ timestamp }) => (
+  <div style={{ display: "flex", alignItems: "center" }}>
+    <div>Last edited {moment(timestamp).fromNow()}</div>
+    <div
+      style={{
+        color: "green",
+        padding: "0px 3px",
+        marginLeft: 5,
+        borderRadius: "50%",
+        border: "1px solid #ccc",
+      }}
+    >
+      ✔
+    </div>
+  </div>
+);

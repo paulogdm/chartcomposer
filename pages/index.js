@@ -23,14 +23,24 @@ const DROPBOX_APP_DIR = "/Apps/ChartComposer";
 const PREFERENCES_PATH = `${DROPBOX_APP_DIR}/.preferences.json`;
 const NEW_SONG_NAME = "new_song.pro";
 
+const LOCAL_STORAGE_FIELDS = [
+  "folders",
+  "songs",
+  "user",
+  "dirty",
+  "preferences",
+];
+
 export default class IndexPage extends React.Component {
   constructor(props) {
     super();
     this.state = {
       chordPro: {},
       closedFolders: {},
+      dirty: {},
       folders: {},
       loading: false,
+      onLine: true,
       preferences: defaultPreferences,
       preferencesOpen: false,
       saving: false,
@@ -47,19 +57,16 @@ export default class IndexPage extends React.Component {
 
   componentDidMount() {
     if (localStorage) {
-      const songs = JSON.parse(localStorage.getItem("songs") || "{}");
-      const folders = JSON.parse(localStorage.getItem("folders") || "{}");
+      let localState = {};
+      LOCAL_STORAGE_FIELDS.forEach(field => {
+        const localValue = localStorage.getItem(field);
+        if (localValue) {
+          localState[field] = JSON.parse(localValue);
+        }
+      });
+      console.log("componentDidMount localStorage", { localState });
+      this.setState(localState);
 
-      const localUser = localStorage.getItem("user");
-      const user = localUser ? JSON.parse(localUser) : null;
-
-      let preferences = { ...this.state.preferences };
-      const localPreferences = localStorage.getItem("preferences");
-      if (localPreferences) {
-        preferences = localPreferences;
-      }
-
-      this.setState({ folders, preferences, songs, user });
       const accessToken = localStorage.getItem("db-access-token");
       if (accessToken) {
         this.dbx = new Dropbox({ accessToken });
@@ -73,19 +80,41 @@ export default class IndexPage extends React.Component {
           this.setState({ user });
         });
 
-        // Always try to load the latest user preferences file as well.
         this.loadPreferencesFromDropbox();
+
+        // Sync the folder contents in the background in case there have
+        // been changes in the user's dropbox that are out of sync with local
+        // storage.
+        if (localState.folders) {
+          Object.keys(localState.folders).forEach(folderId => {
+            const folder = localState.folders[folderId];
+            console.log("Re-sync", { folder });
+            this.loadDropboxLink(folder.url, true);
+          });
+        }
       }
     }
 
+    const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();
-    this.setState({ smallScreenMode });
+    this.setState({
+      onLine,
+      smallScreenMode,
+    });
+    if (onLine) {
+      this.checkDirty();
+    }
+
     window.addEventListener("resize", this.debouncedOnResize);
+    window.addEventListener("offline", this.updateOnlineStatus);
+    window.addEventListener("online", this.updateOnlineStatus);
   }
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.debouncedOnResize);
     this.dbx = null;
+    window.removeEventListener("resize", this.debouncedOnResize);
+    window.removeEventListener("offline", this.updateOnlineStatus);
+    window.removeEventListener("online", this.updateOnlineStatus);
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -93,22 +122,31 @@ export default class IndexPage extends React.Component {
       this.isNotFirstUpdate = true;
       return;
     }
-    if (!_.isEqual(this.state.folders, nextState.folders)) {
-      const folders = nextState.folders;
-      localStorage.setItem("folders", JSON.stringify(nextState.folders));
+    LOCAL_STORAGE_FIELDS.forEach(field => {
+      if (!_.isEqual(this.state[field], nextState[field])) {
+        localStorage.setItem(field, JSON.stringify(nextState[field]));
+        console.log("updating local storage", {
+          field,
+          next: nextState[field],
+        });
+      }
+    });
+    if (!this.state.onLine && nextState.onLine) {
+      this.checkDirty();
     }
-    if (!_.isEqual(this.state.songs, nextState.songs)) {
-      localStorage.setItem("songs", JSON.stringify(nextState.songs));
+  }
+
+  updateOnlineStatus = e => {
+    this.setState({ onLine: navigator.onLine });
+  };
+
+  checkDirty() {
+    const { dirty, onLine } = this.state;
+    console.log("checkDirty", { dirty, onLine });
+    if (_.isEmpty(dirty)) {
+      return;
     }
-    if (!_.isEqual(this.state.user, nextState.user)) {
-      localStorage.setItem("user", JSON.stringify(nextState.user));
-    }
-    if (!_.isEqual(this.state.preferences, nextState.preferences)) {
-      localStorage.setItem(
-        "preferences",
-        JSON.stringify(nextState.preferences),
-      );
-    }
+    console.log("We're ridin dirty...");
   }
 
   loadPreferencesFromDropbox = () => {
@@ -137,7 +175,7 @@ export default class IndexPage extends React.Component {
             this.loadFilesFromDropboxFolder(folderId);
           });
         } else {
-          console.log("preferences and local state match");
+          console.log("preferences on dropbox and local state match");
         }
       })
       .catch(error => {
@@ -173,14 +211,16 @@ export default class IndexPage extends React.Component {
       dropboxInputValue: e.target.value,
     });
 
-  loadDropboxLink = () => {
-    const url = this.state.dropboxInputValue;
-    console.log({ url });
+  loadDropboxLink = (url, isCheckForChanges = false) => {
+    console.log("loadDropboxLink", { url, isCheckForChanges });
     if (!url) {
       return;
     }
 
-    this.setState({ loading: true, songId: null });
+    this.setState({
+      loading: !isCheckForChanges,
+      songId: isCheckForChanges ? this.state.songId : null,
+    });
 
     this.dbx
       .sharingGetSharedLinkMetadata({ url })
@@ -189,29 +229,35 @@ export default class IndexPage extends React.Component {
         const tag = response[".tag"];
         if (tag === "folder") {
           const folderId = response.id;
+          const songs = this.state.folders[folderId]
+            ? { ...this.state.folders[folderId].songs }
+            : {};
           const folders = {
             ...this.state.folders,
             [folderId]: {
               ...response,
-              songs: {},
+              songs,
             },
           };
+          this.setState({ folders });
 
-          const preferences = {
-            ...this.state.preferences,
-            folders: {
-              ...this.state.preferences.folders,
-              ...folders,
-            },
-          };
-          this.updatePreferences(preferences);
+          if (!isCheckForChanges) {
+            const preferences = {
+              ...this.state.preferences,
+              folders: {
+                ...this.state.preferences.folders,
+                ...folders,
+              },
+            };
+            this.updatePreferences(preferences);
 
-          const closedFolders = {
-            ...this.state.closedFolders,
-            [folderId]: false,
-          };
-          this.setState({ folders, closedFolders });
-          this.loadFilesFromDropboxFolder(folderId);
+            const closedFolders = {
+              ...this.state.closedFolders,
+              [folderId]: false,
+            };
+            this.setState({ closedFolders });
+          }
+          this.loadFilesFromDropboxFolder(folderId, isCheckForChanges);
         } else if (tag === "file") {
           const songId = response.id;
           const songs = {
@@ -229,26 +275,45 @@ export default class IndexPage extends React.Component {
       });
   };
 
-  loadFilesFromDropboxFolder = folderId => {
+  loadFilesFromDropboxFolder = (folderId, isCheckForChanges = false) => {
     const url = this.state.folders[folderId].url;
     console.log("loadFilesFromDropboxFolder", { url });
     if (!url) {
       return;
     }
-    // clear out current song in editor
-    this.setState({ loading: true, song: null, songId: null });
+    this.setState({ loading: !isCheckForChanges });
 
     this.dbx
       .filesListFolder({ path: "", shared_link: { url } })
       .then(response => {
         console.log({ response });
-        // Clear out the current songs because they are no longer accessible
-        // when we switch to a new Dropbox folder.
-        let songs = {};
+        const { dirty } = this.state;
+        let songs = { ...this.state.folders[folderId].songs };
+        let idsOnDropbox = [];
         response.entries.forEach(entry => {
           if (entry[".tag"] === "file" && isChordProFileName(entry.name)) {
-            console.log("adding file", entry.name);
-            songs[entry.id] = entry;
+            console.log("got", entry.name, { entry });
+            if (dirty[entry.id]) {
+              console.warn("NOT SYNCING CUZ DIRTY", entry.id);
+            } else {
+              songs[entry.id] = entry;
+            }
+            idsOnDropbox.push(entry.id);
+          }
+        });
+
+        // nuke any files that lingered in localStorage and aren't dirty.
+        Object.keys(songs).forEach(songId => {
+          const song = songs[songId];
+          if (idsOnDropbox.indexOf(songId) === -1) {
+            console.warn(
+              { song, songId },
+              "not currently in our dropbox folder",
+            );
+            if (Object.keys(dirty).indexOf(songId) === -1) {
+              console.warn("and", songId, "not dirty, so nuking");
+              delete songs[songId];
+            }
           }
         });
         console.log({ songs });
@@ -256,10 +321,7 @@ export default class IndexPage extends React.Component {
           ...this.state.folders,
           [folderId]: {
             ...this.state.folders[folderId],
-            songs: {
-              ...this.state.folders[folderId].songs,
-              ...songs,
-            },
+            songs,
           },
         };
         this.setState({ folders, dropboxInputValue: "" });
@@ -349,26 +411,32 @@ export default class IndexPage extends React.Component {
       });
   };
 
-  onChange = e => {
+  onChangeSongChordPro = e => {
     const { songId } = this.state;
     const songChordPro = e.target.value;
     const chordPro = {
       ...this.state.chordPro,
       [songId]: songChordPro,
     };
-    this.setState({ chordPro });
+    const dirty = {
+      ...this.state.dirty,
+      [songId]: true,
+    };
+    this.setState({ chordPro, dirty });
 
     if (this.saveTimeout_) {
       clearTimeout(this.saveTimeout_);
     }
-    this.saveTimeout_ = setTimeout(this.onSave, 1000);
+    this.saveTimeout_ = setTimeout(() => {
+      this.saveSongChordPro(songId);
+    }, 2000);
   };
 
-  onSave = () => {
-    const { chordPro, folders, songId } = this.state;
+  saveSongChordPro = songId => {
+    const { chordPro, folders } = this.state;
     const songChordPro = chordPro[songId];
     const song = this.getSongById(songId);
-    console.log("onSave", { songId, song, songChordPro });
+    console.log("saveSongChordPro", { songId, song, songChordPro });
     let path;
     const isNewSong = song.name === NEW_SONG_NAME;
     if (isNewSong) {
@@ -394,6 +462,11 @@ export default class IndexPage extends React.Component {
       .filesUpload(filesCommitInfo)
       .then(response => {
         console.log("SAVED song", { response });
+
+        let dirty = { ...this.state.dirty };
+        delete dirty[songId];
+        this.setState({ dirty });
+
         if (isNewSong) {
           console.log("SAVED NEW SONG!");
           const newSongId = response.id;
@@ -535,7 +608,32 @@ export default class IndexPage extends React.Component {
             }
           }
         `}</style>
-        {loading ? <LoadingIndicator /> : null}
+
+        {saving && (
+          <LoadingIndicator
+            hasBackground={false}
+            style={{
+              padding: "5px 10px 10px 10px",
+              position: "fixed",
+              fontSize: 10,
+              right: 42,
+              top: 0,
+              zIndex: 2,
+            }}
+          />
+        )}
+
+        {loading ? (
+          <LoadingIndicator
+            style={{
+              position: "fixed",
+              left: "50%",
+              top: "50%",
+              transform: "translate3d(-50%, -50%, 0)",
+              zIndex: 2,
+            }}
+          />
+        ) : null}
         {preferencesOpen ? (
           <Preferences
             preferences={preferences}
@@ -660,11 +758,10 @@ export default class IndexPage extends React.Component {
                   }}
                 >
                   <SongEditor
-                    onChange={this.onChange}
-                    onSave={this.onSave}
-                    preferences={preferences}
+                    onChange={this.onChangeSongChordPro}
                     readOnly={readOnly}
                     saving={saving}
+                    server_modified={song.server_modified}
                     value={chordPro[songId]}
                   />
                 </div>
