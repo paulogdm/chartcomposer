@@ -1,6 +1,7 @@
 import getConfig from "next/config";
 import { createOauthFlow } from "react-oauth-flow";
 
+import withSentry from "./withSentry";
 import Meta from "./Meta";
 import Footer from "./Footer";
 
@@ -12,12 +13,12 @@ const {
   IS_DEV,
 } = publicRuntimeConfig;
 
-export default ({ children }) => (
+export default withSentry(({ children }) => (
   <div>
     <Meta />
     {children}
   </div>
-);
+));
 
 const { Sender, Receiver } = createOauthFlow({
   authorizeUrl: "https://www.dropbox.com/oauth2/authorize",

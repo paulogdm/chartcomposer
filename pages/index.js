@@ -108,6 +108,13 @@ export default class IndexPage extends React.Component {
     window.addEventListener("resize", this.debouncedOnResize);
     window.addEventListener("offline", this.updateOnlineStatus);
     window.addEventListener("online", this.updateOnlineStatus);
+
+    if (
+      window.location.search &&
+      window.location.search.indexOf("error") !== -1
+    ) {
+      throw new Error("This is Lindsey testing Sentry");
+    }
   }
 
   componentWillUnmount() {
