@@ -3,7 +3,9 @@
   "version": "0.0.2",
   "description": "",
   "main": "index.js",
-  "alias": "chartcomposer.com",
+  "now": {
+    "alias": "chartcomposer.com"
+  },
   "scripts": {
     "dev": "next",
     "build": "next build",

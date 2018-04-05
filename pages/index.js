@@ -267,6 +267,12 @@ export default class IndexPage extends React.Component {
           this.loadFilesFromDropboxFolder(folderId, isCheckForChanges);
         } else if (tag === "file") {
           const songId = response.id;
+          if (!isChordProFileName(response.name)) {
+            this.setState({ loading: false, dropboxInputValue: "" }, () => {
+              alert("Your link does not resolve to a chordpro file, sorry.");
+            });
+            return;
+          }
           const songs = {
             ...this.state.songs,
             [songId]: {
