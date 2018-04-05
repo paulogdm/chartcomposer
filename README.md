@@ -16,5 +16,4 @@ Go to http://localhost:3000/
 
 ```
 deploy.sh
-now alias
 ```
