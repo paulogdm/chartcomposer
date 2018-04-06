@@ -1,19 +1,17 @@
 # ChartComposer
 
-1.  Download Now Desktop at https://zeit.co/download
+ChartComposer is a website (https://chartcomposer.com) for displaying and
+editing ChordPro files.
 
-2.
+To run / develop locally:
+
+* Download the Now Desktop at https://zeit.co/download
+* Clone this repository
 
 ```
+cd chartcomposer
 npm install
 dev.sh
 ```
 
-3)
-Go to http://localhost:3000/
-
-4.  DEPLOY
-
-```
-deploy.sh
-```
+Deployment using `now` is done automatically via Travis
