@@ -1,4 +1,7 @@
 language: node_js
+notifications:
+  email:
+    - lsimon@commoner.com
 node_js:
 - node
 cache: npm
