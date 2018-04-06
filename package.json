@@ -30,5 +30,7 @@
     "react-oauth-flow": "^1.1.1",
     "whatwg-fetch": "^2.0.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "now": "^11.0.6"
+  }
 }
