@@ -5,7 +5,20 @@ import Background from "./Background";
 export const defaultPreferences = {
   color: "Red",
   songs: {},
-  folders: {},
+  folders: {
+    "id:zY8_f7IMoCgAAAAAAAE7DA": {
+      ".tag": "folder",
+      url:
+        "https://www.dropbox.com/sh/hyt61zo702g3c5c/AACT5_YdGoZiEyYt4yI6Oolaa?dl=0",
+      id: "id:zY8_f7IMoCgAAAAAAAE7DA",
+      name: "Demo Songs",
+      link_permissions: {
+        resolved_visibility: { ".tag": "public" },
+        can_revoke: false,
+        revoke_failure_reason: { ".tag": "owner_only" },
+      },
+    },
+  },
 };
 
 export default class Preferences extends React.Component {
