@@ -1,9 +1,10 @@
 export default function chordProParse(value) {
   gSong = importChordPro(value);
   var sHtml = exportHtml(gSong);
+  var sTextSize = ( gSong.textsize == parseInt(gSong.textsize) ? gSong.textsize + "px" : gSong.textsize );  // add "px" to integers, ow allow % and em
   return {
     __html:
-      "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif;'>" +
+      "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " + gSong.textcolour + "; font-size: " + sTextSize + "; font-family: " + gSong.textfont + ";'>" +
       sHtml +
       "</div>",
   };
@@ -106,6 +107,7 @@ var gaDefaultSettings = {
   tabfont: "Verdana, Arial, Helvetica, sans-serif",
   tabsize: 14,
   tabcolour: "black",
+  x_chordposition: "inline",
 };
 
 function createSong() {
@@ -187,9 +189,6 @@ function doDirective(line) {
     case "chordfont":
     case "chordsize":
     case "chordcolour":
-    case "tabfont":
-    case "tabsize":
-    case "tabcolour":
       gSong[directive] = parameters;
       break;
 
@@ -261,6 +260,7 @@ function doDirective(line) {
 
     // Custom directives
     case "x_audio":
+    case "x_chordposition":
       gSong[directive] = parameters;
       break;
     case "x_instrument": // guitar, ukulele, uke, bass, mandolin
@@ -270,6 +270,9 @@ function doDirective(line) {
         'Warning: Directive "' + directive + '" is not supported currently.',
       );
       break;
+    case "tabfont":
+    case "tabsize":
+    case "tabcolour":
     default:
       console.log('Warning: No handler for directive "' + directive + '".');
   }
@@ -291,7 +294,7 @@ function exportHtml(song) {
     "capo",
 	"x_audio",
   ];
-  console.log(song);
+
   for (var i = 0; i < aProperties.length; i++) {
     var prop = aProperties[i];
     if (song[prop]) {
@@ -331,6 +334,7 @@ function exportHtml(song) {
   return aResults.join("\n");
 }
 
+
 // Need this cause CSS rules are missing
 function getCss(prop) {
   switch (prop) {
@@ -346,12 +350,11 @@ function getCss(prop) {
       return " style='padding-top: 0.5em; margin-bottom: 0.5em; padding-left: 0.5em;'";
     case "comment":
       return " style='padding-top: 0.5em; padding-bottom: 0.5em;'";
-    case "chorus":
-      return " style='border-left: 5px solid #CCC;'";
   }
 
   return "";
 }
+
 
 function exportHtmlPart(aParts, i) {
   var aResults = [];
@@ -374,6 +377,11 @@ function exportHtmlPart(aParts, i) {
     "<div class=song" + part.type + sStyle + getCss(part.type) + ">",
   );
 
+  var sChordSize = ( gSong.chordsize == parseInt(gSong.chordsize) ? gSong.chordsize + "px" : gSong.chordsize );  // add "px" to integers, ow allow % and em
+  var sChordStyle = " style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: " + gSong.chordcolour + "; font-size: " + sChordSize + "; font-family: " + gSong.chordfont + ";'";
+  var sChordPosition = ( "above" === gSong.x_chordposition ? " style='position: absolute;'" : "" );
+  var sLineHeight = ( "above" === gSong.x_chordposition ? "2.3" : "1.8" );
+  var sTextStyle = " style='line-height: " + sLineHeight + ";'";
   if (part.lines) {
     for (var i = 0; i < part.lines.length; i++) {
       var line = part.lines[i];
@@ -386,12 +394,12 @@ function exportHtmlPart(aParts, i) {
 			  var sBaseChord = sChord.substr(0, 1);
 			  var sBaseChordNew = transpose(sBaseChord, capo);
 			  var sChordNew = sChord.replace(sBaseChord, sBaseChordNew);
-			  line = line.replace('[' + sChord + ']', "<span class='chord settingschord' style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: red;'>" + sChordNew + "</span>");
+			  line = line.replace('[' + sChord + ']', "<code class='chord settingschord'" + sChordStyle + "><span" + sChordPosition + ">" + sChordNew + "</span></code>");
 		  }
 	  }
 	  else {
 		  // If no capo then just wrap the chord in a span.
-		  line = line.replace( /\[/g, "<span class='chord settingschord' style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: red;'>").replace(/\]/g, "</span>");
+		  line = line.replace( /\[/g, "<code class='chord settingschord'" + sChordStyle + "><span" + sChordPosition + ">").replace(/\]/g, "</span></code>");
 	  }
       line =
         "comment" === part.type || "choruscomment" === part.type
@@ -400,7 +408,7 @@ function exportHtmlPart(aParts, i) {
             "</div><div style='clear: both;'></div>"
           : line;
       aResults.push(
-        "<div class=lyricline style='line-height: 1.8;'>" + line + "</div>",
+        "<div class=lyricline" + sTextStyle + ">" + line + "</div>",
       );
     }
   }
