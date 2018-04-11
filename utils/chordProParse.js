@@ -260,9 +260,11 @@ function doDirective(line) {
     case "col":
 
     // Custom directives
+    case "x_audio":
+      gSong[directive] = parameters;
+      break;
     case "x_instrument": // guitar, ukulele, uke, bass, mandolin
     case "x_url":
-    case "x_audio_url":
     case "x_youtube_url":
       console.log(
         'Warning: Directive "' + directive + '" is not supported currently.',
@@ -287,20 +289,36 @@ function exportHtml(song) {
     "key",
     "tempo",
     "capo",
+	"x_audio",
   ];
+  console.log(song);
   for (var i = 0; i < aProperties.length; i++) {
     var prop = aProperties[i];
     if (song[prop]) {
-      aResults.push(
-        "<div class=song" +
-          prop +
-          getCss(prop) +
-          ">" +
-          ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
-          song[prop] +
-          "</div>",
-      );
-    }
+		switch (prop) {
+		case "x_audio":
+			// add link for audio file
+			aResults.push(
+						  "<div class=song" +
+						  prop +
+						  getCss(prop) +
+						  "><a target='_blank' href='" +
+						  song[prop] +
+						  "'>audio file</a></div>",
+						  );
+			break;
+		default:
+			aResults.push(
+						  "<div class=song" +
+						  prop +
+						  getCss(prop) +
+						  ">" +
+						  ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
+						  song[prop] +
+						  "</div>",
+						  );
+		}
+	}
   }
   aResults.push("</div>");
 
