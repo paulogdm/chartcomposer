@@ -304,7 +304,7 @@ function exportHtml(song) {
 						  getCss(prop) +
 						  "><a target='_blank' href='" +
 						  song[prop] +
-						  "'>audio file</a></div>",
+						  "'>audio</a></div>",
 						  );
 			break;
 		default:
@@ -356,6 +356,7 @@ function getCss(prop) {
 function exportHtmlPart(aParts, i) {
   var aResults = [];
   var part = aParts[i];
+  var capo = gSong.capo; // transpose?
 
   var nextPart = i < aParts.length - 1 ? aParts[i + 1] : null;
   var sStyle = "";
@@ -376,12 +377,22 @@ function exportHtmlPart(aParts, i) {
   if (part.lines) {
     for (var i = 0; i < part.lines.length; i++) {
       var line = part.lines[i];
-      line = line
-        .replace(
-          /\[/g,
-          "<span class='chord settingschord' style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: red;'>",
-        )
-        .replace(/\]/g, "</span>");
+	  if ( capo ) {
+		  // If a capo was specified then transpose each chord.
+		  var matches;
+		  while ( matches = line.match(/\[(.*?)\]/) ) {
+			  // TODO - Should we do a map to cache chords that are already transposed?
+			  var sChord = matches[1];
+			  var sBaseChord = sChord.substr(0, 1);
+			  var sBaseChordNew = transpose(sBaseChord, capo);
+			  var sChordNew = sChord.replace(sBaseChord, sBaseChordNew);
+			  line = line.replace('[' + sChord + ']', "<span class='chord settingschord' style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: red;'>" + sChordNew + "</span>");
+		  }
+	  }
+	  else {
+		  // If no capo then just wrap the chord in a span.
+		  line = line.replace( /\[/g, "<span class='chord settingschord' style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: red;'>").replace(/\]/g, "</span>");
+	  }
       line =
         "comment" === part.type || "choruscomment" === part.type
           ? "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
@@ -470,3 +481,187 @@ function exportChordProPart(aParts, i) {
 
   return aResults.join("\n");
 }
+
+
+function transpose(sChord, sSteps) {
+	var sNewChord = '';
+	if ( "undefined" !== ghSteps[sChord] ) {
+		var hChord = ghSteps[sChord];
+		if ( "undefined" !== hChord[sSteps] ) {
+			sNewChord = hChord[sSteps];
+		}
+	}
+
+	return sNewChord;
+}
+
+
+var ghSteps = {};
+ghSteps['C'] = { '1': 'C', 
+				 '1.5': 'C#', 
+				 '2': 'D', 
+				 '2.5': 'Eb',
+				 '3': 'E',
+				 '4': 'F',
+				 '4.5': 'F#',
+				 '5': 'G',
+				 '5.5': 'Ab',
+				 '6': 'A', 
+				 '6.5': 'Bb',
+				 '7': 'B' 
+                };
+
+ghSteps['C#'] = { '1': 'C#', 
+				 '1.5': 'D', 
+				 '2': 'Eb', 
+				 '2.5': 'E',
+				 '3': 'F',
+				 '4': 'F#',
+				 '4.5': 'G',
+				 '5': 'Ab',
+				 '5.5': 'A',
+				 '6': 'Bb', 
+				 '6.5': 'B',
+				 '7': 'C' 
+                };
+
+ghSteps['D'] = { '1': 'D', 
+				 '1.5': 'Eb', 
+				 '2': 'E', 
+				 '2.5': 'F',
+				 '3': 'F#',
+				 '4': 'G',
+				 '4.5': 'Ab',
+				 '5': 'A',
+				 '5.5': 'Bb',
+				 '6': 'B', 
+				 '6.5': 'C',
+				 '7': 'C#' 
+                };
+
+ghSteps['Eb'] = { '1': 'Eb', 
+				 '1.5': 'E', 
+				 '2': 'F', 
+				 '2.5': 'F#',
+				 '3': 'G',
+				 '4': 'Ab',
+				 '4.5': 'A',
+				 '5': 'Bb',
+				 '5.5': 'B',
+				 '6': 'C', 
+				 '6.5': 'C#',
+				 '7': 'D' 
+                };
+
+ghSteps['E'] = { '1': 'E', 
+				 '1.5': 'F', 
+				 '2': 'F#', 
+				 '2.5': 'G',
+				 '3': 'Ab',
+				 '4': 'A',
+				 '4.5': 'Bb',
+				 '5': 'B',
+				 '5.5': 'C',
+				 '6': 'C#', 
+				 '6.5': 'D',
+				 '7': 'Eb' 
+                };
+
+ghSteps['F'] = { '1': 'F', 
+				 '1.5': 'F#', 
+				 '2': 'G', 
+				 '2.5': 'Ab',
+				 '3': 'A',
+				 '4': 'Bb',
+				 '4.5': 'B',
+				 '5': 'C',
+				 '5.5': 'C#',
+				 '6': 'D', 
+				 '6.5': 'Eb',
+				 '7': 'E' 
+                };
+
+ghSteps['F#'] = { '1': 'F#', 
+				 '1.5': 'G', 
+				 '2': 'Ab', 
+				 '2.5': 'A',
+				 '3': 'Bb',
+				 '4': 'B',
+				 '4.5': 'C',
+				 '5': 'C#',
+				 '5.5': 'D',
+				 '6': 'Eb', 
+				 '6.5': 'E',
+				 '7': 'F' 
+                };
+
+ghSteps['G'] = { '1': 'G', 
+				 '1.5': 'Ab', 
+				 '2': 'A', 
+				 '2.5': 'Bb',
+				 '3': 'B',
+				 '4': 'C',
+				 '4.5': 'C#',
+				 '5': 'D',
+				 '5.5': 'Eb',
+				 '6': 'E', 
+				 '6.5': 'F',
+				 '7': 'F#' 
+                };
+
+ghSteps['Ab'] = { '1': 'Ab', 
+				 '1.5': 'A', 
+				 '2': 'Bb', 
+				 '2.5': 'B',
+				 '3': 'C',
+				 '4': 'C#',
+				 '4.5': 'D',
+				 '5': 'Eb',
+				 '5.5': 'E',
+				 '6': 'F', 
+				 '6.5': 'F#',
+				 '7': 'G' 
+                };
+
+ghSteps['A'] = { '1': 'A', 
+				 '1.5': 'Bb', 
+				 '2': 'B', 
+				 '2.5': 'C',
+				 '3': 'C#',
+				 '4': 'D',
+				 '4.5': 'Eb',
+				 '5': 'E',
+				 '5.5': 'F',
+				 '6': 'F#', 
+				 '6.5': 'G',
+				 '7': 'Ab' 
+                };
+
+ghSteps['Bb'] = { '1': 'Bb', 
+				 '1.5': 'B', 
+				 '2': 'C', 
+				 '2.5': 'C#',
+				 '3': 'D',
+				 '4': 'Eb',
+				 '4.5': 'E',
+				 '5': 'F',
+				 '5.5': 'F#',
+				 '6': 'G', 
+				 '6.5': 'Ab',
+				 '7': 'A' 
+                };
+
+ghSteps['B'] = { '1': 'B', 
+				 '1.5': 'C', 
+				 '2': 'C#', 
+				 '2.5': 'D',
+				 '3': 'Eb',
+				 '4': 'E',
+				 '4.5': 'F',
+				 '5': 'F#',
+				 '5.5': 'G',
+				 '6': 'Ab', 
+				 '6.5': 'A',
+				 '7': 'Bb' 
+                };
+
