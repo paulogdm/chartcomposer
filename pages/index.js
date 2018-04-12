@@ -759,6 +759,7 @@ export default class IndexPage extends React.Component {
             >
               {songId &&
               song &&
+              !readOnly &&
               (smallScreenMode === "SongEditor" || smallScreenMode === null) ? (
                 <div
                   className="panel-song-editor"
