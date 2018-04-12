@@ -1,9 +1,16 @@
 import React from "react";
+import _ from "lodash";
 
 import Background from "./Background";
+import {
+  displayPreferenceDefaults,
+  displayPreferenceMap,
+} from "../utils/chordProParse";
 
 export const defaultPreferences = {
-  color: "Red",
+  display: {
+    ...displayPreferenceDefaults,
+  },
   songs: {},
   folders: {
     "id:zY8_f7IMoCgAAAAAAAE7DA": {
@@ -26,6 +33,7 @@ export default class Preferences extends React.Component {
     super();
     this.state = {
       isOpen: false,
+      preferences: { ...props.preferences },
     };
   }
 
@@ -38,26 +46,71 @@ export default class Preferences extends React.Component {
     this.clickListener = null;
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.preferences &&
+      !_.isEqual(this.state.preferences, nextProps.preferences)
+    ) {
+      console.log("preferences componentWillReceiveProps", { preferences });
+      this.setState({ preferences: { ...nextProps.preferences } });
+    }
+  }
+
   onDocumentClick = e => {
     if (!this.contents.contains(e.target)) {
       this.props.togglePreferencesOpen();
     }
   };
 
-  onChangeColor = e => {
-    console.log("onChangeColor", e.target.value);
+  onChangeDisplayPreference = e => {
     let preferences = {
-      ...this.props.preferences,
-      color: e.target.value,
+      ...this.state.preferences,
+      display: {
+        ...this.state.preferences.display,
+        [e.target.name]: e.target.value,
+      },
     };
+    console.log("onChangeDisplayPreference", e.target.value, e.target.name, {
+      preferences,
+    });
+    this.setState({ preferences });
+  };
+
+  onClickResetDefault = e => {
+    let preferences = {
+      ...this.state.preferences,
+      display: {
+        ...displayPreferenceDefaults,
+      },
+    };
+    console.log("onClickResetDefault", { preferences });
+    this.setState({ preferences });
+  };
+
+  onClickSave = e => {
+    let preferences = {
+      ...this.state.preferences,
+      display: {
+        ...this.state.preferences.display,
+        [e.target.name]: e.target.value,
+      },
+    };
+    console.log("onClickSave", { preferences });
     this.props.updatePreferences(preferences);
   };
 
   render() {
-    const { preferences, togglePreferencesOpen } = this.props;
+    const { togglePreferencesOpen } = this.props;
+    const { preferences } = this.state;
+    const sections = Object.keys(displayPreferenceMap);
+    sections.sort();
+
     return (
       <div>
         <style jsx>{`
+          .pref {
+            margin-bottom: 16px;
+          }
           .label-c {
             margin-bottom: 5px;
           }
@@ -80,27 +133,95 @@ export default class Preferences extends React.Component {
           style={{
             background: "#fff",
             border: "2px solid #ccc",
-            padding: "0 20px 20px",
+            padding: "10px 30px 30px",
             position: "fixed",
-            width: 400,
-            height: 300,
             left: "50%",
             top: "50%",
             transform: "translate3d(-50%, -50%, 0)",
             zIndex: 2,
           }}
         >
-          <h2>Preferences</h2>
-          <div className="close" onClick={togglePreferencesOpen}>
-            ×
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+            }}
+          >
+            <div>
+              <h2>Display Preferences</h2>
+              <div className="close" onClick={togglePreferencesOpen}>
+                ×
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                overflow: "auto",
+              }}
+            >
+              {sections.map(section => {
+                return (
+                  <section key={section} style={{ margin: "0 10px" }}>
+                    <h3>{section}</h3>
+                    <div>
+                      {Object.keys(displayPreferenceMap[section])
+                        .sort()
+                        .map(key => {
+                          const prefInfo = displayPreferenceMap[section][key];
+                          const selected =
+                            preferences.display[key] ||
+                            displayPreferenceDefaults[key];
+                          return (
+                            <div key={key} className="pref">
+                              <div className="label-c">
+                                <label>{prefInfo.label}</label>
+                              </div>
+                              <select
+                                onChange={this.onChangeDisplayPreference}
+                                name={key}
+                                value={selected}
+                              >
+                                {prefInfo.options.map(option => (
+                                  <option
+                                    key={option.value}
+                                    value={option.value}
+                                  >
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
           </div>
-          <div className="label-c">
-            <label>Chord color</label>
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "center",
+              marginTop: 20,
+              textAlign: "center",
+            }}
+          >
+            <span
+              onClick={this.onClickResetDefault}
+              style={{
+                cursor: "pointer",
+                fontSize: 11,
+                textDecoration: "underline",
+              }}
+            >
+              Reset to defaults
+            </span>
+            <div style={{ width: 20 }} />
+            <button onClick={this.onClickSave}>Save</button>
           </div>
-          <select onChange={this.onChangeColor} value={preferences.color}>
-            <option>Blue</option>
-            <option>Red</option>
-          </select>
         </div>
       </div>
     );

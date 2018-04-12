@@ -1,10 +1,20 @@
-export default function chordProParse(value) {
-  gSong = importChordPro(value);
+export default function chordProParse(value, userDisplayPreferences) {
+  console.log("chordProParse", { userDisplayPreferences });
+  gSong = importChordPro(value, userDisplayPreferences);
   var sHtml = exportHtml(gSong);
-  var sTextSize = ( gSong.textsize == parseInt(gSong.textsize) ? gSong.textsize + "px" : gSong.textsize );  // add "px" to integers, ow allow % and em
+  var sTextSize =
+    gSong.textsize == parseInt(gSong.textsize)
+      ? gSong.textsize + "px"
+      : gSong.textsize; // add "px" to integers, ow allow % and em
   return {
     __html:
-      "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " + gSong.textcolour + "; font-size: " + sTextSize + "; font-family: " + gSong.textfont + ";'>" +
+      "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
+      gSong.textcolour +
+      "; font-size: " +
+      sTextSize +
+      "; font-family: " +
+      gSong.textfont +
+      ";'>" +
       sHtml +
       "</div>",
   };
@@ -13,8 +23,8 @@ export default function chordProParse(value) {
 var gSong; // the song object is a global
 var giLine; // the current line number being parsed
 var gaLines; // the array of lines
-function importChordPro(text) {
-  gSong = createSong();
+function importChordPro(text, userDisplayPreferences) {
+  gSong = createSong(userDisplayPreferences);
   gSong.chordprotext = text;
 
   gaLines = text.split("\n");
@@ -97,7 +107,7 @@ function matchesClosingDirectives(line, aClosingDirectives) {
   return false;
 }
 
-var gaDefaultSettings = {
+const gaDefaultSettings = {
   textfont: "Verdana, Arial, Helvetica, sans-serif",
   textsize: 14,
   textcolour: "black",
@@ -110,18 +120,88 @@ var gaDefaultSettings = {
   x_chordposition: "inline",
 };
 
-function createSong() {
+export { gaDefaultSettings as displayPreferenceDefaults };
+
+const fontOptions = [
+  { label: "Default", value: "Verdana, Arial, Helvetica, sans-serif" },
+  { label: "Lucida Grande", value: "Lucida Grande, sans-serif" },
+];
+const sizeOptions = [
+  { label: "12", value: 12 },
+  { label: "14", value: 14 },
+  { label: "16", value: 16 },
+  { label: "18", value: 18 },
+  { label: "20", value: 20 },
+];
+const colorOptions = [
+  { label: "Red", value: "red" },
+  { label: "Black", value: "black" },
+  { label: "Blue", value: "blue" },
+  { label: "Green", value: "green" },
+];
+
+export const displayPreferenceMap = {
+  Text: {
+    textfont: {
+      label: "Font",
+      options: fontOptions,
+    },
+    textsize: {
+      label: "Size",
+      options: sizeOptions,
+    },
+    textcolour: {
+      label: "Color",
+      options: colorOptions,
+    },
+  },
+  Chord: {
+    chordfont: {
+      label: "Font",
+      options: fontOptions,
+    },
+    chordsize: {
+      label: "Size",
+      options: sizeOptions,
+    },
+    chordcolour: {
+      label: "Color",
+      options: colorOptions,
+    },
+    x_chordposition: {
+      label: "Position",
+      options: [
+        { label: "Above", value: "above" },
+        { label: "Inline", value: "inline" },
+      ],
+    },
+  },
+  Tab: {
+    tabfont: {
+      label: "Font",
+      options: fontOptions,
+    },
+    tabsize: {
+      label: "Size",
+      options: sizeOptions,
+    },
+    tabcolour: {
+      label: "Color",
+      options: colorOptions,
+    },
+  },
+};
+
+function createSong(userDisplayPreferences) {
   var song = {};
 
   // placeholder for the parts of the song
   song.parts = [];
 
   // Initialize some settings:
-  for (var name in gaDefaultSettings) {
-    if (gaDefaultSettings.hasOwnProperty(name)) {
-      song[name] = gaDefaultSettings[name];
-    }
-  }
+  Object.keys(gaDefaultSettings).forEach(name => {
+    song[name] = userDisplayPreferences[name] || gaDefaultSettings[name];
+  });
 
   return song;
 }
@@ -292,36 +372,36 @@ function exportHtml(song) {
     "key",
     "tempo",
     "capo",
-	"x_audio",
+    "x_audio",
   ];
 
   for (var i = 0; i < aProperties.length; i++) {
     var prop = aProperties[i];
     if (song[prop]) {
-		switch (prop) {
-		case "x_audio":
-			// add link for audio file
-			aResults.push(
-						  "<div class=song" +
-						  prop +
-						  getCss(prop) +
-						  "><a target='_blank' href='" +
-						  song[prop] +
-						  "'>audio</a></div>",
-						  );
-			break;
-		default:
-			aResults.push(
-						  "<div class=song" +
-						  prop +
-						  getCss(prop) +
-						  ">" +
-						  ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
-						  song[prop] +
-						  "</div>",
-						  );
-		}
-	}
+      switch (prop) {
+        case "x_audio":
+          // add link for audio file
+          aResults.push(
+            "<div class=song" +
+              prop +
+              getCss(prop) +
+              "><a target='_blank' href='" +
+              song[prop] +
+              "'>audio</a></div>",
+          );
+          break;
+        default:
+          aResults.push(
+            "<div class=song" +
+              prop +
+              getCss(prop) +
+              ">" +
+              ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
+              song[prop] +
+              "</div>",
+          );
+      }
+    }
   }
   aResults.push("</div>");
 
@@ -333,7 +413,6 @@ function exportHtml(song) {
 
   return aResults.join("\n");
 }
-
 
 // Need this cause CSS rules are missing
 function getCss(prop) {
@@ -354,7 +433,6 @@ function getCss(prop) {
 
   return "";
 }
-
 
 function exportHtmlPart(aParts, i) {
   var aResults = [];
@@ -377,30 +455,58 @@ function exportHtmlPart(aParts, i) {
     "<div class=song" + part.type + sStyle + getCss(part.type) + ">",
   );
 
-  var sChordSize = ( gSong.chordsize == parseInt(gSong.chordsize) ? gSong.chordsize + "px" : gSong.chordsize );  // add "px" to integers, ow allow % and em
-  var sChordStyle = " style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: " + gSong.chordcolour + "; font-size: " + sChordSize + "; font-family: " + gSong.chordfont + ";'";
-  var sChordPosition = ( "above" === gSong.x_chordposition ? " style='position: absolute;'" : "" );
-  var sLineHeight = ( "above" === gSong.x_chordposition ? "2.3" : "1.8" );
+  var sChordSize =
+    gSong.chordsize == parseInt(gSong.chordsize)
+      ? gSong.chordsize + "px"
+      : gSong.chordsize; // add "px" to integers, ow allow % and em
+  var sChordStyle =
+    " style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: " +
+    gSong.chordcolour +
+    "; font-size: " +
+    sChordSize +
+    "; font-family: " +
+    gSong.chordfont +
+    ";'";
+  var sChordPosition =
+    "above" === gSong.x_chordposition ? " style='position: absolute;'" : "";
+  var sLineHeight = "above" === gSong.x_chordposition ? "2.3" : "1.8";
   var sTextStyle = " style='line-height: " + sLineHeight + ";'";
   if (part.lines) {
     for (var i = 0; i < part.lines.length; i++) {
       var line = part.lines[i];
-	  if ( capo ) {
-		  // If a capo was specified then transpose each chord.
-		  var matches;
-		  while ( matches = line.match(/\[(.*?)\]/) ) {
-			  // TODO - Should we do a map to cache chords that are already transposed?
-			  var sChord = matches[1];
-			  var sBaseChord = sChord.substr(0, 1);
-			  var sBaseChordNew = transpose(sBaseChord, capo);
-			  var sChordNew = sChord.replace(sBaseChord, sBaseChordNew);
-			  line = line.replace('[' + sChord + ']', "<code class='chord settingschord'" + sChordStyle + "><span" + sChordPosition + ">" + sChordNew + "</span></code>");
-		  }
-	  }
-	  else {
-		  // If no capo then just wrap the chord in a span.
-		  line = line.replace( /\[/g, "<code class='chord settingschord'" + sChordStyle + "><span" + sChordPosition + ">").replace(/\]/g, "</span></code>");
-	  }
+      if (capo) {
+        // If a capo was specified then transpose each chord.
+        var matches;
+        while ((matches = line.match(/\[(.*?)\]/))) {
+          // TODO - Should we do a map to cache chords that are already transposed?
+          var sChord = matches[1];
+          var sBaseChord = sChord.substr(0, 1);
+          var sBaseChordNew = transpose(sBaseChord, capo);
+          var sChordNew = sChord.replace(sBaseChord, sBaseChordNew);
+          line = line.replace(
+            "[" + sChord + "]",
+            "<code class='chord settingschord'" +
+              sChordStyle +
+              "><span" +
+              sChordPosition +
+              ">" +
+              sChordNew +
+              "</span></code>",
+          );
+        }
+      } else {
+        // If no capo then just wrap the chord in a span.
+        line = line
+          .replace(
+            /\[/g,
+            "<code class='chord settingschord'" +
+              sChordStyle +
+              "><span" +
+              sChordPosition +
+              ">",
+          )
+          .replace(/\]/g, "</span></code>");
+      }
       line =
         "comment" === part.type || "choruscomment" === part.type
           ? "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
@@ -490,186 +596,195 @@ function exportChordProPart(aParts, i) {
   return aResults.join("\n");
 }
 
-
 function transpose(sChord, sSteps) {
-	var sNewChord = '';
-	if ( "undefined" !== ghSteps[sChord] ) {
-		var hChord = ghSteps[sChord];
-		if ( "undefined" !== hChord[sSteps] ) {
-			sNewChord = hChord[sSteps];
-		}
-	}
+  var sNewChord = "";
+  if ("undefined" !== ghSteps[sChord]) {
+    var hChord = ghSteps[sChord];
+    if ("undefined" !== hChord[sSteps]) {
+      sNewChord = hChord[sSteps];
+    }
+  }
 
-	return sNewChord;
+  return sNewChord;
 }
 
-
 var ghSteps = {};
-ghSteps['C'] = { '1': 'C', 
-				 '1.5': 'C#', 
-				 '2': 'D', 
-				 '2.5': 'Eb',
-				 '3': 'E',
-				 '4': 'F',
-				 '4.5': 'F#',
-				 '5': 'G',
-				 '5.5': 'Ab',
-				 '6': 'A', 
-				 '6.5': 'Bb',
-				 '7': 'B' 
-                };
+ghSteps["C"] = {
+  "1": "C",
+  "1.5": "C#",
+  "2": "D",
+  "2.5": "Eb",
+  "3": "E",
+  "4": "F",
+  "4.5": "F#",
+  "5": "G",
+  "5.5": "Ab",
+  "6": "A",
+  "6.5": "Bb",
+  "7": "B",
+};
 
-ghSteps['C#'] = { '1': 'C#', 
-				 '1.5': 'D', 
-				 '2': 'Eb', 
-				 '2.5': 'E',
-				 '3': 'F',
-				 '4': 'F#',
-				 '4.5': 'G',
-				 '5': 'Ab',
-				 '5.5': 'A',
-				 '6': 'Bb', 
-				 '6.5': 'B',
-				 '7': 'C' 
-                };
+ghSteps["C#"] = {
+  "1": "C#",
+  "1.5": "D",
+  "2": "Eb",
+  "2.5": "E",
+  "3": "F",
+  "4": "F#",
+  "4.5": "G",
+  "5": "Ab",
+  "5.5": "A",
+  "6": "Bb",
+  "6.5": "B",
+  "7": "C",
+};
 
-ghSteps['D'] = { '1': 'D', 
-				 '1.5': 'Eb', 
-				 '2': 'E', 
-				 '2.5': 'F',
-				 '3': 'F#',
-				 '4': 'G',
-				 '4.5': 'Ab',
-				 '5': 'A',
-				 '5.5': 'Bb',
-				 '6': 'B', 
-				 '6.5': 'C',
-				 '7': 'C#' 
-                };
+ghSteps["D"] = {
+  "1": "D",
+  "1.5": "Eb",
+  "2": "E",
+  "2.5": "F",
+  "3": "F#",
+  "4": "G",
+  "4.5": "Ab",
+  "5": "A",
+  "5.5": "Bb",
+  "6": "B",
+  "6.5": "C",
+  "7": "C#",
+};
 
-ghSteps['Eb'] = { '1': 'Eb', 
-				 '1.5': 'E', 
-				 '2': 'F', 
-				 '2.5': 'F#',
-				 '3': 'G',
-				 '4': 'Ab',
-				 '4.5': 'A',
-				 '5': 'Bb',
-				 '5.5': 'B',
-				 '6': 'C', 
-				 '6.5': 'C#',
-				 '7': 'D' 
-                };
+ghSteps["Eb"] = {
+  "1": "Eb",
+  "1.5": "E",
+  "2": "F",
+  "2.5": "F#",
+  "3": "G",
+  "4": "Ab",
+  "4.5": "A",
+  "5": "Bb",
+  "5.5": "B",
+  "6": "C",
+  "6.5": "C#",
+  "7": "D",
+};
 
-ghSteps['E'] = { '1': 'E', 
-				 '1.5': 'F', 
-				 '2': 'F#', 
-				 '2.5': 'G',
-				 '3': 'Ab',
-				 '4': 'A',
-				 '4.5': 'Bb',
-				 '5': 'B',
-				 '5.5': 'C',
-				 '6': 'C#', 
-				 '6.5': 'D',
-				 '7': 'Eb' 
-                };
+ghSteps["E"] = {
+  "1": "E",
+  "1.5": "F",
+  "2": "F#",
+  "2.5": "G",
+  "3": "Ab",
+  "4": "A",
+  "4.5": "Bb",
+  "5": "B",
+  "5.5": "C",
+  "6": "C#",
+  "6.5": "D",
+  "7": "Eb",
+};
 
-ghSteps['F'] = { '1': 'F', 
-				 '1.5': 'F#', 
-				 '2': 'G', 
-				 '2.5': 'Ab',
-				 '3': 'A',
-				 '4': 'Bb',
-				 '4.5': 'B',
-				 '5': 'C',
-				 '5.5': 'C#',
-				 '6': 'D', 
-				 '6.5': 'Eb',
-				 '7': 'E' 
-                };
+ghSteps["F"] = {
+  "1": "F",
+  "1.5": "F#",
+  "2": "G",
+  "2.5": "Ab",
+  "3": "A",
+  "4": "Bb",
+  "4.5": "B",
+  "5": "C",
+  "5.5": "C#",
+  "6": "D",
+  "6.5": "Eb",
+  "7": "E",
+};
 
-ghSteps['F#'] = { '1': 'F#', 
-				 '1.5': 'G', 
-				 '2': 'Ab', 
-				 '2.5': 'A',
-				 '3': 'Bb',
-				 '4': 'B',
-				 '4.5': 'C',
-				 '5': 'C#',
-				 '5.5': 'D',
-				 '6': 'Eb', 
-				 '6.5': 'E',
-				 '7': 'F' 
-                };
+ghSteps["F#"] = {
+  "1": "F#",
+  "1.5": "G",
+  "2": "Ab",
+  "2.5": "A",
+  "3": "Bb",
+  "4": "B",
+  "4.5": "C",
+  "5": "C#",
+  "5.5": "D",
+  "6": "Eb",
+  "6.5": "E",
+  "7": "F",
+};
 
-ghSteps['G'] = { '1': 'G', 
-				 '1.5': 'Ab', 
-				 '2': 'A', 
-				 '2.5': 'Bb',
-				 '3': 'B',
-				 '4': 'C',
-				 '4.5': 'C#',
-				 '5': 'D',
-				 '5.5': 'Eb',
-				 '6': 'E', 
-				 '6.5': 'F',
-				 '7': 'F#' 
-                };
+ghSteps["G"] = {
+  "1": "G",
+  "1.5": "Ab",
+  "2": "A",
+  "2.5": "Bb",
+  "3": "B",
+  "4": "C",
+  "4.5": "C#",
+  "5": "D",
+  "5.5": "Eb",
+  "6": "E",
+  "6.5": "F",
+  "7": "F#",
+};
 
-ghSteps['Ab'] = { '1': 'Ab', 
-				 '1.5': 'A', 
-				 '2': 'Bb', 
-				 '2.5': 'B',
-				 '3': 'C',
-				 '4': 'C#',
-				 '4.5': 'D',
-				 '5': 'Eb',
-				 '5.5': 'E',
-				 '6': 'F', 
-				 '6.5': 'F#',
-				 '7': 'G' 
-                };
+ghSteps["Ab"] = {
+  "1": "Ab",
+  "1.5": "A",
+  "2": "Bb",
+  "2.5": "B",
+  "3": "C",
+  "4": "C#",
+  "4.5": "D",
+  "5": "Eb",
+  "5.5": "E",
+  "6": "F",
+  "6.5": "F#",
+  "7": "G",
+};
 
-ghSteps['A'] = { '1': 'A', 
-				 '1.5': 'Bb', 
-				 '2': 'B', 
-				 '2.5': 'C',
-				 '3': 'C#',
-				 '4': 'D',
-				 '4.5': 'Eb',
-				 '5': 'E',
-				 '5.5': 'F',
-				 '6': 'F#', 
-				 '6.5': 'G',
-				 '7': 'Ab' 
-                };
+ghSteps["A"] = {
+  "1": "A",
+  "1.5": "Bb",
+  "2": "B",
+  "2.5": "C",
+  "3": "C#",
+  "4": "D",
+  "4.5": "Eb",
+  "5": "E",
+  "5.5": "F",
+  "6": "F#",
+  "6.5": "G",
+  "7": "Ab",
+};
 
-ghSteps['Bb'] = { '1': 'Bb', 
-				 '1.5': 'B', 
-				 '2': 'C', 
-				 '2.5': 'C#',
-				 '3': 'D',
-				 '4': 'Eb',
-				 '4.5': 'E',
-				 '5': 'F',
-				 '5.5': 'F#',
-				 '6': 'G', 
-				 '6.5': 'Ab',
-				 '7': 'A' 
-                };
+ghSteps["Bb"] = {
+  "1": "Bb",
+  "1.5": "B",
+  "2": "C",
+  "2.5": "C#",
+  "3": "D",
+  "4": "Eb",
+  "4.5": "E",
+  "5": "F",
+  "5.5": "F#",
+  "6": "G",
+  "6.5": "Ab",
+  "7": "A",
+};
 
-ghSteps['B'] = { '1': 'B', 
-				 '1.5': 'C', 
-				 '2': 'C#', 
-				 '2.5': 'D',
-				 '3': 'Eb',
-				 '4': 'E',
-				 '4.5': 'F',
-				 '5': 'F#',
-				 '5.5': 'G',
-				 '6': 'Ab', 
-				 '6.5': 'A',
-				 '7': 'Bb' 
-                };
-
+ghSteps["B"] = {
+  "1": "B",
+  "1.5": "C",
+  "2": "C#",
+  "2.5": "D",
+  "3": "Eb",
+  "4": "E",
+  "4.5": "F",
+  "5": "F#",
+  "5.5": "G",
+  "6": "Ab",
+  "6.5": "A",
+  "7": "Bb",
+};

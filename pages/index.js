@@ -790,7 +790,10 @@ export default class IndexPage extends React.Component {
                     width: smallScreenMode === "SongView" ? "100%" : "60%",
                   }}
                 >
-                  <SongView value={chordPro[songId]} />
+                  <SongView
+                    preferences={preferences.display}
+                    value={chordPro[songId]}
+                  />
                 </div>
               ) : null}
             </div>
