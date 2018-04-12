@@ -192,7 +192,7 @@ export const displayPreferenceMap = {
   },
 };
 
-function createSong(userDisplayPreferences) {
+function createSong(userDisplayPreferences = {}) {
   var song = {};
 
   // placeholder for the parts of the song
