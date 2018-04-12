@@ -650,6 +650,7 @@ export default class IndexPage extends React.Component {
         {preferencesOpen ? (
           <Preferences
             preferences={preferences}
+            smallScreenMode={smallScreenMode}
             togglePreferencesOpen={this.togglePreferencesOpen}
             updatePreferences={this.updatePreferences}
           />

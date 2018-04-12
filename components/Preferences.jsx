@@ -100,7 +100,8 @@ export default class Preferences extends React.Component {
   };
 
   render() {
-    const { togglePreferencesOpen } = this.props;
+    const { smallScreenMode, togglePreferencesOpen } = this.props;
+    const isSmallScreen = smallScreenMode !== null;
     const { preferences } = this.state;
     const sections = Object.keys(displayPreferenceMap);
     sections.sort();
@@ -133,11 +134,14 @@ export default class Preferences extends React.Component {
           style={{
             background: "#fff",
             border: "2px solid #ccc",
+            bottom: isSmallScreen ? 0 : null,
+            boxSizing: "border-box",
             padding: "10px 30px 30px",
             position: "fixed",
-            left: "50%",
-            top: "50%",
-            transform: "translate3d(-50%, -50%, 0)",
+            left: isSmallScreen ? 0 : "50%",
+            right: isSmallScreen ? 0 : null,
+            top: isSmallScreen ? 0 : "50%",
+            transform: isSmallScreen ? null : "translate3d(-50%, -50%, 0)",
             zIndex: 2,
           }}
         >
@@ -150,13 +154,17 @@ export default class Preferences extends React.Component {
           >
             <div>
               <h2>Display Preferences</h2>
-              <div className="close" onClick={togglePreferencesOpen}>
+              <div
+                className="close"
+                onClick={togglePreferencesOpen}
+                style={{ fontSize: isSmallScreen ? 30 : null }}
+              >
                 ×
               </div>
             </div>
             <div
               style={{
-                display: "flex",
+                display: isSmallScreen ? null : "flex",
                 overflow: "auto",
               }}
             >
@@ -199,28 +207,33 @@ export default class Preferences extends React.Component {
                 );
               })}
             </div>
-          </div>
-          <div
-            style={{
-              alignItems: "center",
-              display: "flex",
-              justifyContent: "center",
-              marginTop: 20,
-              textAlign: "center",
-            }}
-          >
-            <span
-              onClick={this.onClickResetDefault}
+            <div
               style={{
-                cursor: "pointer",
-                fontSize: 11,
-                textDecoration: "underline",
+                alignItems: "center",
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 20,
+                textAlign: "center",
               }}
             >
-              Reset to defaults
-            </span>
-            <div style={{ width: 20 }} />
-            <button onClick={this.onClickSave}>Save</button>
+              <span
+                onClick={this.onClickResetDefault}
+                style={{
+                  cursor: "pointer",
+                  fontSize: 11,
+                  textDecoration: "underline",
+                }}
+              >
+                Reset to defaults
+              </span>
+              <div style={{ width: 20 }} />
+              <button
+                onClick={this.onClickSave}
+                style={{ fontSize: isSmallScreen ? 20 : null }}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       </div>
