@@ -186,6 +186,7 @@ export default class IndexPage extends React.Component {
         }
       })
       .catch(error => {
+        // This is expected initially to catch.
         console.warn("Error loading preferences", { error });
       });
   };
@@ -283,8 +284,8 @@ export default class IndexPage extends React.Component {
         }
       })
       .catch(error => {
-        console.error({ error });
         this.setState({ loading: false });
+        throw error;
       });
   };
 
@@ -340,7 +341,7 @@ export default class IndexPage extends React.Component {
         this.setState({ folders, dropboxInputValue: "" });
       })
       .catch(error => {
-        console.error({ error });
+        throw error;
       })
       .finally(() => {
         this.setState({ loading: false });
@@ -397,7 +398,7 @@ export default class IndexPage extends React.Component {
       smallScreenMode: nextSmallScreenMode,
       songId,
     });
-    const song = this.getSongById(songId);
+    const [song, _] = this.getSongById(songId);
     console.log("setSongId", { songId, song, folderId });
     const dropboxInputValue = folderId
       ? folders[folderId].url
@@ -417,7 +418,7 @@ export default class IndexPage extends React.Component {
         console.log({ chordPro });
       })
       .catch(error => {
-        console.error({ error });
+        throw error;
       })
       .finally(() => {
         this.setState({ loading: false });
@@ -448,8 +449,8 @@ export default class IndexPage extends React.Component {
   saveSongChordPro = songId => {
     const { chordPro, folders } = this.state;
     const songChordPro = chordPro[songId];
-    const song = this.getSongById(songId);
-    console.log("saveSongChordPro", { songId, song, songChordPro });
+    const [song, folderId] = this.getSongById(songId);
+    console.log("saveSongChordPro", { folderId, songId, song, songChordPro });
     let path;
     const isNewSong = song.name === NEW_SONG_NAME;
     if (isNewSong) {
@@ -478,36 +479,33 @@ export default class IndexPage extends React.Component {
 
         let dirty = { ...this.state.dirty };
         delete dirty[songId];
-        this.setState({ dirty });
 
+        let folders = {
+          ...this.state.folders,
+        };
+        let chordPro = {
+          ...this.state.chordPro,
+        };
         if (isNewSong) {
           console.log("SAVED NEW SONG!");
-          const newSongId = response.id;
-          const folderId = song.folderId;
-          // Replaces the old temporary id with the one from dropbox.
-          const folders = {
-            ...this.state.folders,
-            [folderId]: {
-              ...this.state.folders[folderId],
-              songs: {
-                ...this.state.folders[folderId].songs,
-                [newSongId]: response,
-              },
-            },
-          };
           delete folders[folderId].songs[songId];
-
-          let chordPro = {
-            ...this.state.chordPro,
-            [newSongId]: songChordPro,
-          };
           delete chordPro[songId];
-
-          this.setState({ chordPro, folders, songId: newSongId });
+          songId = response.id;
         }
+        console.log({ folders, folderId });
+        folders[folderId] = {
+          ...folders[folderId],
+          songs: {
+            ...folders[folderId].songs,
+            [songId]: response,
+          },
+        };
+
+        chordPro[songId] = songChordPro;
+        this.setState({ chordPro, dirty, folders, songId });
       })
       .catch(error => {
-        console.error({ error });
+        throw error;
       })
       .finally(() => {
         this.setState({ saving: false });
@@ -515,17 +513,20 @@ export default class IndexPage extends React.Component {
   };
 
   getSongById(songId) {
+    if (!songId) {
+      return [null, null];
+    }
     const { folders, songs } = this.state;
     const folderIds = Object.keys(folders);
     for (var i = 0, folderId; (folderId = folderIds[i]); i++) {
       if (folders[folderId].songs && folders[folderId].songs[songId]) {
-        return folders[folderId].songs[songId];
+        return [folders[folderId].songs[songId], folderId];
       }
     }
     console.log("getSongById", songId, "not found in folders, looking in", {
       songs,
     });
-    return songs[songId];
+    return [songs[songId], null];
   }
 
   toggleFolderOpen = folderId => {
@@ -577,7 +578,7 @@ export default class IndexPage extends React.Component {
         console.log("SAVED PREFERENCES!");
       })
       .catch(error => {
-        console.error({ error });
+        throw error;
       })
       .finally(() => {
         this.setState({ loading: false });
@@ -605,7 +606,7 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-    const song = songId && this.getSongById(songId);
+    const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     return (
       <Page>
@@ -768,7 +769,7 @@ export default class IndexPage extends React.Component {
                     borderRight: "1px solid #ccc",
                     height: "100%",
                     overflow: "auto",
-                    padding: 10,
+                    padding: "8px 0",
                     width: smallScreenMode === "SongEditor" ? "100%" : "40%",
                   }}
                 >
