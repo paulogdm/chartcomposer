@@ -5,7 +5,6 @@ const SongEditor = ({ onChange, readOnly, saving, server_modified, value }) => {
   if (!value) {
     return null;
   }
-  console.log({ server_modified });
   return (
     <div
       style={{

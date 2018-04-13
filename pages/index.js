@@ -22,6 +22,7 @@ const Dropbox = dropbox.Dropbox;
 const DROPBOX_APP_DIR = "/Apps/ChartComposer";
 const PREFERENCES_PATH = `${DROPBOX_APP_DIR}/.preferences.json`;
 const NEW_SONG_NAME = "new_song.pro";
+const NEW_SONG_ID_MARKER = "NEW-SONG";
 
 const LOCAL_STORAGE_FIELDS = [
   "folders",
@@ -358,13 +359,34 @@ export default class IndexPage extends React.Component {
   };
 
   newSong = folderId => {
-    const songId = Date.now().toString();
-    console.log("newSong", songId);
+    const songName = window.prompt("Name of new song");
+    if (!songName) {
+      console.warn("User cancelled the new song prompt.");
+      return;
+    }
+
+    const songId = `${NEW_SONG_ID_MARKER}-${Date.now().toString()}`;
+    console.log("newSong", songId, songName);
     const chordPro = {
       ...this.state.chordPro,
-      [songId]:
-        "{title: New Song}\n{artist: }\n\n{start_of_verse}\n{comment: Verse 1}\n[D]Row, row, row your boat\n[D]Gently down the stream\n{end_of_verse}\n{start_of_chorus}\n{comment: Chorus}\n{end_of_chorus}\n",
+      [songId]: `{title: ${songName}}
+{artist: }
+
+{start_of_verse}
+{comment: Verse 1}
+[D]Row, row, row your boat
+[D]Gently down the stream
+{end_of_verse}
+
+{start_of_chorus}
+{comment: Chorus}
+[C]Merrily merrily merrily merrily...
+{end_of_chorus}`,
     };
+    const name = `${songName}.pro`;
+    const path_lower = `${
+      this.state.folders[folderId].path_lower
+    }/${name.replace(/\s+/g, "_")}`;
     const folders = {
       ...this.state.folders,
       [folderId]: {
@@ -374,13 +396,15 @@ export default class IndexPage extends React.Component {
           [songId]: {
             id: songId,
             folderId,
-            path_lower: NEW_SONG_NAME,
-            name: NEW_SONG_NAME,
+            path_lower,
+            name,
           },
         },
       },
     };
-    this.setState({ chordPro, folders, songId });
+    this.setState({ chordPro, folders, songId }, () => {
+      this.saveSongChordPro(songId);
+    });
   };
 
   setSongId = (songId, folderId) => {
@@ -450,19 +474,10 @@ export default class IndexPage extends React.Component {
     const { chordPro, folders } = this.state;
     const songChordPro = chordPro[songId];
     const [song, folderId] = this.getSongById(songId);
-    console.log("saveSongChordPro", { folderId, songId, song, songChordPro });
-    let path;
-    const isNewSong = song.name === NEW_SONG_NAME;
-    if (isNewSong) {
-      // this is a new song - not in Dropbox yet
-      let songTitle = songChordPro.match(/{title:(.*?)}/)
-        ? songChordPro.match(/{title:(.*?)}/)[1].trim()
-        : "New Song";
-      let filename = songTitle.toLowerCase().replace(" ", "_") + ".pro";
-      path = `${folders[song.folderId].path_lower}/${filename}`;
-    } else {
-      path = getPathForSong(song);
-    }
+    const path = getPathForSong(song);
+    const isNewSong = song.id.indexOf(NEW_SONG_ID_MARKER) === 0;
+    console.log("saveSongChordPro", { folderId, isNewSong, songId, song });
+
     const filesCommitInfo = {
       autorename: false,
       contents: songChordPro,
@@ -487,10 +502,10 @@ export default class IndexPage extends React.Component {
           ...this.state.chordPro,
         };
         if (isNewSong) {
-          console.log("SAVED NEW SONG!");
           delete folders[folderId].songs[songId];
           delete chordPro[songId];
           songId = response.id;
+          console.log("SAVED NEW SONG! songId is now", songId);
         }
         console.log({ folders, folderId });
         folders[folderId] = {

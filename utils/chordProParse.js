@@ -1,5 +1,4 @@
 export default function chordProParse(value, userDisplayPreferences) {
-  console.log("chordProParse", { userDisplayPreferences });
   gSong = importChordPro(value, userDisplayPreferences);
   var sHtml = exportHtml(gSong);
   var sTextSize =
@@ -46,7 +45,6 @@ function importChordPro(text, userDisplayPreferences) {
     }
   }
 
-  console.log(gSong);
   return gSong;
 }
 
@@ -76,11 +74,13 @@ function doBlock(type, closingdirectives) {
       // Yay! This specific block type has a matching closing directive!
       break;
     } else if ("" === line && 0 === aClosingDirectives.length) {
-      console.log(
+      /*
+      console.debug(
         'debug: assuming this blank line closes the current "' +
           type +
           '" block',
       );
+      */
       break;
     } else if (isDirective(line)) {
       doDirective(line);
@@ -219,7 +219,7 @@ function isComment(line) {
 function doDirective(line) {
   var aMatches = line.match(/{([^:}]+)(.*)}/);
   if (!aMatches) {
-    console.log("Warning: Could not find directive in line: " + line);
+    console.warn("Warning: Could not find directive in line: " + line);
     return;
   }
 
@@ -299,7 +299,7 @@ function doDirective(line) {
     case "end_of_verse":
     case "end_of_tab":
     case "eot":
-      console.log(
+      console.error(
         "ERROR: Should never reach this closing directive: " + directive,
       );
       break;
@@ -346,7 +346,7 @@ function doDirective(line) {
     case "x_instrument": // guitar, ukulele, uke, bass, mandolin
     case "x_url":
     case "x_youtube_url":
-      console.log(
+      console.warn(
         'Warning: Directive "' + directive + '" is not supported currently.',
       );
       break;
@@ -354,7 +354,7 @@ function doDirective(line) {
     case "tabsize":
     case "tabcolour":
     default:
-      console.log('Warning: No handler for directive "' + directive + '".');
+      console.warn('Warning: No handler for directive "' + directive + '".');
   }
 }
 
