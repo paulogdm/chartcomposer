@@ -99,7 +99,7 @@ export default class IndexPage extends React.Component {
                 <li>Paste that link into ChartComposer and hit "Go".</li>
               </ol>
 
-              <h2>FAQ</h2>
+              <h2 id={"faq"}>FAQ</h2>
 
               <div style={{ "font-weight": "bold" }}>
                 Q: Can I share my songs?
@@ -163,7 +163,42 @@ export default class IndexPage extends React.Component {
               </div>
 
               <div style={{ "font-weight": "bold" }}>
-                Q: Which ChordPro directies are supported by ChartComposer?
+                Q: What's "ChordPro"?
+              </div>
+              <div style={{ "margin-bottom": "1em" }}>
+                A: ChordPro is a <a href="https://en.wikipedia.org/wiki/Markup_language">markup language</a> for creating sheet music. 
+				You can find out more about ChordPro <a href="http://www.chordpro.org/">here</a>.
+				It's open source, well documented, <a href="http://www.chordpro.org/chordpro/Support.html">supported</a>, 
+				and <a href="https://github.com/ChordPro/chordpro">available on Github</a>. 
+				<p>
+				If you add ChordPro markup to a set of lyrics you end up with sheet music. It's that easy!
+				There are two main parts to ChordPro markup: You add chords by putting them inside square brackets.
+				You add other song parts by using ChordPro directives within curly brackets. Here's an example:
+				</p>
+				<pre style={{border: "1px solid", padding: "1em", "margin-left": "4em",}}>
+				  &#123;title: Amazing Grace&#125;<br/>
+				  &#123;composer: John Newton&#125;<br/>
+				  &#123;key: D&#125;<br/>
+				  &nbsp;<br/>
+				  &#123;start_of_verse&#125;<br/>
+				  &#123;comment: Verse 1&#125;<br/>
+				  [D]Amazing grace! (how [G]sweet the [D]sound)<br/>
+				  That [D]saved a wretch like [A7]me!<br/>
+				  I [D]once was lost, but [G]now am [D]found,<br/>
+				  Was [D]blind, but [A7]now I [D]see.<br/>
+				  &#123;end_of_verse&#125;<br/>
+				</pre>
+
+				<p>
+				  Here's what that ChordPro text looks like in ChartComposer:
+				</p>
+				<div style={{border: "1px solid", padding: "1em", "margin-left": "4em",}}>
+				  <img src={"/static/amazing-grace.png"}/>
+				</div>
+			  </div>
+
+              <div style={{ "font-weight": "bold" }}>
+                Q: Which ChordPro directives are supported by ChartComposer?
               </div>
               <div style={{ "margin-bottom": "1em" }}>
                 A: ChartComposer supports the following directives. You can see
@@ -223,20 +258,35 @@ export default class IndexPage extends React.Component {
                   <li>
                     <code>title</code>
                   </li>
-                  <li>
-                    <code>x_audio</code>
-                  </li>
-                  <li>
-                    <code>x_chordposition</code>
-                  </li>
                 </ul>
+
+				<p>
+				  ChartComposer adds the following custom directives:
+				</p>
+				<ul>
+                  <li>
+                    <code>&#123;x_audio: url&#125;</code> - Add a link to an audio file. 
+                  </li>
+                  <li>
+                    <code>&#123;x_chordposition: inline|above &#125;</code> - Specify where to place the chords relative to the lyrics.
+                  </li>
+				</ul>
               </div>
 
-              <div style={{ "font-weight": "bold" }}>Q: </div>
-              <div style={{ "margin-bottom": "1em" }}>A: </div>
+              <div style={{ "font-weight": "bold" }}>
+                Q: Who created ChartComposer?
+              </div>
+              <div style={{ "margin-bottom": "1em" }}>
+                A: ChartComposer is brought to you by <a href="https://twitter.com/elsigh">Lindsey Simon</a> and <a href="https://twitter.com/souders">Steve Souders</a>.
+			  </div>
 
-              <div style={{ "font-weight": "bold" }}>Q: </div>
-              <div style={{ "margin-bottom": "1em" }}>A: </div>
+              <div style={{ "font-weight": "bold" }}>
+                Q: Is ChartComposer open source?
+              </div>
+              <div style={{ "margin-bottom": "1em" }}>
+                A: Yes. You can find the code on <a href="https://github.com/elsigh/chartcomposer">Github</a>.
+			  </div>
+
             </div>
           </div>
         </div>
