@@ -802,8 +802,8 @@ export default class IndexPage extends React.Component {
                     value={chordPro[songId]}
                   />
                 </div>
-              ) : null}
-              {chordPro[songId] &&
+              ) : 
+				( chordPro[songId] &&
               (smallScreenMode === "SongView" || smallScreenMode === null) ? (
                 <div
                   className="panel-song-view"
@@ -819,7 +819,21 @@ export default class IndexPage extends React.Component {
                     value={chordPro[songId]}
                   />
                 </div>
-              ) : null}
+              ) : 
+				( 
+				<div style={{"text-align": "center", "padding": "1em", "width": "100%", "font-size": "1.2em",}}>
+				  <h1>Welcome to ChartComposer!</h1>
+				  <ul style={{"list-style-type": "none",}}>
+					<li style={{"margin-bottom": "4px",}}> Create sheet music </li>
+					<li style={{"margin-bottom": "4px",}}> Share with friends </li>
+					<li style={{"margin-bottom": "4px",}}> Save in Dropbox </li>
+					<li style={{"margin-bottom": "4px",}}> Format using ChordPro </li>
+				  </ul>
+				  <p>
+					Find out <a href="about">more</a>!
+				  </p>
+				</div>
+				) ) } 
             </div>
           </div>
         </div>
