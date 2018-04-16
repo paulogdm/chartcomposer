@@ -1,5 +1,6 @@
 export default function chordProParse(value, userDisplayPreferences) {
-  gSong = importChordPro(value, userDisplayPreferences);
+  gSong = parseChordProString(value, userDisplayPreferences);
+  console.debug({ chordProParsed: gSong });
   var sHtml = exportHtml(gSong);
   var sTextSize =
     gSong.textsize == parseInt(gSong.textsize)
@@ -22,7 +23,7 @@ export default function chordProParse(value, userDisplayPreferences) {
 var gSong; // the song object is a global
 var giLine; // the current line number being parsed
 var gaLines; // the array of lines
-function importChordPro(text, userDisplayPreferences) {
+export function parseChordProString(text, userDisplayPreferences) {
   gSong = createSong(userDisplayPreferences);
   gSong.chordprotext = text;
 
@@ -36,7 +37,7 @@ function importChordPro(text, userDisplayPreferences) {
     } else if (isComment(line)) {
       // do nothing
     } else if ("" === line) {
-      //console.log("DEBUG: blank line");
+      console.debug("DEBUG: blank line");
     } else {
       // A line with no directive and it must NOT be within a directive block
       // like chorus or verse. We assume this is lyrics so we create a verse.
@@ -74,13 +75,11 @@ function doBlock(type, closingdirectives) {
       // Yay! This specific block type has a matching closing directive!
       break;
     } else if ("" === line && 0 === aClosingDirectives.length) {
-      /*
       console.debug(
         'debug: assuming this blank line closes the current "' +
           type +
           '" block',
       );
-      */
       break;
     } else if (isDirective(line)) {
       doDirective(line);

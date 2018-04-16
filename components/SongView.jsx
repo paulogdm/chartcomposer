@@ -1,6 +1,7 @@
-import chordProParse from "../utils/chordProParse.js";
+import chordProParse, { parseChordProString } from "../utils/chordProParse.js";
 
 const SongView = ({ preferences, value }) => {
+  //const obj = parseChordProString(value, preferences);
   return (
     <div>
       <style jsx>{`

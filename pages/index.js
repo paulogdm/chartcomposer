@@ -625,6 +625,12 @@ export default class IndexPage extends React.Component {
     const readOnly = song && !song.path_lower;
     return (
       <Page>
+        <style jsx global>{`
+          html,
+          body {
+            overflow: hidden;
+          }
+        `}</style>
         <style jsx>{`
           @media print {
             .header,

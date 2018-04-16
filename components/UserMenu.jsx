@@ -76,13 +76,15 @@ export default class UserMenu extends React.Component {
                 textAlign: "right",
               }}
             >
+              <li>
+                <a href="/about">About</a>
+              </li>
               <li onClick={this.togglePreferences}>
                 <div>Preferences</div>
               </li>
               <li onClick={signOut}>
                 <div>Sign out</div>
               </li>
-			  <li> <a href="/about">About</a> </li>
             </ol>
           </div>
         ) : null}
