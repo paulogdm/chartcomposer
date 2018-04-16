@@ -82,6 +82,7 @@ export default class UserMenu extends React.Component {
               <li onClick={signOut}>
                 <div>Sign out</div>
               </li>
+			  <li> <a href="/about">About</a> </li>
             </ol>
           </div>
         ) : null}
