@@ -12,6 +12,7 @@ const Header = ({
   smallScreenMode,
   togglePreferencesOpen,
   user,
+  nologin,
 }) => (
   <div
     className={className}
@@ -126,7 +127,7 @@ const Header = ({
           signOut={signOut}
           togglePreferencesOpen={togglePreferencesOpen}
         />
-      ) : (
+      ) : ( nologin ? (<span></span>) : (
         <Sender
           state={{ to: "/" }}
           render={({ url }) => (
@@ -146,7 +147,7 @@ const Header = ({
             </div>
           )}
         />
-      )}
+      ) ) }
     </div>
   </div>
 );
