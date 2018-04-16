@@ -13,6 +13,7 @@ const Header = ({
   togglePreferencesOpen,
   user,
   nologin,
+  title,
 }) => (
   <div
     className={className}
@@ -70,7 +71,7 @@ const Header = ({
           paddingTop: 0,
         }}
       >
-        ChartComposer
+        {title ? (title) : ("ChartComposer") }
       </h1>
       {user ? (
         <div
