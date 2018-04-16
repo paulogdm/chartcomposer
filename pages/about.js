@@ -197,19 +197,13 @@ export default class IndexPage extends React.Component {
                     <code>composer</code>
                   </li>
                   <li>
-                    <code>end_of_chorus</code>
-                  </li>
-                  <li>
-                    <code>end_of_verse</code>
-                  </li>
-                  <li>
                     <code>key</code>
                   </li>
                   <li>
-                    <code>start_of_chorus</code>
+                    <code>start_of_chorus, end_of_chorus</code>
                   </li>
                   <li>
-                    <code>start_of_verse</code>
+                    <code>start_of_verse, end_of_verse</code>
                   </li>
                   <li>
                     <code>subtitle</code>
