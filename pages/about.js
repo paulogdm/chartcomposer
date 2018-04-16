@@ -44,7 +44,7 @@ export default class IndexPage extends React.Component {
 			  </ol>
 
 			  <h3>Dropbox "Share folder" links</h3>
-			  <p>There's one more key concept behind ChartComposer: <b>Dropbox "Share folder" links.</b> Whether you're sharing songs with friends or just viewing your own songs, you tell ChartComposwer which Dropbox folder they're in. Here's how to get your Share folder URL:
+			  <p>There's one more key concept behind ChartComposer: <b>Dropbox "Share folder" links.</b> Whether you're sharing songs with friends or just viewing your own songs, you tell ChartComposer which Dropbox folder they're in. Here's how to get your Share folder URL:
 			  </p>
 			  <ol>
 				<li>Go to <a href="https://www.dropbox.com/">Dropbox</a> and sign in.</li>
@@ -76,7 +76,7 @@ export default class IndexPage extends React.Component {
 			  </div>
 
 			  <div style={{"font-weight": "bold",}}>Q: Do I have to have a Dropbox account to use ChartComposer?</div>
-			  <div style={{"margin-bottom":"1em",}}>A: No. You can login as "Guest" and use any Dropbox "Share folder" link. For example, your friend who has a Dropbox account can save songs in their Dropbox account. Then they can give you their Dropbox "Share folder" link and you can see their songs in ChartComposwer even though you don't have a Dropbox account.</div>
+			  <div style={{"margin-bottom":"1em",}}>A: No. You can login as "Guest" and use any Dropbox "Share folder" link. For example, your friend who has a Dropbox account can save songs in their Dropbox account. Then they can give you their Dropbox "Share folder" link and you can see their songs in ChartComposer even though you don't have a Dropbox account.</div>
 
 
 			  <div style={{"font-weight": "bold",}}>Q: Which ChordPro directies are supported by ChartComposer?</div>
