@@ -29,6 +29,8 @@ export default class IndexPage extends React.Component {
         >
           <Header
             className="header"
+	        smallScreenMode={null} // need this to hide "View" button
+	        nologin={true}
           />
 	      <div style={{ display: "flex", flex: 1, border: "1px solid red" }}>
 	      CVSNO 1
