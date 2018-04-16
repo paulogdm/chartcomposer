@@ -128,7 +128,7 @@ const Header = ({
           signOut={signOut}
           togglePreferencesOpen={togglePreferencesOpen}
         />
-      ) : ( nologin ? (<span></span>) : (
+      ) : ( nologin ? (<a href="/">Home</a>) : (
         <Sender
           state={{ to: "/" }}
           render={({ url }) => (
@@ -145,6 +145,8 @@ const Header = ({
               <a href={url}>Sign in</a>
               <div style={{ margin: "0 5px" }}>|</div>
               <SignInAsGuest />
+              <div style={{ margin: "0 5px" }}>|</div>
+			  <a href="/about">About</a>
             </div>
           )}
         />
