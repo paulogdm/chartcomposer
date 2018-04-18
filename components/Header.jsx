@@ -50,10 +50,14 @@ const Header = ({
     <div
       className="title-and-input"
       style={{
+        alignItems: "center",
         display: "flex",
+        flexDirection: "row",
       }}
     >
-      {smallScreenMode !== null && smallScreenMode !== "SongList" ? (
+      {smallScreenMode !== null &&
+      smallScreenMode !== "SongList" &&
+      smallScreenMode !== "PromoCopy" ? (
         <div
           onClick={() => {
             setSmallScreenMode("SongList");
@@ -71,7 +75,7 @@ const Header = ({
           paddingTop: 0,
         }}
       >
-        {title ? (title) : ("ChartComposer") }
+        {title ? title : "ChartComposer"}
       </h1>
       {user ? (
         <div
@@ -109,6 +113,7 @@ const Header = ({
     <div style={{ display: "flex" }}>
       {smallScreenMode !== null &&
       smallScreenMode !== "SongList" &&
+      smallScreenMode !== "PromoCopy" &&
       !readOnly ? (
         <button
           onClick={() => {
@@ -128,7 +133,9 @@ const Header = ({
           signOut={signOut}
           togglePreferencesOpen={togglePreferencesOpen}
         />
-      ) : ( nologin ? (<a href="/">Home</a>) : (
+      ) : nologin ? (
+        <a href="/">Home</a>
+      ) : (
         <Sender
           state={{ to: "/" }}
           render={({ url }) => (
@@ -146,11 +153,11 @@ const Header = ({
               <div style={{ margin: "0 5px" }}>|</div>
               <SignInAsGuest />
               <div style={{ margin: "0 5px" }}>|</div>
-			  <a href="/about">About</a>
+              <a href="/about">About</a>
             </div>
           )}
         />
-      ) ) }
+      )}
     </div>
   </div>
 );

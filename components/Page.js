@@ -42,4 +42,8 @@ const SignInAsGuest = () => (
   </a>
 );
 
+export function isGuestAccessToken(accessToken) {
+  return accessToken === DROPBOX_PUBLIC_TOKEN;
+}
+
 export { Sender, SignInAsGuest, Receiver };

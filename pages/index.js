@@ -8,7 +8,7 @@ import _ from "lodash";
 
 import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
-import Page from "../components/Page";
+import Page, { isGuestAccessToken } from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
@@ -71,6 +71,10 @@ export default class IndexPage extends React.Component {
       const accessToken = localStorage.getItem("db-access-token");
       if (accessToken) {
         this.dbx = new Dropbox({ accessToken });
+        this.setState({
+          signedInAsGuest: isGuestAccessToken(accessToken),
+          smallScreenMode: this.getDefaultSmallScreenMode(),
+        });
         if (window) {
           // for console debugging
           window.dbx = this.dbx;
@@ -195,7 +199,7 @@ export default class IndexPage extends React.Component {
   getDefaultSmallScreenMode() {
     let smallScreenMode = this.state.smallScreenMode;
     if (window.innerWidth <= 768 && smallScreenMode === null) {
-      smallScreenMode = "SongList";
+      smallScreenMode = this.dbx ? "SongList" : "PromoCopy";
     } else if (window.innerWidth > 768 && smallScreenMode !== null) {
       smallScreenMode = null;
     }
@@ -577,6 +581,10 @@ export default class IndexPage extends React.Component {
 
   updatePreferences = preferences => {
     this.setState({ preferences });
+    if (this.state.signedInAsGuest) {
+      console.debug("Bail updatePreferences for guests");
+      return;
+    }
     const filesCommitInfo = {
       autorename: false,
       contents: JSON.stringify(preferences),
@@ -621,6 +629,7 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
+
     const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     return (
@@ -700,77 +709,81 @@ export default class IndexPage extends React.Component {
             user={user}
           />
           <div style={{ display: "flex", flex: 1 }}>
-            <div
-              className="panel-song-list"
-              style={{
-                borderRight: "1px solid #ccc",
-                borderTop: "1px solid #ccc",
-                display:
-                  smallScreenMode === "SongList" || smallScreenMode === null
-                    ? "flex"
-                    : "none",
-                flex: smallScreenMode === "SongList" ? 1 : null,
-                flexDirection: "column",
-                width:
-                  sidebarClosed || smallScreenMode === "SongList"
-                    ? null
-                    : "300px",
-              }}
-            >
+            {smallScreenMode === "PromoCopy" ? (
+              <PromoCopy />
+            ) : (
               <div
+                className="panel-song-list"
                 style={{
-                  color: "#666",
-                  fontWeight: 600,
+                  borderRight: "1px solid #ccc",
+                  borderTop: "1px solid #ccc",
+                  display:
+                    smallScreenMode === "SongList" || smallScreenMode === null
+                      ? "flex"
+                      : "none",
+                  flex: smallScreenMode === "SongList" ? 1 : null,
+                  flexDirection: "column",
+                  width:
+                    sidebarClosed || smallScreenMode === "SongList"
+                      ? null
+                      : "300px",
                 }}
               >
-                {sidebarClosed ? (
-                  <div
-                    onClick={this.toggleSidebarClosed}
-                    style={{ cursor: "pointer", padding: 10 }}
-                  >
-                    ♫ ►
-                  </div>
-                ) : (
+                <div
+                  style={{
+                    color: "#666",
+                    fontWeight: 600,
+                  }}
+                >
+                  {sidebarClosed ? (
+                    <div
+                      onClick={this.toggleSidebarClosed}
+                      style={{ cursor: "pointer", padding: 10 }}
+                    >
+                      ♫ ►
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div style={{ padding: 10 }}>♫ Songs</div>
+                      {smallScreenMode === null ? (
+                        <div
+                          onClick={this.toggleSidebarClosed}
+                          style={{ cursor: "pointer", padding: 10 }}
+                        >
+                          ◀
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+                {sidebarClosed ? null : (
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
+                      background: "#eee",
+                      flex: 1,
+                      overflow: "auto",
                     }}
                   >
-                    <div style={{ padding: 10 }}>♫ Songs</div>
-                    {smallScreenMode === null ? (
-                      <div
-                        onClick={this.toggleSidebarClosed}
-                        style={{ cursor: "pointer", padding: 10 }}
-                      >
-                        ◀
-                      </div>
-                    ) : null}
+                    <SongList
+                      closedFolders={closedFolders}
+                      folders={folders}
+                      newSong={this.newSong}
+                      removeFolder={this.removeFolder}
+                      setSongId={this.setSongId}
+                      smallScreenMode={smallScreenMode}
+                      songId={songId}
+                      songs={songs}
+                      toggleFolderOpen={this.toggleFolderOpen}
+                    />
                   </div>
                 )}
               </div>
-              {sidebarClosed ? null : (
-                <div
-                  style={{
-                    background: "#eee",
-                    flex: 1,
-                    overflow: "auto",
-                  }}
-                >
-                  <SongList
-                    closedFolders={closedFolders}
-                    folders={folders}
-                    newSong={this.newSong}
-                    removeFolder={this.removeFolder}
-                    setSongId={this.setSongId}
-                    smallScreenMode={smallScreenMode}
-                    songId={songId}
-                    songs={songs}
-                    toggleFolderOpen={this.toggleFolderOpen}
-                  />
-                </div>
-              )}
-            </div>
+            )}
             <div
               style={{
                 background: "#fff",
@@ -802,8 +815,7 @@ export default class IndexPage extends React.Component {
                     value={chordPro[songId]}
                   />
                 </div>
-              ) : 
-				( chordPro[songId] &&
+              ) : chordPro[songId] &&
               (smallScreenMode === "SongView" || smallScreenMode === null) ? (
                 <div
                   className="panel-song-view"
@@ -819,21 +831,9 @@ export default class IndexPage extends React.Component {
                     value={chordPro[songId]}
                   />
                 </div>
-              ) : 
-				( 
-				<div style={{"text-align": "center", "padding": "1em", "width": "100%", "font-size": "1.2em",}}>
-				  <h1>Welcome to ChartComposer!</h1>
-				  <ul style={{"list-style-type": "none",}}>
-					<li style={{"margin-bottom": "4px",}}> Create sheet music </li>
-					<li style={{"margin-bottom": "4px",}}> Share with friends </li>
-					<li style={{"margin-bottom": "4px",}}> Save in Dropbox </li>
-					<li style={{"margin-bottom": "4px",}}> Format using ChordPro </li>
-				  </ul>
-				  <p>
-					Find out <a href="about">more</a>!
-				  </p>
-				</div>
-				) ) } 
+              ) : null}
+
+              {!songId && smallScreenMode === null ? <PromoCopy /> : null}
             </div>
           </div>
         </div>
@@ -841,3 +841,33 @@ export default class IndexPage extends React.Component {
     );
   }
 }
+
+const PromoCopy = () => (
+  <div
+    style={{
+      textAlign: "center",
+      padding: "1em",
+      width: "100%",
+      fontSize: "1.2em",
+    }}
+  >
+    <h1>Welcome to ChartComposer!</h1>
+    <ul
+      style={{
+        listStyleType: "none",
+        margin: "40px auto",
+        padding: 0,
+        width: 200,
+        textAlign: "left",
+      }}
+    >
+      <li style={{ marginBottom: 4 }}>Create sheet music</li>
+      <li style={{ marginBottom: 4 }}>Share with friends</li>
+      <li style={{ marginBottom: 4 }}>Save in Dropbox</li>
+      <li style={{ marginBottom: 16 }}>Format using ChordPro</li>
+      <li>
+        Find out <a href="/about">more</a>!
+      </li>
+    </ul>
+  </div>
+);
