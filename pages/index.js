@@ -54,6 +54,7 @@ export default class IndexPage extends React.Component {
     };
     this.dbx = null;
     this.debouncedOnResize = _.debounce(this.onResize, 300);
+    this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 8000);
   }
 
   componentDidMount() {
@@ -453,9 +454,8 @@ export default class IndexPage extends React.Component {
       });
   };
 
-  onChangeSongChordPro = e => {
+  onChangeSongChordPro = songChordPro => {
     const { songId } = this.state;
-    const songChordPro = e.target.value;
     const chordPro = {
       ...this.state.chordPro,
       [songId]: songChordPro,
@@ -464,14 +464,9 @@ export default class IndexPage extends React.Component {
       ...this.state.dirty,
       [songId]: true,
     };
-    this.setState({ chordPro, dirty });
-
-    if (this.saveTimeout_) {
-      clearTimeout(this.saveTimeout_);
-    }
-    this.saveTimeout_ = setTimeout(() => {
-      this.saveSongChordPro(songId);
-    }, 2000);
+    this.setState({ chordPro, dirty }, () => {
+      this.debouncedSaveSongChordPro(songId);
+    });
   };
 
   saveSongChordPro = songId => {
@@ -629,7 +624,7 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-
+    console.warn({ smallScreenMode });
     const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     return (
@@ -796,34 +791,37 @@ export default class IndexPage extends React.Component {
               {songId &&
               song &&
               !readOnly &&
+              chordPro[songId] &&
               (smallScreenMode === "SongEditor" || smallScreenMode === null) ? (
                 <div
                   className="panel-song-editor"
                   style={{
                     borderRight: "1px solid #ccc",
+                    flex: 1,
                     height: "100%",
                     overflow: "auto",
                     padding: "8px 0",
-                    width: smallScreenMode === "SongEditor" ? "100%" : "40%",
                   }}
                 >
                   <SongEditor
+                    key={songId}
                     onChange={this.onChangeSongChordPro}
                     readOnly={readOnly}
                     saving={saving}
-                    server_modified={song.server_modified}
+                    serverModified={song.server_modified}
                     value={chordPro[songId]}
                   />
                 </div>
-              ) : chordPro[songId] &&
+              ) : null}
+              {chordPro[songId] &&
               (smallScreenMode === "SongView" || smallScreenMode === null) ? (
                 <div
                   className="panel-song-view"
                   style={{
                     height: "100%",
+                    flex: 1,
                     overflow: "auto",
                     padding: 10,
-                    width: smallScreenMode === "SongView" ? "100%" : "60%",
                   }}
                 >
                   <SongView
