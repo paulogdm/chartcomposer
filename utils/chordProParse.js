@@ -238,6 +238,9 @@ function doDirective(line) {
     case "t":
       directive = "title";
       break;
+    case "c":
+      directive = "comment";
+      break;
     case "st":
       directive = "subtitle";
       break;
@@ -277,12 +280,10 @@ function doDirective(line) {
       // Technically the "chorus" directive just displays a comment that says "Chorus".
       gSong.parts.push({ type: "choruscomment", lines: ["Chorus"] }); // TODO - this will NOT be styled like comments
       break;
-    case "c":
     case "comment":
-      gSong.parts.push({ type: "comment", lines: [parameters] });
-      break;
     case "x_audio":
-      gSong.parts.push({ type: "x_audio", lines: [parameters] });
+    case "image":
+      gSong.parts.push({ type: directive, lines: [parameters] });
       break;
 
     // blocks of lyrics
@@ -320,7 +321,6 @@ function doDirective(line) {
     case "ci":
     case "comment_box":
     case "cb":
-    case "image":
     case "define":
     case "chord":
 
@@ -509,17 +509,29 @@ function exportHtmlPart(aParts, i) {
 			  line + "</div><div style='clear: both;'></div>";
 	  }
 	  else if ( "x_audio" === part.type ) {
-		  // syntax: {x_audio: url [name]}
-		  var aParams = line.trim().split(' ');
-		  if ( 0 === aParams.length ) {
+		  // syntax: {x_audio: url="url" [title="name"]}
+		  var hParams = parseParameters(line);
+		  if ( ! hParams['url'] ) {
 			  continue; // must have URL
 		  }
-		  else if ( 1 === aParams.length ) {
-			  line = "<a target='_blank' href='" + aParams[0] + "'>audio</a>";
+		  else {
+			  line = "<a target='_blank' href='" + hParams['url'] + "'>" + ( hParams['title'] ? hParams['title'] : "audio" ) + "</a>";
+		  }
+	  }
+	  else if ( "image" === part.type ) {
+		  // syntax: {image: src=filename options }
+		  // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
+		  // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
+		  line = "<img " + line + ">";
+		  /*
+		  var hParams = parseParameters(line);
+		  if ( ! hParams['src'] ) {
+			  continue; // must have URL
 		  }
 		  else {
-			  line = "<a target='_blank' href='" + aParams[0] + "'>" + line.replace(aParams[0], '').trim() + "</a>";
+			  line = "<img src='" + hParams['src'] + "'>";
 		  }
+		  */
 	  }
 
 	  // Add this line to the results.
@@ -533,6 +545,54 @@ function exportHtmlPart(aParts, i) {
 
   return aResults.join("\n");
 }
+
+
+// Return a hash based on name=value tuples.
+// example: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'
+function parseParameters(sParams) {
+	var hParams = {};
+
+	// Extract one tuple at a time.
+	while ( sParams ) {
+		sParams = sParams.trim();
+		var aMatches = sParams.match(/([^=]*)=\"(.*?)\"(.*)/);
+	    if ( ! aMatches ) {
+			aMatches = sParams.match(/([^=]*)=\'(.*?)\'(.*)/);
+			if ( ! aMatches ) {
+				aMatches = sParams.match(/([^=]*)=([^ ]*)(.*)/);
+				if ( ! aMatches ) {
+					break;
+				}
+				else { console.log("aMatches 3:", aMatches); }
+			}
+			else { console.log("aMatches 2:", aMatches); }
+		}
+		else { console.log("aMatches 1:", aMatches); }
+
+		var sKey = aMatches[1].toLowerCase();
+		var sVal = cleanQuotes(aMatches[2]);
+		hParams[sKey] = sVal;
+		sParams = aMatches[3];
+	}
+
+	return hParams;
+}
+
+
+// Remove leading and trailing quotes from a string.
+function cleanQuotes(s) {
+	s = s.trim();
+
+	var c0 = s.charAt(0);
+	if ( "'" === c0 || '"' === c0 ) {
+		// Assume that if it _starts_ with a quote then it ends with a quote and that
+		// quote character is not used within the string.
+		s = s.replace(c0, '').replace(c0, '').trim();
+	}
+
+	return s;
+}
+
 
 // TODO - If you import ChordPro text that contains "#" comments, blank lines, etc.
 // those will be lost when you export back to ChordPro.
