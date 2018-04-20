@@ -232,6 +232,9 @@ export default class IndexPage extends React.Component {
                     <code>composer</code>
                   </li>
                   <li>
+                    <code>image</code>
+                  </li>
+                  <li>
                     <code>key</code>
                   </li>
                   <li>
@@ -265,7 +268,7 @@ export default class IndexPage extends React.Component {
 				</p>
 				<ul>
                   <li>
-                    <code>&#123;x_audio: url&#125;</code> - Add a link to an audio file. 
+                    <code>&#123;x_audio: url="https://example.com/foo.m4a" title="my band"&#125;</code> - Add a link to an audio file. 
                   </li>
                   <li>
                     <code>&#123;x_chordposition: inline|above &#125;</code> - Specify where to place the chords relative to the lyrics.
