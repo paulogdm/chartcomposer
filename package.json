@@ -11,15 +11,14 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "deploy":
-      "now -e NODE_ENV=production --team chartcomposer --token $NOW_TOKEN --npm -e DROPBOX_APP_KEY=@dropbox_app_key -e DROPBOX_APP_SECRET=@dropbox_app_secret -e DROPBOX_PUBLIC_TOKEN=@dropbox_public_token",
+    "deploy": "now -e NODE_ENV=production --team chartcomposer --token $NOW_TOKEN --npm -e DROPBOX_APP_KEY=@dropbox_app_key -e DROPBOX_APP_SECRET=@dropbox_app_secret -e DROPBOX_PUBLIC_TOKEN=@dropbox_public_token",
     "alias": "now alias --team chartcomposer --token=$NOW_TOKEN"
   },
   "author": "Lindsey Simon <elsigh@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "create-next": "^0.1.4",
-    "dropbox": "^4.0.1",
+    "dropbox": "^4.0.3",
     "localforage": "^1.6.0",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",

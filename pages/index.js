@@ -1,7 +1,5 @@
 import React from "react";
-// elsigh-hacked version of the Dropbox-sdk to work on next where
-// the missing `window` ref doesn't mean we're in a web worker.
-import dropbox from "../utils/Dropbox-sdk";
+import dropbox from "dropbox";
 import localforage from "localforage";
 import "whatwg-fetch";
 import _ from "lodash";
@@ -166,7 +164,7 @@ export default class IndexPage extends React.Component {
     this.dbx
       .filesDownload({ path: PREFERENCES_PATH })
       .then(async response => {
-        const preferencesStr = await blobToText(response.fileBinary);
+        const preferencesStr = await blobToText(response.fileBlob);
         const preferences = JSON.parse(preferencesStr);
         this.setState({ preferences });
         console.log({ preferences });
@@ -438,13 +436,14 @@ export default class IndexPage extends React.Component {
         path: song[".tag"] === "file" ? `/${song.name}` : null,
       })
       .then(async response => {
-        const songChordPro = await blobToText(response.fileBinary);
+        //console.log({ response });
+        const songChordPro = await blobToText(response.fileBlob);
         const chordPro = {
           ...this.state.chordPro,
           [songId]: songChordPro,
         };
         this.setState({ chordPro });
-        console.log({ chordPro });
+        //console.log({ chordPro });
       })
       .catch(error => {
         throw error;
