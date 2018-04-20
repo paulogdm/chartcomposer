@@ -268,6 +268,7 @@ function doDirective(line) {
     case "chordfont":
     case "chordsize":
     case "chordcolour":
+    case "x_chordposition":
       gSong[directive] = parameters;
       break;
 
@@ -279,6 +280,9 @@ function doDirective(line) {
     case "c":
     case "comment":
       gSong.parts.push({ type: "comment", lines: [parameters] });
+      break;
+    case "x_audio":
+      gSong.parts.push({ type: "x_audio", lines: [parameters] });
       break;
 
     // blocks of lyrics
@@ -338,10 +342,6 @@ function doDirective(line) {
     case "col":
 
     // Custom directives
-    case "x_audio":
-    case "x_chordposition":
-      gSong[directive] = parameters;
-      break;
     case "x_instrument": // guitar, ukulele, uke, bass, mandolin
     case "x_url":
     case "x_youtube_url":
@@ -371,24 +371,20 @@ function exportHtml(song) {
     "key",
     "tempo",
     "capo",
-    "x_audio",
+	// These are properties that we do NOT want to show in the viewer.
+    //"textfont",
+    //"textsize",
+    //"textcolour",
+    //"chordfont",
+    //"chordsize",
+    //"chordcolour",
+    //"x_chordposition",
   ];
 
   for (var i = 0; i < aProperties.length; i++) {
     var prop = aProperties[i];
     if (song[prop]) {
       switch (prop) {
-        case "x_audio":
-          // add link for audio file
-          aResults.push(
-            "<div class=song" +
-              prop +
-              getCss(prop) +
-              "><a target='_blank' href='" +
-              song[prop] +
-              "'>audio</a></div>",
-          );
-          break;
         default:
           aResults.push(
             "<div class=song" +
@@ -506,12 +502,27 @@ function exportHtmlPart(aParts, i) {
           )
           .replace(/\]/g, "</span></code>");
       }
-      line =
-        "comment" === part.type || "choruscomment" === part.type
-          ? "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
-            line +
-            "</div><div style='clear: both;'></div>"
-          : line;
+
+	  // Special CSS for comment and choruscomment.
+	  if ( "comment" === part.type || "choruscomment" === part.type ) {
+		  line = "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
+			  line + "</div><div style='clear: both;'></div>";
+	  }
+	  else if ( "x_audio" === part.type ) {
+		  // syntax: {x_audio: url [name]}
+		  var aParams = line.trim().split(' ');
+		  if ( 0 === aParams.length ) {
+			  continue; // must have URL
+		  }
+		  else if ( 1 === aParams.length ) {
+			  line = "<a target='_blank' href='" + aParams[0] + "'>audio</a>";
+		  }
+		  else {
+			  line = "<a target='_blank' href='" + aParams[0] + "'>" + line.replace(aParams[0], '').trim() + "</a>";
+		  }
+	  }
+
+	  // Add this line to the results.
       aResults.push(
         "<div class=lyricline" + sTextStyle + ">" + line + "</div>",
       );
