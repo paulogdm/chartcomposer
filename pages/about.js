@@ -163,6 +163,14 @@ export default class IndexPage extends React.Component {
               </div>
 
               <div style={{ "font-weight": "bold" }}>
+                Q: How do I turn off the annoying Dropbox notifications whenever I edit a song?
+              </div>
+              <div style={{ "margin-bottom": "1em" }}>
+				A: Go into your Dropbox preferences and uncheck "Edits to files".
+				  <img src={"/static/dropbox-prefs.png"}/>
+			  </div>
+
+              <div style={{ "font-weight": "bold" }}>
                 Q: What's "ChordPro"?
               </div>
               <div style={{ "margin-bottom": "1em" }}>
