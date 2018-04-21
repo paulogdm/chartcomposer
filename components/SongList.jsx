@@ -146,9 +146,19 @@ const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
             paddingLeft,
           }}
         >
-          {song.name}
+          {removeExtension(song.name)}
         </li>
       ))}
     </ol>
   );
 };
+
+
+function removeExtension(filename) {
+	var iDot = filename.lastIndexOf(".");
+	if ( -1 !== iDot ) {
+		filename = filename.substring(0, iDot);
+	}
+
+	return filename;
+}
