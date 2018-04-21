@@ -172,6 +172,7 @@ export default class IndexPage extends React.Component {
 				To do this, find the audio file in Dropbox and click "Share" and copy the share link. 
 				<em>But you have to change the URL slightly</em>.
 				Replace <code>?dl=0</code> with <code>?raw=1</code> in order to point to the raw audio file (instead of a Dropbox page containing the audio file).
+				We do this automatically in ChartComposer, but if you want your ChordPro files to work in other applications you'll need to make this change.
 			  </div>
 
               <div style={{ "font-weight": "bold" }}>
