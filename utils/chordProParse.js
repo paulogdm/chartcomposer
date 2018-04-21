@@ -515,7 +515,7 @@ function exportHtmlPart(aParts, i) {
 			  continue; // must have URL
 		  }
 		  else {
-			  line = "<a target='_blank' href='" + hParams['url'] + "'>" + ( hParams['title'] ? hParams['title'] : "audio" ) + "</a>";
+			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + "<audio src='" + hParams['url'] + "' controls style='width: 80%'></audio>";
 		  }
 	  }
 	  else if ( "image" === part.type ) {
