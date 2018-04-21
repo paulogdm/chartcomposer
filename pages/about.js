@@ -162,6 +162,18 @@ export default class IndexPage extends React.Component {
                 ChartComposer even though you don't have a Dropbox account.
               </div>
 
+              <div style={{ "font-weight": "bold" }} id={"audiohowto"}>
+                <div>Q: How do I embed audio files in my sheet music?</div>
+				Q: My Dropbox Share URLs for audio files and images don't work with the <code>x_audio</code> and <code>image</code> directives. How do I get them to work?
+              </div>
+              <div style={{ "margin-bottom": "1em" }}>
+				A: A lot of our users have audio recordings of songs stored in Dropbox that they want to listen to as they play along with the sheet music. 
+				You can embed audio links in your sheet music using the <code>x_audio</code>. 
+				To do this, find the audio file in Dropbox and click "Share" and copy the share link. 
+				<em>But you have to change the URL slightly</em>.
+				Replace <code>?dl=0</code> with <code>?raw=1</code> in order to point to the raw audio file (instead of a Dropbox page containing the audio file).
+			  </div>
+
               <div style={{ "font-weight": "bold" }}>
                 Q: How do I turn off the annoying Dropbox notifications whenever I edit a song?
               </div>
@@ -276,7 +288,7 @@ export default class IndexPage extends React.Component {
 				</p>
 				<ul>
                   <li>
-                    <code>&#123;x_audio: url="https://example.com/foo.m4a" title="my band"&#125;</code> - Add a link to an audio file. 
+                    <code>&#123;x_audio: url="https://example.com/foo.m4a" title="my band"&#125;</code> - Add a link to an audio file. See <a href='#audiohowto'>how to embed audio files from Dropbox</a>.
                   </li>
                   <li>
                     <code>&#123;x_chordposition: inline|above &#125;</code> - Specify where to place the chords relative to the lyrics.
