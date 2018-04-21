@@ -515,14 +515,14 @@ function exportHtmlPart(aParts, i) {
 			  continue; // must have URL
 		  }
 		  else {
-			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + "<audio src='" + hParams['url'] + "' controls style='width: 80%'></audio>";
+			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + "<audio src='" + fixDropboxUrl(hParams['url']) + "' controls style='width: 80%'></audio>";
 		  }
 	  }
 	  else if ( "image" === part.type ) {
 		  // syntax: {image: src=filename options }
 		  // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
 		  // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
-		  line = "<img " + line + ">";
+		  line = "<img " + fixDropboxUrl(line) + ">";
 		  /*
 		  var hParams = parseParameters(line);
 		  if ( ! hParams['src'] ) {
@@ -544,6 +544,17 @@ function exportHtmlPart(aParts, i) {
   aResults.push("</div>");
 
   return aResults.join("\n");
+}
+
+
+// The Dropbox Share URL for images and audio files end with "?dl=0" which takes you to an HTML 
+// page containing the object. You have to replace that with "?raw=1" to get the actual file.
+function fixDropboxUrl(url) {
+	if ( -1 !== url.indexOf("https://www.dropbox.com/") && -1 !== url.indexOf("?dl=0") ) {
+		url = url.replace("?dl=0", "?raw=1");
+	}
+
+	return url;
 }
 
 
