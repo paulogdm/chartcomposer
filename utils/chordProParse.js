@@ -515,7 +515,14 @@ function exportHtmlPart(aParts, i) {
 			  continue; // must have URL
 		  }
 		  else {
-			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + "<audio src='" + fixDropboxUrl(hParams['url']) + "' controls style='width: 80%'></audio>";
+			  var url = fixDropboxUrl(hParams['url']);
+			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + 
+				  "<audio controls style='width: 80%'>" +
+				  "<source src='" + url + "' type='audio/mpeg'/>" + 
+				  "<source src='" + url + "' type='audio/mp4'/>" + 
+				  "<source src='" + url + "' type='audio/m4a'/>" + 
+				  "<source src='" + url + "' type='audio/x-m4a'/>" + // this is what works for mobile safari
+				  "</audio>";
 		  }
 	  }
 	  else if ( "image" === part.type ) {
