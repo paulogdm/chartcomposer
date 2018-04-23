@@ -558,6 +558,14 @@ export default class IndexPage extends React.Component {
     });
   };
 
+  copyShareLink = folderUrl => {
+	  var msgbox = document.createElement("div");
+	  folderUrl = "https://speedcurve.com/?share=" + encodeURIComponent(folderUrl);
+	  msgbox.innerHTML = "<div id=msgbox style='margin: 1em; padding: 1em; border: 1px solid black; background: #EEE;'><div style='margin-bottom: 0.4em;'><input value='" + folderUrl + "' id=sharelink style='width: 90%; max-width: 300px;'></div><div style='text-align: left;'><input type=button onclick='document.getElementById(\"sharelink\").select(); document.execCommand(\"copy\"); document.getElementById(\"sharelink\").blur(); document.getElementById(\"msgbox\").remove();' value='Copy to Clipboard'>&nbsp;<input type=button onclick='document.getElementById(\"msgbox\").remove()' value='Cancel'></div></div>";
+	  msgbox.style.cssText = "position: absolute; top: 20px; left: 20px;";
+	  document.body.appendChild(msgbox);
+  };
+
   removeFolder = folderId => {
     let folders = { ...this.state.folders };
     delete folders[folderId];
@@ -768,6 +776,7 @@ export default class IndexPage extends React.Component {
                       folders={folders}
                       newSong={this.newSong}
                       removeFolder={this.removeFolder}
+				      copyShareLink={this.copyShareLink}
                       setSongId={this.setSongId}
                       smallScreenMode={smallScreenMode}
                       songId={songId}
