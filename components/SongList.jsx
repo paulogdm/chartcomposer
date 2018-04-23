@@ -6,6 +6,7 @@ const SongList = ({
   closedFolders,
   newSong,
   removeFolder,
+  copyShareLink,
   setSongId,
   songId,
   songs,
@@ -21,6 +22,7 @@ const SongList = ({
               isOpen={!closedFolders[folder.id]}
               newSong={newSong}
               removeFolder={removeFolder}
+			  copyShareLink={copyShareLink}
               setSongId={setSongId}
               songId={songId}
               toggleFolderOpen={toggleFolderOpen}
@@ -40,6 +42,7 @@ const SongFolder = ({
   isOpen,
   newSong,
   removeFolder,
+  copyShareLink,
   setSongId,
   songId,
   toggleFolderOpen,
@@ -77,11 +80,21 @@ const SongFolder = ({
               newSong(folder.id);
             }}
             style={{ padding: 10 }}
-            title="New song in folder"
+            title="New song"
           >
             +
           </button>
         ) : null}
+        <button
+          onClick={e => {
+            e.stopPropagation();
+			copyShareLink(folder.url);
+          }}
+          style={{ padding: 10 }}
+          title="Share folder"
+        >
+		&#x02197;
+		</button>
         <button
           onClick={e => {
             e.stopPropagation();
