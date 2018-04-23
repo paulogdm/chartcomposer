@@ -4,7 +4,7 @@ import LoadingIndicator from "./LoadingIndicator";
 class SongEditor extends React.Component {
   constructor(props) {
     super();
-    this.state = { value: props.value, editorClosed: false, };
+    this.state = { value: props.value, editorClosed: false };
   }
 
   onChange = e => {
@@ -16,7 +16,7 @@ class SongEditor extends React.Component {
   toggleEditorClosed = () => {
     console.log("toggleEditorClosed");
     this.setState({
-	  editorClosed: !this.state.editorClosed,
+      editorClosed: !this.state.editorClosed,
     });
   };
 
@@ -52,7 +52,10 @@ class SongEditor extends React.Component {
             <div />
           )}
 
-          <LastSaved timestamp={serverModified} />
+          <LastSaved
+            toggleEditorClosed={this.toggleEditorClosed}
+            timestamp={serverModified}
+          />
         </div>
         <div style={{ flex: 1, position: "relative" }}>
           <textarea
@@ -76,7 +79,7 @@ class SongEditor extends React.Component {
 
 export default SongEditor;
 
-const LastSaved = ({ timestamp }) => (
+const LastSaved = ({ timestamp, toggleEditorClosed }) => (
   <div style={{ display: "flex", alignItems: "center", padding: 5 }}>
     <div>Last edited {moment(timestamp).fromNow()}</div>
     <div
@@ -90,10 +93,14 @@ const LastSaved = ({ timestamp }) => (
     >
       ✔
     </div>
-	<div
-       onClick={this.toggleEditorClosed}
-       style={{ cursor: "pointer", padding: "0px 3px 0px 12px", fontSize: "13px" }}
-       >
+    <div
+      onClick={toggleEditorClosed}
+      style={{
+        cursor: "pointer",
+        padding: "0px 3px 0px 12px",
+        fontSize: "13px",
+      }}
+    >
       ◀
     </div>
   </div>
