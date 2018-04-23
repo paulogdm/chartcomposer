@@ -29,7 +29,6 @@ class SongEditor extends React.Component {
           display: "flex",
           flexDirection: "column",
           height: "100%",
-		  display: ( editorClosed ? "none" : "block" ),
         }}
       >
         <style jsx>{`
