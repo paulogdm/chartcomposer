@@ -4,7 +4,7 @@ import LoadingIndicator from "./LoadingIndicator";
 class SongEditor extends React.Component {
   constructor(props) {
     super();
-    this.state = { value: props.value };
+    this.state = { value: props.value, editorClosed: false, };
   }
 
   onChange = e => {
@@ -13,15 +13,23 @@ class SongEditor extends React.Component {
     this.setState({ value }, () => onChange(value));
   };
 
+  toggleEditorClosed = () => {
+    console.log("toggleEditorClosed");
+    this.setState({
+	  editorClosed: !this.state.editorClosed,
+    });
+  };
+
   render() {
     const { readOnly, saving, serverModified } = this.props;
-    const { value } = this.state;
+    const { value, editorClosed } = this.state;
     return (
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           height: "100%",
+		  display: ( editorClosed ? "none" : "block" ),
         }}
       >
         <style jsx>{`
@@ -82,6 +90,12 @@ const LastSaved = ({ timestamp }) => (
       }}
     >
       ✔
+    </div>
+	<div
+       onClick={this.toggleEditorClosed}
+       style={{ cursor: "pointer", padding: "0px 3px 0px 12px", fontSize: "13px" }}
+       >
+      ◀
     </div>
   </div>
 );
