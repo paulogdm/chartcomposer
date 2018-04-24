@@ -282,6 +282,7 @@ function doDirective(line) {
       break;
     case "comment":
     case "x_audio":
+    case "x_video":
     case "image":
       gSong.parts.push({ type: directive, lines: [parameters] });
       break;
@@ -516,16 +517,20 @@ function exportHtmlPart(aParts, i) {
 		  }
 		  else {
 			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + "<audio src='" + fixDropboxUrl(hParams['url']) + "' controls style='width: 80%'></audio>";
-			  /*
-			  var url = fixDropboxUrl(hParams['url']);
-			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + 
-				  "<audio controls style='width: 80%'>" +
-				  "<source src='" + url + "' type='audio/mpeg'/>" + 
-				  "<source src='" + url + "' type='audio/mp4'/>" + 
-				  "<source src='" + url + "' type='audio/m4a'/>" + 
-				  "<source src='" + url + "' type='audio/x-m4a'/>" + // this is what works for mobile safari
-				  "</audio>";
-			  */
+		  }
+	  }
+	  else if ( "x_video" === part.type ) {
+		  // syntax: {x_video: url="url" [title="name"]}
+		  var hParams = parseParameters(line);
+		  if ( ! hParams['url'] ) {
+			  continue; // must have URL
+		  }
+		  else {
+			  var youtubeUrl = getYoutubeUrl(hParams['url']);
+			  if ( youtubeUrl ) {
+				  // https://www.youtube.com/embed/R0fQm9OsMcw
+				  line = "<iframe width='560' height='315' src='" + youtubeUrl + "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen></iframe>";
+			  }
 		  }
 	  }
 	  else if ( "image" === part.type ) {
@@ -554,6 +559,23 @@ function exportHtmlPart(aParts, i) {
   aResults.push("</div>");
 
   return aResults.join("\n");
+}
+
+
+function getYoutubeUrl(url) {
+	var aMatches, youtubeId;
+	if ( aMatches = url.match(/https:\/\/www.youtube.com\/watch\?v=([^&]*)/) ) {
+		youtubeId = aMatches[1];
+	}
+	else if ( aMatches = url.match(/https:\/\/youtu.be\/([^&]*)/) ) {
+		youtubeId = aMatches[1];
+	}
+
+	if ( youtubeId ) {
+		return "https://www.youtube.com/embed/" + youtubeId;
+	}
+
+	return "";
 }
 
 
