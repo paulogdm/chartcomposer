@@ -574,7 +574,7 @@ export default class IndexPage extends React.Component {
     var msgbox = document.createElement("div");
     folderUrl = `${
       window.location.origin
-    }/?share=%{encodeURIComponent(folderUrl)}`;
+    }/?share=` + encodeURIComponent(folderUrl);
     msgbox.innerHTML =
       "<div id=msgbox style='margin: 1em; padding: 1em; border: 1px solid black; background: #EEE;'><div style='margin-bottom: 0.4em;'><input value='" +
       folderUrl +
