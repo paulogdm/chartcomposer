@@ -1,14 +1,10 @@
-import DropboxChooser from "../utils/DropboxChooser";
+
 
 import { Sender, SignInAsGuest } from "../components/Page";
 import UserMenu from "../components/UserMenu";
 
-import publicRuntimeConfig from "../utils/publicRuntimeConfig";
-const { DROPBOX_APP_KEY } = publicRuntimeConfig;
-
 const Header = ({
   className,
-  loadDropboxLink,
   readOnly,
   setSmallScreenMode,
   signOut,
@@ -38,9 +34,6 @@ const Header = ({
         .title-and-input {
           align-items: left;
           flex-direction: column;
-        }
-        .title-and-input > h1 {
-          padding-right: 0;
         }
       }
       @media print {
@@ -80,47 +73,6 @@ const Header = ({
       >
         {title ? title : "ChartComposer"}
       </h1>
-      {user ? (
-        <div
-          style={{
-            alignItems: "center",
-            display: "flex",
-          }}
-        >
-          <DropboxChooser
-            appKey={DROPBOX_APP_KEY}
-            success={choices => {
-              console.debug("DropboxChooser success", { choices });
-              const folder = choices[0];
-              if (!folder.isDir) {
-                alert("Please choose a folder, not a file");
-                return;
-              }
-              loadDropboxLink(folder.link);
-            }}
-            multiselect={false}
-            extensions={[]}
-            folderselect
-          >
-            <div style={{ cursor: "pointer", textDecoration: "underline" }}>
-              Choose a folder
-            </div>
-          </DropboxChooser>
-          <div style={{ margin: "0 10px" }}>or</div>
-          <div
-            onClick={e => {
-              const url = window.prompt("Dropbox shared folder URL");
-              if (!url) {
-                return;
-              }
-              loadDropboxLink(url);
-            }}
-            style={{ cursor: "pointer", textDecoration: "underline" }}
-          >
-            Paste a link
-          </div>
-        </div>
-      ) : null}
     </div>
 
     <div style={{ display: "flex" }}>

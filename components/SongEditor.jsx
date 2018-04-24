@@ -24,12 +24,6 @@ class SongEditor extends React.Component {
           height: "100%",
         }}
       >
-        <style jsx>{`
-          textarea:focus {
-            border-color: lightblue !important;
-            outline: none;
-          }
-        `}</style>
         <div
           style={{
             display: "flex",

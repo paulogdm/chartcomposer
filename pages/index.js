@@ -5,6 +5,7 @@ import localforage from "localforage";
 import "whatwg-fetch";
 import _ from "lodash";
 
+import AddFolder from "../components/AddFolder";
 import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
 import Page from "../components/Page";
@@ -745,7 +746,6 @@ export default class IndexPage extends React.Component {
         >
           <Header
             className="header"
-            loadDropboxLink={this.loadDropboxLink}
             readOnly={readOnly}
             setSmallScreenMode={this.setSmallScreenMode}
             signOut={this.signOut}
@@ -795,14 +795,17 @@ export default class IndexPage extends React.Component {
                       }}
                     >
                       <div style={{ padding: 10 }}>♫ Songs</div>
-                      {smallScreenMode === null ? (
-                        <div
-                          onClick={this.toggleSidebarClosed}
-                          style={{ cursor: "pointer", padding: 10 }}
-                        >
-                          ◀
-                        </div>
-                      ) : null}
+                      <div style={{ alignItems: "center", display: "flex" }}>
+                        <AddFolder loadDropboxLink={this.loadDropboxLink} />
+                        {smallScreenMode === null ? (
+                          <div
+                            onClick={this.toggleSidebarClosed}
+                            style={{ cursor: "pointer", padding: 10 }}
+                          >
+                            ◀
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -816,10 +819,10 @@ export default class IndexPage extends React.Component {
                   >
                     <SongList
                       closedFolders={closedFolders}
+                      copyShareLink={this.copyShareLink}
                       folders={folders}
                       newSong={this.newSong}
                       removeFolder={this.removeFolder}
-                      copyShareLink={this.copyShareLink}
                       setSongId={this.setSongId}
                       smallScreenMode={smallScreenMode}
                       songId={songId}

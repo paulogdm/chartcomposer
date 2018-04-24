@@ -10,6 +10,11 @@ export default () => (
         font: 13px menlo, sans-serif;
         margin: 0;
       }
+      textarea:focus,
+      button:focus,
+      li:focus {
+        outline: 1px solid #666;
+      }
     `}</style>
   </div>
 );

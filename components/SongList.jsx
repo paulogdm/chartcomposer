@@ -2,11 +2,12 @@ import React from "react";
 import _ from "lodash";
 
 const SongList = ({
-  folders,
   closedFolders,
+  copyShareLink,
+  folders,
+  loadDropboxLink,
   newSong,
   removeFolder,
-  copyShareLink,
   setSongId,
   songId,
   songs,
@@ -22,7 +23,7 @@ const SongList = ({
               isOpen={!closedFolders[folder.id]}
               newSong={newSong}
               removeFolder={removeFolder}
-			  copyShareLink={copyShareLink}
+              copyShareLink={copyShareLink}
               setSongId={setSongId}
               songId={songId}
               toggleFolderOpen={toggleFolderOpen}
@@ -88,13 +89,13 @@ const SongFolder = ({
         <button
           onClick={e => {
             e.stopPropagation();
-			copyShareLink(folder.url);
+            copyShareLink(folder.url);
           }}
           style={{ padding: 10 }}
           title="Share folder"
         >
-		&#x02197;
-		</button>
+          &#x02197;
+        </button>
         <button
           onClick={e => {
             e.stopPropagation();
@@ -150,6 +151,7 @@ const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
           onClick={() => {
             setSongId(song.id, folder && folder.id);
           }}
+          tabIndex={0}
           style={{
             background: "#fff",
             borderBottom: "1px solid #ccc",
@@ -166,12 +168,11 @@ const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
   );
 };
 
-
 function removeExtension(filename) {
-	var iDot = filename.lastIndexOf(".");
-	if ( -1 !== iDot ) {
-		filename = filename.substring(0, iDot);
-	}
+  var iDot = filename.lastIndexOf(".");
+  if (-1 !== iDot) {
+    filename = filename.substring(0, iDot);
+  }
 
-	return filename;
+  return filename;
 }
