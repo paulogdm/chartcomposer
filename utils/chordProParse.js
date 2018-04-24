@@ -531,6 +531,9 @@ function exportHtmlPart(aParts, i) {
 				  // https://www.youtube.com/embed/R0fQm9OsMcw
 				  line = "<iframe width='560' height='315' src='" + youtubeUrl + "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen></iframe>";
 			  }
+			  else {
+				  line = "<video src='" + fixDropboxUrl(hParams['url']) + "' controls style='width: 80%'></video>";
+			  }
 		  }
 	  }
 	  else if ( "image" === part.type ) {
