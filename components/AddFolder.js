@@ -29,27 +29,11 @@ const AddFolder = ({ loadDropboxLink }) => (
         title="Choose a folder on Dropbox"
         style={{
           backgroundColor: "transparent",
-          borderRightColor: "transparent",
         }}
       >
         + 📁
       </button>
     </DropboxChooser>
-    <button
-      onClick={e => {
-        const url = window.prompt("Dropbox shared folder URL");
-        if (!url) {
-          return;
-        }
-        loadDropboxLink(url);
-      }}
-      title="Paste a Dropbox folder link"
-      style={{
-        backgroundColor: "transparent",
-      }}
-    >
-      + 🔗
-    </button>
   </div>
 );
 
