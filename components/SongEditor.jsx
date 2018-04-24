@@ -83,14 +83,5 @@ const LastSaved = ({ timestamp }) => (
     >
       ✔
     </div>
-    <div
-      style={{
-        cursor: "pointer",
-        padding: "0px 3px 0px 12px",
-        fontSize: "13px",
-      }}
-    >
-      ◀
-    </div>
   </div>
 );
