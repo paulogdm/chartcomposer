@@ -1,4 +1,5 @@
 import React from "react";
+import Draggable from "react-draggable";
 import dropbox from "dropbox";
 import localforage from "localforage";
 import "whatwg-fetch";
@@ -37,6 +38,7 @@ export default class IndexPage extends React.Component {
       chordPro: {},
       closedFolders: {},
       dirty: {},
+      dropboxInputValue: "",
       folders: {},
       loading: false,
       onLine: true,
@@ -44,14 +46,15 @@ export default class IndexPage extends React.Component {
       preferencesOpen: false,
       saving: false,
       smallScreenMode: null,
-      dropboxInputValue: "",
+      resizerPosition: { x: 0, y: 0 },
       sidebarClosed: false,
+      songEditorPercentWidth: 50,
       songId: null,
       songs: {},
       user: null,
     };
     this.dbx = null;
-    this.debouncedOnResize = _.debounce(this.onResize, 300);
+    this.debouncedOnWindowResize = _.debounce(this.onWindowResize, 300);
     this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 8000);
   }
 
@@ -109,7 +112,7 @@ export default class IndexPage extends React.Component {
       this.checkDirty();
     }
 
-    window.addEventListener("resize", this.debouncedOnResize);
+    window.addEventListener("resize", this.debouncedOnWindowResize);
     window.addEventListener("offline", this.updateOnlineStatus);
     window.addEventListener("online", this.updateOnlineStatus);
 
@@ -123,7 +126,7 @@ export default class IndexPage extends React.Component {
 
   componentWillUnmount() {
     this.dbx = null;
-    window.removeEventListener("resize", this.debouncedOnResize);
+    window.removeEventListener("resize", this.debouncedOnWindowResize);
     window.removeEventListener("offline", this.updateOnlineStatus);
     window.removeEventListener("online", this.updateOnlineStatus);
   }
@@ -212,9 +215,9 @@ export default class IndexPage extends React.Component {
     });
   };
 
-  onResize = e => {
+  onWindowResize = e => {
     const smallScreenMode = this.getDefaultSmallScreenMode();
-    console.log("onResize", window.innerWidth, smallScreenMode);
+    console.log("onWindowResize", window.innerWidth, smallScreenMode);
     this.setState({ smallScreenMode });
   };
 
@@ -424,6 +427,8 @@ export default class IndexPage extends React.Component {
       loading: true,
       smallScreenMode: nextSmallScreenMode,
       songId,
+      resizerPosition: { x: 0, y: 0 },
+      songEditorPercentWidth: 50,
     });
     const [song, _] = this.getSongById(songId);
     console.log("setSongId", { songId, song, folderId });
@@ -559,11 +564,15 @@ export default class IndexPage extends React.Component {
   };
 
   copyShareLink = folderUrl => {
-	  var msgbox = document.createElement("div");
-	  folderUrl = "https://chartcomposer.com/?share=" + encodeURIComponent(folderUrl);
-	  msgbox.innerHTML = "<div id=msgbox style='margin: 1em; padding: 1em; border: 1px solid black; background: #EEE;'><div style='margin-bottom: 0.4em;'><input value='" + folderUrl + "' id=sharelink style='width: 90%; max-width: 300px;'></div><div style='text-align: left;'><input type=button onclick='document.getElementById(\"sharelink\").select(); document.execCommand(\"copy\"); document.getElementById(\"sharelink\").blur(); document.getElementById(\"msgbox\").remove();' value='Copy to Clipboard'>&nbsp;<input type=button onclick='document.getElementById(\"msgbox\").remove()' value='Cancel'></div></div>";
-	  msgbox.style.cssText = "position: absolute; top: 20px; left: 20px;";
-	  document.body.appendChild(msgbox);
+    var msgbox = document.createElement("div");
+    folderUrl =
+      "https://chartcomposer.com/?share=" + encodeURIComponent(folderUrl);
+    msgbox.innerHTML =
+      "<div id=msgbox style='margin: 1em; padding: 1em; border: 1px solid black; background: #EEE;'><div style='margin-bottom: 0.4em;'><input value='" +
+      folderUrl +
+      "' id=sharelink style='width: 90%; max-width: 300px;'></div><div style='text-align: left;'><input type=button onclick='document.getElementById(\"sharelink\").select(); document.execCommand(\"copy\"); document.getElementById(\"sharelink\").blur(); document.getElementById(\"msgbox\").remove();' value='Copy to Clipboard'>&nbsp;<input type=button onclick='document.getElementById(\"msgbox\").remove()' value='Cancel'></div></div>";
+    msgbox.style.cssText = "position: absolute; top: 20px; left: 20px;";
+    document.body.appendChild(msgbox);
   };
 
   removeFolder = folderId => {
@@ -579,6 +588,26 @@ export default class IndexPage extends React.Component {
 
   togglePreferencesOpen = () => {
     this.setState({ preferencesOpen: !this.state.preferencesOpen });
+  };
+
+  onPanelResizeDrag = (e, draggableData) => {
+    const { x, y } = this.state.resizerPosition;
+    const resizerPosition = {
+      x: x + draggableData.deltaX,
+      y: y + draggableData.deltaY,
+    };
+    const containerWidth = this.resizablePanelEl.offsetWidth;
+    const songEditorPercentWidth =
+      (containerWidth / 2 + resizerPosition.x) / containerWidth * 100;
+    /*
+    console.warn(
+      "DRAG",
+      songEditorPercentWidth,
+      draggableData,
+      resizerPosition,
+    );
+    */
+    this.setState({ resizerPosition, songEditorPercentWidth });
   };
 
   updatePreferences = preferences => {
@@ -621,19 +650,29 @@ export default class IndexPage extends React.Component {
       folders,
       loading,
       closedFolders,
+      dropboxInputValue,
       preferences,
       preferencesOpen,
       saving,
-      dropboxInputValue,
       sidebarClosed,
       smallScreenMode,
       songs,
+      songEditorPercentWidth,
       songId,
       user,
     } = this.state;
-    console.warn({ smallScreenMode });
+    //console.debug({ smallScreenMode });
     const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
+    const renderSongEditor =
+      songId &&
+      song &&
+      !readOnly &&
+      chordPro[songId] &&
+      (smallScreenMode === "SongEditor" || smallScreenMode === null);
+    const renderSongView =
+      chordPro[songId] &&
+      (smallScreenMode === "SongView" || smallScreenMode === null);
     return (
       <Page>
         <style jsx global>{`
@@ -776,7 +815,7 @@ export default class IndexPage extends React.Component {
                       folders={folders}
                       newSong={this.newSong}
                       removeFolder={this.removeFolder}
-				      copyShareLink={this.copyShareLink}
+                      copyShareLink={this.copyShareLink}
                       setSongId={this.setSongId}
                       smallScreenMode={smallScreenMode}
                       songId={songId}
@@ -788,27 +827,53 @@ export default class IndexPage extends React.Component {
               </div>
             )}
             <div
+              ref={el => (this.resizablePanelEl = el)}
               style={{
                 background: "#fff",
                 borderTop: "1px solid #ccc",
                 flex: 1,
                 display: smallScreenMode === "SongList" ? "none" : "flex",
                 height: "100%",
+                position: "relative",
               }}
             >
-              {songId &&
-              song &&
-              !readOnly &&
-              chordPro[songId] &&
-              (smallScreenMode === "SongEditor" || smallScreenMode === null) ? (
+              {renderSongEditor && renderSongView ? (
+                <div
+                  className="panel-resizer-c"
+                  key={songId}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
+                  }}
+                >
+                  <Draggable axis="x" onDrag={this.onPanelResizeDrag}>
+                    <div
+                      className="panel-resizer"
+                      style={{
+                        borderLeft: "2px solid #ccc",
+                        bottom: 0,
+                        cursor: "ew-resize",
+                        left: `50%`,
+                        position: "absolute",
+                        top: 0,
+                        width: 10,
+                        zIndex: 2,
+                      }}
+                    />
+                  </Draggable>
+                </div>
+              ) : null}
+              {renderSongEditor && (
                 <div
                   className="panel-song-editor"
                   style={{
-                    borderRight: "1px solid #ccc",
-                    flex: 1,
                     height: "100%",
                     overflow: "auto",
                     padding: "8px 0",
+                    width: `${songEditorPercentWidth}%`,
                   }}
                 >
                   <SongEditor
@@ -820,9 +885,8 @@ export default class IndexPage extends React.Component {
                     value={chordPro[songId]}
                   />
                 </div>
-              ) : null}
-              {chordPro[songId] &&
-              (smallScreenMode === "SongView" || smallScreenMode === null) ? (
+              )}
+              {renderSongView ? (
                 <div
                   className="panel-song-view"
                   style={{
