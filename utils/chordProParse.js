@@ -608,7 +608,7 @@ function exportHtmlPart(aParts, i) {
         // syntax: {image: src=filename options }
         // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
         // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
-        line = "<img " + fixDropboxUrl(line) + ">";
+        line = "<img " + fixDropboxUrl(line) + " style='width: 100%'>";
         /*
 		  var hParams = parseParameters(line);
 		  if ( ! hParams['src'] ) {
