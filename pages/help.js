@@ -35,6 +35,7 @@ export default class IndexPage extends React.Component {
             <div
               style={{
                 padding: "1em",
+			    "margin-left": "4em",
                 "max-width": "800px",
                 "font-family": "verdana",
               }}
@@ -46,21 +47,32 @@ export default class IndexPage extends React.Component {
               </p>
 			  <ul>
 				<li> <a href="#getting-started">Getting Started</a> </li>
-				<li> <a href="#CVSNO">CVSNO</a> </li>
-				<li> <a href="#CVSNO">CVSNO</a> </li>
-				<li> <a href="#CVSNO">CVSNO</a> </li>
-				<li> <a href="#CVSNO">CVSNO</a> </li>
-				<li> <a href="#CVSNO">CVSNO</a> </li>
+				<ul>
+				  <li> <a href="#guest-mode">Guest mode</a> </li>
+				  <li> <a href="#signedin-mode">Signed-in mode</a> </li>
+				</ul>
+				<li> <a href="#sharing">Sharing</a> </li>
+				<ul>
+				  <li> <a href="#view-only-access">View-only access</a> </li>
+				  <li> <a href="#edit-access">Edit access</a> </li>
+				  <li> <a href="#restricted-view-only-access">Restriected view-only access</a> </li>
+				</ul>
+				<li> <a href="#editing-songs">Editing Songs</a> </li>
+				<ul>
+				  <li> <a href="#chordpro-example">ChordPro Example</a> </li>
+				  <li> <a href="#chordpro-directives">ChordPro Directives</a> </li>
+				</ul>
+				<li> <a href="#faq">FAQ</a> </li>
 			  </ul>
 
 
-			  <h2 id="getting-started">Getting Started</h2>
+			  <h2 style={{"margin-top": "2.5em", "margin-left": "-2em"}} id="getting-started">Getting Started</h2>
 
 			  <h3 id="guest-mode">Guest mode</h3>
 			  <p>
 				You can take a quick look at ChartComposer by going to <a href="https://chartcomposer.com">https://chartcomposer.com</a> and clicking "Guest".
 				Click on one of the sample songs to see what it looks like. 
-				As "guest" you're in View Only mode - you can <em>see</em> songs but you can't <em>edit</em> or <em>create</em> songs.
+				As "guest" you're in View-only mode - you can <em>see</em> songs but you can't <em>edit</em> or <em>create</em> songs.
 				Here are things you can do as "guest":
 			  </p>
 			  <ul>
@@ -72,16 +84,20 @@ export default class IndexPage extends React.Component {
 
 			  <p>
 				In guest mode you're relying on other users to create songs and share them with you.
-				For example, your bandmate or music teacher might share a link to their Dropbox folder with you.
-				You can paste that Dropbox folder URL into ChartComposer and see all their sheet music.
-				Or they might share a ChartComposer share link with you, in which case you can just click the link 
-				and you'll be take directly into their folder.
-				See <a href="sharing">Sharing</a> to learn more about these links and see some examples.
+				For example, your bandmate or music teacher can share their ChartComposer folder link with you.
+				You can just click the link to go directly into their folder.
+				See <a href="sharing">Sharing</a> to learn more about shared folder links.
 			  </p>
 				  
-			  <h3 id="user-mode">User mode</h3>
+			  <h3 id="signedin-mode">Signed-in mode</h3>
 			  <p>
-				
+				If you'd like to create and edit songs, you need to click "Sign in". 
+				This will display the Dropbox login form which gives ChartComposer the ability to access your songs in Dropbox.
+				ChartComposer only works with Dropbox. 
+				We chose this approach because many musicians already have their songs in Dropbox.
+				It also gives our users the confidence that no matter what happens to ChartComposer, their songs 
+				will always be accessible in Dropbox.
+				If you don't have a Dropbox account, you can <a href="https://www.dropbox.com/">create one for free</a>.
 			  </p>
 
 
@@ -89,156 +105,180 @@ export default class IndexPage extends React.Component {
 
 
 
-			  <h2 id="sharing">Sharing</h2>
+			  <h2 style={{"margin-top": "2.5em", "margin-left": "-2em"}} id="sharing">Sharing</h2>
 			  <p>
-				If you've created songs in ChartComposer you can easily share them with other people.
-				The first step is to create a "Dropbox shared link". In Dropbox, click on "Share" and then "create a link".
-				(Here are the <a href="https://www.dropbox.com/help/files-folders/view-only-access#link">full instructions</a>.)
+				It's easy to share a song folder with ChartComposer.
+				You can choose to give other people <b>View-only</b> access to your song folder
+				or <b>Edit</b> access.
+			  </p>
+
+			  <p id="view-only-access">
+				<b>View-only access:</b> To give someone View-only access, click on the "Share folder" icon next to the folder name.
+				This pops up a box that shows the share folder link.
+				Click "Copy to clipboard" and send the share folder link to your friends.
+				A cool thing is that share folder links work for everyone - a Dropbox account is <em>not</em> required.
+			  </p>
+
+			  <p id="edit-access"> 
+				<b>Edit access:</b> To give someone Edit access, you must first add them to the folder 
+				following <a href="https://www.dropbox.com/help/files-folders/share-with-others#folders">these instructions in Dropbox</a>.
+				Note that for someone to be able to edit your songs they must have a Dropbox account.
+				When you add them to your Dropbox folder, they can open that folder in ChartComposer by using the "Choose a folder on Dropbox" icon at the top of the Songs list.
+			  </p>
+
+			  <p id="restricted-view-only-access">
+				<b>Restricted View-only access:</b> One downside to the share folder links described above is that you can't restrict View-only access to 
+				specific individuals.
+				If you want to do that, simply follow the instructions for giving someone Edit access, but choose "view" instead of "edit" in the Dropbox UI.
+				This way, you have explicit control over who can see your songs.
+				Note however that each individual must have a Dropbox account. 
+				(Dropbox accounts can be created for free.)
 			  </p>
 
 
 
 
+              <h2 style={{"margin-top": "2.5em", "margin-left": "-2em"}} id="editing-songs">Editing Songs</h2>
+			  <p>
+				ChartComposer requires that songs be written in ChordPro 
+                format. <a href="http://www.chordpro.org/">ChordPro</a> is the
+                closest thing the sheet music industry has for a "standard".
+                There are other popular formats, but they're generally
+                proprietary. ChartComposer parses and displays ChordPro
+                files (.pro, .crd, .cho, .chopro, .chordpro, &amp; .txt).
+                Using ChordPro means you can take your songs to other
+                websites that support ChordPro if you want.
+			  </p>
+
+			  <p>
+				If you're new to ChordPro, here's a quick primer.
+				ChordPro is a <a href="https://en.wikipedia.org/wiki/Markup_language">markup language</a> for creating sheet music. 
+				You can find out more about ChordPro <a href="http://www.chordpro.org/">here</a>.
+				It's open source, well documented, <a href="http://www.chordpro.org/chordpro/Support.html">supported</a>, 
+				and <a href="https://github.com/ChordPro/chordpro">available on Github</a>. 
+			  </p>
+
+			  <h3 id="chordpro-example">ChordPro Example</h3>
+			  <p>
+				If you add ChordPro markup to a set of lyrics you end up with sheet music. It's that easy!
+				There are two main parts to ChordPro markup: You add chords by putting them inside square brackets.
+				You add other song parts by using ChordPro directives within curly brackets. Here's an example:
+			  </p>
+
+			  <pre style={{border: "1px solid", padding: "1em", "margin-left": "4em",}}>
+				&#123;title: Amazing Grace&#125;<br/>
+				&#123;composer: John Newton&#125;<br/>
+				&#123;key: D&#125;<br/>
+				&nbsp;<br/>
+				&#123;start_of_verse&#125;<br/>
+				&#123;comment: Verse 1&#125;<br/>
+				[D]Amazing grace! (how [G]sweet the [D]sound)<br/>
+				That [D]saved a wretch like [A7]me!<br/>
+				I [D]once was lost, but [G]now am [D]found,<br/>
+				Was [D]blind, but [A7]now I [D]see.<br/>
+				&#123;end_of_verse&#125;<br/>
+			  </pre>
+
+			  <p>
+				Here's what that ChordPro text looks like in ChartComposer:
+			  </p>
+			  <div style={{border: "1px solid", padding: "1em", "margin-left": "4em",}}>
+				<img src={"/static/amazing-grace.png"}/>
+			  </div>
 
 
+			  <h3 id="chordpro-directives">ChordPro Directives</h3>
+			  <p>
+			  There are about 50 ChordPro directives (the commands inside the curly brackets).
+			  You can see all the ChordPro directives <a href="http://www.chordpro.org/chordpro/ChordPro-Directives.html">here</a>.
+			  This is the list of ChordPro directives supported by ChartComposer.
+			  </p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h1>CVSNO</h1>
-
-
-
-              <p>Two key concepts for ChartComposer are:</p>
-              <ol>
+              <ul>
                 <li>
-                  {" "}
-                  <b>All sheet music files are stored in Dropbox.</b>{" "}
-                  <div style={{ padding: "4px 0 8px 12px" }}>
-                    Most of our musician friends store their songs in Dropbox.
-                    They don't want to move them to some newfangled website, and
-                    they don't want to worry about the songs disappearing if
-                    that newfangled website goes away. By storing the songs in
-                    Dropbox, our users never have to worry about the safety of
-                    their songs. No matter what happens to ChartComposer, you'll
-                    still have your songs in Dropbox.
-                  </div>
+                  <code>artist</code>
                 </li>
                 <li>
-                  {" "}
-                  <b>All sheet music files are written in ChordPro.</b>
-                  <div style={{ padding: "4px 0 8px 12px" }}>
-                    <a href="http://www.chordpro.org/">ChordPro</a> is the
-                    closest thing the sheet music industry has for a "standard".
-                    There are other popular formats, but they're generally
-                    proprietary. ChartComposer parses and displays ChordPro
-                    files (.pro, .crd, .cho, .chopro, .chordpro, &amp; .txt).
-                    Using ChordPro means you can take your songs to other
-                    websites that support ChordPro if you want.
-                  </div>
-                </li>
-              </ol>
-
-
-
-
-
-
-<h1>CVSNO</h1>
-
-
-
-              <h3>Dropbox "Share folder" links</h3>
-              <p>
-                There's one more key concept behind ChartComposer:{" "}
-                <b>Dropbox "Share folder" links.</b> Whether you're sharing
-                songs with friends or just viewing your own songs, you tell
-                ChartComposer which Dropbox folder they're in. Here's how to get
-                your Share folder URL:
-              </p>
-              <ol>
-                <li>
-                  Go to <a href="https://www.dropbox.com/">Dropbox</a> and sign
-                  in.
+                  <code>capo</code>
                 </li>
                 <li>
-                  Click on <a href="https://www.dropbox.com/home">My files</a>.
+                  <code>chordcolour</code>
                 </li>
-                <li>Find the folder that contains your sheet music.</li>
-                <li>Click "Share folder".</li>
                 <li>
-                  Choose "Can edit" or "Can view", then click "Create a link",
-                  then click "Copy link".
+                  <code>chordfont</code>
                 </li>
-                <li>Paste that link into ChartComposer and hit "Go".</li>
-              </ol>
+                <li>
+                  <code>chordsize</code>
+                </li>
+                <li>
+                  <code>chorus</code>
+                </li>
+                <li>
+                  <code>comment</code>
+                </li>
+                <li>
+                  <code>composer</code>
+                </li>
+                <li>
+                  <code>duration</code>
+                </li>
+                <li>
+                  <code>image</code>
+                </li>
+                <li>
+                  <code>key</code>
+                </li>
+                <li>
+                  <code>start_of_chorus, end_of_chorus</code>
+                </li>
+                <li>
+                  <code>start_of_verse, end_of_verse</code>
+                </li>
+                <li>
+                  <code>subtitle</code>
+                </li>
+                <li>
+                  <code>tempo</code>
+                </li>
+                <li>
+                  <code>textcolour</code>
+                </li>
+                <li>
+                  <code>textfont</code>
+                </li>
+                <li>
+                  <code>textsize</code>
+                </li>
+                <li>
+                  <code>title</code>
+                </li>
+              </ul>
 
-              <h2 id={"faq"}>FAQ</h2>
+			  <p>
+				ChartComposer adds the following custom directives:
+			  </p>
+			  <ul>
+                <li>
+                  <code>&#123;x_audio: url="https://example.com/foo.m4a" title="my band"&#125;</code> - Add a link to an audio file. See <a href='#audiohowto'>how to embed audio files from Dropbox</a>.
+                </li>
+                <li>
+                  <code>&#123;x_chordposition: inline|above &#125;</code> - Specify where to place the chords relative to the lyrics.
+                </li>
+                <li>
+                  <code>&#123;x_video: url="https://www.youtube.com/watch?v=R0fQm9OsMcw"&#125;</code> - Add a link to a video file.
+                </li>
+			  </ul>
+
+
+
+
+              <h2 style={{"margin-top": "2.5em", "margin-left": "-2em"}} id="faq">FAQ</h2>
 
               <div style={{ "font-weight": "bold" }}>
                 Q: Can I share my songs?
               </div>
               <div style={{ "margin-bottom": "1em" }}>
-                A: Yes! Just create a "Share folder" link in your Dropbox
-                account and give that URL to your friends.
-              </div>
-
-              <div style={{ "font-weight": "bold" }}>
-                Q: Who can see my songs?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-                A: The only people who can see your songs are the people who
-                have your "Share folder" link.
-              </div>
-
-              <div style={{ "font-weight": "bold" }}>
-                Q: Who can edit my songs?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-                A: If you want, you can let other people edit your songs. To do
-                this you have to give them your "Share folder" link (as
-                explained above). In addition, when you create that link you
-                have to choose "Can edit".
-              </div>
-
-              <div style={{ "font-weight": "bold" }}>
-                Q: I'm still confused. What are the different levels of access
-                to my songs?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-                A: There are three levels of access to your songs:
-                <ul>
-                  <li>
-                    <em>private</em> - If you never give anyone the link, then
-                    your songs are private and no one else can see them except
-                    for you.
-                  </li>
-                  <li>
-                    <em>read only</em> - When you click "Share folder" if you
-                    choose "Can view" then people with the link can view your
-                    songs but can not edit your songs.
-                  </li>
-                  <li>
-                    <em>edit</em> - When you click "Share folder" if you choose
-                    "Can edit" then people with the link can edit your songs.
-                  </li>
-                </ul>
+                A: Yes! See <a href="#sharing">Sharing</a>.
               </div>
 
               <div style={{ "font-weight": "bold" }}>
@@ -246,24 +286,8 @@ export default class IndexPage extends React.Component {
               </div>
               <div style={{ "margin-bottom": "1em" }}>
                 A: No. You can login as "Guest" and use any Dropbox "Share
-                folder" link. For example, your friend who has a Dropbox account
-                can save songs in their Dropbox account. Then they can give you
-                their Dropbox "Share folder" link and you can see their songs in
-                ChartComposer even though you don't have a Dropbox account.
+                folder" link. See <a href="#guest-mode">Guest mode</a>.
               </div>
-
-              <div style={{ "font-weight": "bold" }} id={"audiohowto"}>
-                <div>Q: How do I embed audio files in my sheet music?</div>
-				Q: My Dropbox Share URLs for audio files and images don't work with the <code>x_audio</code> and <code>image</code> directives. How do I get them to work?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-				A: A lot of our users have audio recordings of songs stored in Dropbox that they want to listen to as they play along with the sheet music. 
-				You can embed audio links in your sheet music using the <code>x_audio</code>. 
-				To do this, find the audio file in Dropbox and click "Share" and copy the share link. 
-				<em>But you have to change the URL slightly</em>.
-				Replace <code>?dl=0</code> with <code>?raw=1</code> in order to point to the raw audio file (instead of a Dropbox page containing the audio file).
-				We do this automatically in ChartComposer, but if you want your ChordPro files to work in other applications you'll need to make this change.
-			  </div>
 
               <div style={{ "font-weight": "bold" }}>
                 Q: How do I turn off the annoying Dropbox notifications whenever I edit a song?
@@ -277,128 +301,7 @@ export default class IndexPage extends React.Component {
                 Q: What's "ChordPro"?
               </div>
               <div style={{ "margin-bottom": "1em" }}>
-                A: ChordPro is a <a href="https://en.wikipedia.org/wiki/Markup_language">markup language</a> for creating sheet music. 
-				You can find out more about ChordPro <a href="http://www.chordpro.org/">here</a>.
-				It's open source, well documented, <a href="http://www.chordpro.org/chordpro/Support.html">supported</a>, 
-				and <a href="https://github.com/ChordPro/chordpro">available on Github</a>. 
-				<p>
-				If you add ChordPro markup to a set of lyrics you end up with sheet music. It's that easy!
-				There are two main parts to ChordPro markup: You add chords by putting them inside square brackets.
-				You add other song parts by using ChordPro directives within curly brackets. Here's an example:
-				</p>
-				<pre style={{border: "1px solid", padding: "1em", "margin-left": "4em",}}>
-				  &#123;title: Amazing Grace&#125;<br/>
-				  &#123;composer: John Newton&#125;<br/>
-				  &#123;key: D&#125;<br/>
-				  &nbsp;<br/>
-				  &#123;start_of_verse&#125;<br/>
-				  &#123;comment: Verse 1&#125;<br/>
-				  [D]Amazing grace! (how [G]sweet the [D]sound)<br/>
-				  That [D]saved a wretch like [A7]me!<br/>
-				  I [D]once was lost, but [G]now am [D]found,<br/>
-				  Was [D]blind, but [A7]now I [D]see.<br/>
-				  &#123;end_of_verse&#125;<br/>
-				</pre>
-
-				<p>
-				  Here's what that ChordPro text looks like in ChartComposer:
-				</p>
-				<div style={{border: "1px solid", padding: "1em", "margin-left": "4em",}}>
-				  <img src={"/static/amazing-grace.png"}/>
-				</div>
-			  </div>
-
-              <div style={{ "font-weight": "bold" }}>
-                Q: Which ChordPro directives are supported by ChartComposer?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-                A: ChartComposer supports the following directives. You can see
-                all the ChordPro directives{" "}
-                <a href="http://www.chordpro.org/chordpro/ChordPro-Directives.html">
-                  here
-                </a>.
-                <ul>
-                  <li>
-                    <code>artist</code>
-                  </li>
-                  <li>
-                    <code>capo</code>
-                  </li>
-                  <li>
-                    <code>chordcolour</code>
-                  </li>
-                  <li>
-                    <code>chordfont</code>
-                  </li>
-                  <li>
-                    <code>chordsize</code>
-                  </li>
-                  <li>
-                    <code>chorus</code>
-                  </li>
-                  <li>
-                    <code>comment</code>
-                  </li>
-                  <li>
-                    <code>composer</code>
-                  </li>
-                  <li>
-                    <code>image</code>
-                  </li>
-                  <li>
-                    <code>key</code>
-                  </li>
-                  <li>
-                    <code>start_of_chorus, end_of_chorus</code>
-                  </li>
-                  <li>
-                    <code>start_of_verse, end_of_verse</code>
-                  </li>
-                  <li>
-                    <code>subtitle</code>
-                  </li>
-                  <li>
-                    <code>tempo</code>
-                  </li>
-                  <li>
-                    <code>textcolour</code>
-                  </li>
-                  <li>
-                    <code>textfont</code>
-                  </li>
-                  <li>
-                    <code>textsize</code>
-                  </li>
-                  <li>
-                    <code>title</code>
-                  </li>
-                </ul>
-
-				<p>
-				  ChartComposer adds the following custom directives:
-				</p>
-				<ul>
-                  <li>
-                    <code>&#123;x_audio: url="https://example.com/foo.m4a" title="my band"&#125;</code> - Add a link to an audio file. See <a href='#audiohowto'>how to embed audio files from Dropbox</a>.
-                  </li>
-                  <li>
-                    <code>&#123;x_chordposition: inline|above &#125;</code> - Specify where to place the chords relative to the lyrics.
-                  </li>
-				</ul>
-              </div>
-
-              <div style={{ "font-weight": "bold" }}>
-                Q: Who created ChartComposer?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-                A: ChartComposer is brought to you by <a href="https://twitter.com/elsigh">Lindsey Simon</a> and <a href="https://twitter.com/souders">Steve Souders</a>.
-			  </div>
-
-              <div style={{ "font-weight": "bold" }}>
-                Q: Is ChartComposer open source?
-              </div>
-              <div style={{ "margin-bottom": "1em" }}>
-                A: Yes. You can find the code on <a href="https://github.com/elsigh/chartcomposer">Github</a>.
+                A: See <a href="#editing-songs">Editing Songs</a>.
 			  </div>
 
             </div>
