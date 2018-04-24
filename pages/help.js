@@ -107,7 +107,7 @@ export default class IndexPage extends React.Component {
 
 			  <h2 style={{"margin-top": "2.5em", "margin-left": "-2em"}} id="sharing">Sharing</h2>
 			  <p>
-				It's easy to share a song folder with ChartComposer.
+				It's easy to share song folders from ChartComposer.
 				You can choose to give other people <b>View-only</b> access to your song folder
 				or <b>Edit</b> access.
 			  </p>
@@ -285,8 +285,8 @@ export default class IndexPage extends React.Component {
                 Q: Do I have to have a Dropbox account to use ChartComposer?
               </div>
               <div style={{ "margin-bottom": "1em" }}>
-                A: No. You can login as "Guest" and use any Dropbox "Share
-                folder" link. See <a href="#guest-mode">Guest mode</a>.
+                A: No. You can login as "Guest" and open shared folder links from others. 
+				See <a href="#guest-mode">Guest mode</a>.
               </div>
 
               <div style={{ "font-weight": "bold" }}>
