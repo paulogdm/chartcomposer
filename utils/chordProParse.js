@@ -8,7 +8,9 @@ export default function chordProParse(value, userDisplayPreferences) {
       : gSong.textsize; // add "px" to integers, ow allow % and em
   return {
     __html:
-	  ( gSong.duration ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 20px; padding: 10px'>Autoscroll</button>" : "" ) +
+      (gSong.duration
+        ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 20px; padding: 10px'>Autoscroll</button>"
+        : "") +
       "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
       gSong.textcolour +
       "; font-size: " +
@@ -50,61 +52,61 @@ export function parseChordProString(text, userDisplayPreferences) {
   return gSong;
 }
 
+export function setUpAutoscroll() {
+  window.bAutoscroll = false;
+  window.autoscrollTimer;
+  window.tAutoscrollStart;
+  window.nSongTop;
+  window.below;
+  window.toggleAutoScroll = function() {
+    bAutoscroll = !bAutoscroll;
+    if (bAutoscroll) {
+      // start autoscroll
+      console.log("toggleAutoScroll: start");
+      window.tAutoscrollStart = Number(new Date());
+      var songView = document.getElementsByClassName("panel-song-view")[0];
+      window.nSongTop = document
+        .getElementsByClassName("songverse")[0]
+        .getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
+      var nSongHeight = songView.scrollHeight - window.nSongTop;
+      var docHeight = document.documentElement.clientHeight;
+      window.below = window.nSongTop + nSongHeight - docHeight;
+      if (window.below <= 0) {
+        // it fits in the viewport - no need to autoscroll
+        console.log("no need to autoscroll - it all fits");
+        bAutoScroll = false;
+        return;
+      }
 
-window.bAutoscroll = false;
-window.autoscrollTimer;
-window.tAutoscrollStart;
-window.nSongTop;
-window.below;
-window.toggleAutoScroll = function() {
-	bAutoscroll = ! bAutoscroll;
-	if ( bAutoscroll ) {
-		// start autoscroll
-		console.log("toggleAutoScroll: start");
-		window.tAutoscrollStart = Number(new Date());
-		var songView = document.getElementsByClassName('panel-song-view')[0];
-		window.nSongTop = document.getElementsByClassName('songverse')[0].getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
-		var nSongHeight = songView.scrollHeight - window.nSongTop;
-		var docHeight = document.documentElement.clientHeight;
-		window.below = window.nSongTop + nSongHeight - docHeight;
-		if ( window.below <= 0 ) {
-			// it fits in the viewport - no need to autoscroll
-			console.log("no need to autoscroll - it all fits");
-			bAutoScroll = false;
-			return;
-		}
-		
-		autoScroll();
-	}
-	else {
-		console.log("toggleAutoScroll: stop");
-	}
-};
+      autoScroll();
+    } else {
+      console.log("toggleAutoScroll: stop");
+    }
+  };
 
+  window.autoScroll = function() {
+    if (!bAutoscroll) {
+      // stop autoscrolling
+      return;
+    }
 
-window.autoScroll = function() {
-	if ( ! bAutoscroll ) {
-		// stop autoscrolling
-		return;
-	}
+    // By 20 seconds before the end of the song we want the last line to be at the bottom of the viewport.
+    // So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
+    var delta = Number(new Date()) - tAutoscrollStart;
+    var duration = (gSong.duration - 20) * 1000;
+    if (!duration || delta >= duration) {
+      // done scrolling
+      console.log("done autoscrolling");
+      bAutoscroll = false;
+      return;
+    }
 
-	// By 20 seconds before the end of the song we want the last line to be at the bottom of the viewport.
-	// So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
-	var delta = Number(new Date()) - tAutoscrollStart;
-	var duration = (gSong.duration-20) * 1000;
-	if ( ! duration || delta >= duration ) {
-		// done scrolling
-		console.log("done autoscrolling");
-		bAutoscroll = false;
-		return;
-	}
+    var scrollTo = window.nSongTop + delta / duration * window.below;
+    document.getElementsByClassName("panel-song-view")[0].scrollTo(0, scrollTo);
 
-	var scrollTo = window.nSongTop + (delta / duration)*window.below;
-	document.getElementsByClassName('panel-song-view')[0].scrollTo(0, scrollTo);
-
-	setTimeout(autoScroll, 20);
-};
-
+    setTimeout(autoScroll, 20);
+  };
+}
 
 //   closingdirective - a single string or an array of strings
 function doBlock(type, closingdirectives) {
@@ -430,7 +432,7 @@ function exportHtml(song) {
     "tempo",
     "capo",
     "duration",
-	// These are properties that we do NOT want to show in the viewer.
+    // These are properties that we do NOT want to show in the viewer.
     //"textfont",
     //"textsize",
     //"textcolour",
@@ -562,44 +564,52 @@ function exportHtmlPart(aParts, i) {
           .replace(/\]/g, "</span></code>");
       }
 
-	  // Special CSS for comment and choruscomment.
-	  if ( "comment" === part.type || "choruscomment" === part.type ) {
-		  line = "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
-			  line + "</div><div style='clear: both;'></div>";
-	  }
-	  else if ( "x_audio" === part.type ) {
-		  // syntax: {x_audio: url="url" [title="name"]}
-		  var hParams = parseParameters(line);
-		  if ( ! hParams['url'] ) {
-			  continue; // must have URL
-		  }
-		  else {
-			  line = ( hParams['title'] ? "<span style='float: left;'>" + hParams['title'] + ": </span>" : "" ) + "<audio src='" + fixDropboxUrl(hParams['url']) + "' controls style='width: 80%'></audio>";
-		  }
-	  }
-	  else if ( "x_video" === part.type ) {
-		  // syntax: {x_video: url="url" [title="name"]}
-		  var hParams = parseParameters(line);
-		  if ( ! hParams['url'] ) {
-			  continue; // must have URL
-		  }
-		  else {
-			  var youtubeUrl = getYoutubeUrl(hParams['url']);
-			  if ( youtubeUrl ) {
-				  // https://www.youtube.com/embed/R0fQm9OsMcw
-				  line = "<iframe width='560' height='315' src='" + youtubeUrl + "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen></iframe>";
-			  }
-			  else {
-				  line = "<video src='" + fixDropboxUrl(hParams['url']) + "' controls style='width: 80%'></video>";
-			  }
-		  }
-	  }
-	  else if ( "image" === part.type ) {
-		  // syntax: {image: src=filename options }
-		  // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
-		  // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
-		  line = "<img " + fixDropboxUrl(line) + ">";
-		  /*
+      // Special CSS for comment and choruscomment.
+      if ("comment" === part.type || "choruscomment" === part.type) {
+        line =
+          "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
+          line +
+          "</div><div style='clear: both;'></div>";
+      } else if ("x_audio" === part.type) {
+        // syntax: {x_audio: url="url" [title="name"]}
+        var hParams = parseParameters(line);
+        if (!hParams["url"]) {
+          continue; // must have URL
+        } else {
+          line =
+            (hParams["title"]
+              ? "<span style='float: left;'>" + hParams["title"] + ": </span>"
+              : "") +
+            "<audio src='" +
+            fixDropboxUrl(hParams["url"]) +
+            "' controls style='width: 80%'></audio>";
+        }
+      } else if ("x_video" === part.type) {
+        // syntax: {x_video: url="url" [title="name"]}
+        var hParams = parseParameters(line);
+        if (!hParams["url"]) {
+          continue; // must have URL
+        } else {
+          var youtubeUrl = getYoutubeUrl(hParams["url"]);
+          if (youtubeUrl) {
+            // https://www.youtube.com/embed/R0fQm9OsMcw
+            line =
+              "<iframe width='560' height='315' src='" +
+              youtubeUrl +
+              "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen></iframe>";
+          } else {
+            line =
+              "<video src='" +
+              fixDropboxUrl(hParams["url"]) +
+              "' controls style='width: 80%'></video>";
+          }
+        }
+      } else if ("image" === part.type) {
+        // syntax: {image: src=filename options }
+        // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
+        // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
+        line = "<img " + fixDropboxUrl(line) + ">";
+        /*
 		  var hParams = parseParameters(line);
 		  if ( ! hParams['src'] ) {
 			  continue; // must have URL
@@ -608,9 +618,9 @@ function exportHtmlPart(aParts, i) {
 			  line = "<img src='" + hParams['src'] + "'>";
 		  }
 		  */
-	  }
+      }
 
-	  // Add this line to the results.
+      // Add this line to the results.
       aResults.push(
         "<div class=lyricline" + sTextStyle + ">" + line + "</div>",
       );
@@ -622,81 +632,81 @@ function exportHtmlPart(aParts, i) {
   return aResults.join("\n");
 }
 
-
 function getYoutubeUrl(url) {
-	var aMatches, youtubeId;
-	if ( aMatches = url.match(/https:\/\/www.youtube.com\/watch\?v=([^&]*)/) ) {
-		youtubeId = aMatches[1];
-	}
-	else if ( aMatches = url.match(/https:\/\/youtu.be\/([^&]*)/) ) {
-		youtubeId = aMatches[1];
-	}
+  var aMatches, youtubeId;
+  if ((aMatches = url.match(/https:\/\/www.youtube.com\/watch\?v=([^&]*)/))) {
+    youtubeId = aMatches[1];
+  } else if ((aMatches = url.match(/https:\/\/youtu.be\/([^&]*)/))) {
+    youtubeId = aMatches[1];
+  }
 
-	if ( youtubeId ) {
-		return "https://www.youtube.com/embed/" + youtubeId;
-	}
+  if (youtubeId) {
+    return "https://www.youtube.com/embed/" + youtubeId;
+  }
 
-	return "";
+  return "";
 }
 
-
-// The Dropbox Share URL for images and audio files end with "?dl=0" which takes you to an HTML 
+// The Dropbox Share URL for images and audio files end with "?dl=0" which takes you to an HTML
 // page containing the object. You have to replace that with "?raw=1" to get the actual file.
 function fixDropboxUrl(url) {
-	if ( -1 !== url.indexOf("https://www.dropbox.com/") && -1 !== url.indexOf("?dl=0") ) {
-		url = url.replace("?dl=0", "?raw=1");
-	}
+  if (
+    -1 !== url.indexOf("https://www.dropbox.com/") &&
+    -1 !== url.indexOf("?dl=0")
+  ) {
+    url = url.replace("?dl=0", "?raw=1");
+  }
 
-	return url;
+  return url;
 }
-
 
 // Return a hash based on name=value tuples.
 // example: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'
 function parseParameters(sParams) {
-	var hParams = {};
+  var hParams = {};
 
-	// Extract one tuple at a time.
-	while ( sParams ) {
-		sParams = sParams.trim();
-		var aMatches = sParams.match(/([^=]*)=\"(.*?)\"(.*)/);
-	    if ( ! aMatches ) {
-			aMatches = sParams.match(/([^=]*)=\'(.*?)\'(.*)/);
-			if ( ! aMatches ) {
-				aMatches = sParams.match(/([^=]*)=([^ ]*)(.*)/);
-				if ( ! aMatches ) {
-					break;
-				}
-				//else { console.log("aMatches 3:", aMatches); }
-			}
-			//else { console.log("aMatches 2:", aMatches); }
-		}
-		//else { console.log("aMatches 1:", aMatches); }
+  // Extract one tuple at a time.
+  while (sParams) {
+    sParams = sParams.trim();
+    var aMatches = sParams.match(/([^=]*)=\"(.*?)\"(.*)/);
+    if (!aMatches) {
+      aMatches = sParams.match(/([^=]*)=\'(.*?)\'(.*)/);
+      if (!aMatches) {
+        aMatches = sParams.match(/([^=]*)=([^ ]*)(.*)/);
+        if (!aMatches) {
+          break;
+        }
+        //else { console.log("aMatches 3:", aMatches); }
+      }
+      //else { console.log("aMatches 2:", aMatches); }
+    }
+    //else { console.log("aMatches 1:", aMatches); }
 
-		var sKey = aMatches[1].toLowerCase();
-		var sVal = cleanQuotes(aMatches[2]);
-		hParams[sKey] = sVal;
-		sParams = aMatches[3];
-	}
+    var sKey = aMatches[1].toLowerCase();
+    var sVal = cleanQuotes(aMatches[2]);
+    hParams[sKey] = sVal;
+    sParams = aMatches[3];
+  }
 
-	return hParams;
+  return hParams;
 }
-
 
 // Remove leading and trailing quotes from a string.
 function cleanQuotes(s) {
-	s = s.trim();
+  s = s.trim();
 
-	var c0 = s.charAt(0);
-	if ( "'" === c0 || '"' === c0 ) {
-		// Assume that if it _starts_ with a quote then it ends with a quote and that
-		// quote character is not used within the string.
-		s = s.replace(c0, '').replace(c0, '').trim();
-	}
+  var c0 = s.charAt(0);
+  if ("'" === c0 || '"' === c0) {
+    // Assume that if it _starts_ with a quote then it ends with a quote and that
+    // quote character is not used within the string.
+    s = s
+      .replace(c0, "")
+      .replace(c0, "")
+      .trim();
+  }
 
-	return s;
+  return s;
 }
-
 
 // TODO - If you import ChordPro text that contains "#" comments, blank lines, etc.
 // those will be lost when you export back to ChordPro.

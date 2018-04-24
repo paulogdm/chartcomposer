@@ -15,6 +15,7 @@ import SongView from "../components/SongView";
 import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 import getPathForSong from "../utils/getPathForSong";
+import { setUpAutoscroll } from "../utils/chordProParse";
 
 const Dropbox = dropbox.Dropbox;
 
@@ -122,6 +123,15 @@ export default class IndexPage extends React.Component {
     ) {
       throw new Error("This is Lindsey testing Sentry");
     }
+
+    if (
+      window.location.search &&
+      window.location.search.indexOf("share") !== -1
+    ) {
+      debugger;
+    }
+
+    setUpAutoscroll();
   }
 
   componentWillUnmount() {

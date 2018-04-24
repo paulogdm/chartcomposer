@@ -13,13 +13,6 @@ class SongEditor extends React.Component {
     this.setState({ value }, () => onChange(value));
   };
 
-  toggleEditorClosed = () => {
-    console.log("toggleEditorClosed");
-    this.setState({
-      editorClosed: !this.state.editorClosed,
-    });
-  };
-
   render() {
     const { readOnly, saving, serverModified } = this.props;
     const { value, editorClosed } = this.state;
@@ -52,10 +45,7 @@ class SongEditor extends React.Component {
             <div />
           )}
 
-          <LastSaved
-            toggleEditorClosed={this.toggleEditorClosed}
-            timestamp={serverModified}
-          />
+          <LastSaved timestamp={serverModified} />
         </div>
         <div style={{ flex: 1, position: "relative" }}>
           <textarea
@@ -79,7 +69,7 @@ class SongEditor extends React.Component {
 
 export default SongEditor;
 
-const LastSaved = ({ timestamp, toggleEditorClosed }) => (
+const LastSaved = ({ timestamp }) => (
   <div style={{ display: "flex", alignItems: "center", padding: 5 }}>
     <div>Last edited {moment(timestamp).fromNow()}</div>
     <div
@@ -94,7 +84,6 @@ const LastSaved = ({ timestamp, toggleEditorClosed }) => (
       ✔
     </div>
     <div
-      onClick={toggleEditorClosed}
       style={{
         cursor: "pointer",
         padding: "0px 3px 0px 12px",
