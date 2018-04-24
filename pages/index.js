@@ -7,7 +7,7 @@ import _ from "lodash";
 
 import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
-import Page, { isGuestAccessToken } from "../components/Page";
+import Page, { getGuestAccessToken, isGuestAccessToken } from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
@@ -60,6 +60,9 @@ export default class IndexPage extends React.Component {
   }
 
   componentDidMount() {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const shareLink = urlSearchParams.get("share");
+
     if (localStorage) {
       let localState = {};
       LOCAL_STORAGE_FIELDS.forEach(field => {
@@ -71,7 +74,12 @@ export default class IndexPage extends React.Component {
       console.log("componentDidMount localStorage", { localState });
       this.setState(localState);
 
-      const accessToken = localStorage.getItem("db-access-token");
+      let accessToken = localStorage.getItem("db-access-token");
+      // Automatically sign a share-link visitor in as a guest
+      if (shareLink && !accessToken) {
+        accessToken = getGuestAccessToken();
+      }
+
       if (accessToken) {
         this.dbx = new Dropbox({ accessToken });
         this.setState({
@@ -100,6 +108,10 @@ export default class IndexPage extends React.Component {
             this.loadDropboxLink(folder.url, true);
           });
         }
+
+        if (shareLink) {
+          this.loadDropboxLink(shareLink, true);
+        }
       }
     }
 
@@ -117,18 +129,8 @@ export default class IndexPage extends React.Component {
     window.addEventListener("offline", this.updateOnlineStatus);
     window.addEventListener("online", this.updateOnlineStatus);
 
-    if (
-      window.location.search &&
-      window.location.search.indexOf("error") !== -1
-    ) {
+    if (urlSearchParams.has("error")) {
       throw new Error("This is Lindsey testing Sentry");
-    }
-
-    if (
-      window.location.search &&
-      window.location.search.indexOf("share") !== -1
-    ) {
-      debugger;
     }
 
     setUpAutoscroll();
@@ -575,8 +577,9 @@ export default class IndexPage extends React.Component {
 
   copyShareLink = folderUrl => {
     var msgbox = document.createElement("div");
-    folderUrl =
-      "https://chartcomposer.com/?share=" + encodeURIComponent(folderUrl);
+    folderUrl = `${
+      window.location.origin
+    }/?share=%{encodeURIComponent(folderUrl)}`;
     msgbox.innerHTML =
       "<div id=msgbox style='margin: 1em; padding: 1em; border: 1px solid black; background: #EEE;'><div style='margin-bottom: 0.4em;'><input value='" +
       folderUrl +

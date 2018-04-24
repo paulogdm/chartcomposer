@@ -46,4 +46,8 @@ export function isGuestAccessToken(accessToken) {
   return accessToken === DROPBOX_PUBLIC_TOKEN;
 }
 
+export function getGuestAccessToken() {
+  return DROPBOX_PUBLIC_TOKEN;
+}
+
 export { Sender, SignInAsGuest, Receiver };
