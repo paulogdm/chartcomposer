@@ -79,6 +79,9 @@ export default class UserMenu extends React.Component {
               <li>
                 <a href="/about">About</a>
               </li>
+              <li>
+                <a href="/help">Help</a>
+              </li>
               <li onClick={this.togglePreferences}>
                 <div>Preferences</div>
               </li>
