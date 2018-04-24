@@ -578,7 +578,7 @@ export default class IndexPage extends React.Component {
   removeFolder = folderId => {
     let folders = { ...this.state.folders };
     delete folders[folderId];
-    this.setState({ folders });
+    this.setState({ folders, songId: null });
 
     let preferences = { ...this.state.preferences };
     delete preferences.folders[folderId];
