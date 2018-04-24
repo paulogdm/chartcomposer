@@ -1,11 +1,10 @@
-import getConfig from "next/config";
 import { createOauthFlow } from "react-oauth-flow";
 
 import withSentry from "./withSentry";
 import Meta from "./Meta";
 import Footer from "./Footer";
 
-const { publicRuntimeConfig } = getConfig();
+import publicRuntimeConfig from "../utils/publicRuntimeConfig";
 const {
   DROPBOX_APP_KEY,
   DROPBOX_APP_SECRET,
@@ -41,10 +40,6 @@ const SignInAsGuest = () => (
     Guest
   </a>
 );
-
-export function isGuestAccessToken(accessToken) {
-  return accessToken === DROPBOX_PUBLIC_TOKEN;
-}
 
 export function getGuestAccessToken() {
   return DROPBOX_PUBLIC_TOKEN;

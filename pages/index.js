@@ -7,7 +7,7 @@ import _ from "lodash";
 
 import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
-import Page, { getGuestAccessToken, isGuestAccessToken } from "../components/Page";
+import Page from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
@@ -16,6 +16,9 @@ import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 import getPathForSong from "../utils/getPathForSong";
 import { setUpAutoscroll } from "../utils/chordProParse";
+
+import publicRuntimeConfig from "../utils/publicRuntimeConfig";
+const { DROPBOX_PUBLIC_TOKEN } = publicRuntimeConfig;
 
 const Dropbox = dropbox.Dropbox;
 
@@ -39,7 +42,6 @@ export default class IndexPage extends React.Component {
       chordPro: {},
       closedFolders: {},
       dirty: {},
-      dropboxInputValue: "",
       folders: {},
       loading: false,
       onLine: true,
@@ -77,13 +79,12 @@ export default class IndexPage extends React.Component {
       let accessToken = localStorage.getItem("db-access-token");
       // Automatically sign a share-link visitor in as a guest
       if (shareLink && !accessToken) {
-        accessToken = getGuestAccessToken();
+        accessToken = DROPBOX_PUBLIC_TOKEN;
       }
-
       if (accessToken) {
         this.dbx = new Dropbox({ accessToken });
         this.setState({
-          signedInAsGuest: isGuestAccessToken(accessToken),
+          signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
           smallScreenMode: this.getDefaultSmallScreenMode(),
         });
         if (window) {
@@ -233,11 +234,6 @@ export default class IndexPage extends React.Component {
     this.setState({ smallScreenMode });
   };
 
-  onChangeDropboxInput = e =>
-    this.setState({
-      dropboxInputValue: e.target.value,
-    });
-
   loadDropboxLink = (url, isCheckForChanges = false) => {
     console.log("loadDropboxLink", { url, isCheckForChanges });
     if (!url) {
@@ -288,7 +284,7 @@ export default class IndexPage extends React.Component {
         } else if (tag === "file") {
           const songId = response.id;
           if (!isChordProFileName(response.name)) {
-            this.setState({ loading: false, dropboxInputValue: "" }, () => {
+            this.setState({ loading: false }, () => {
               alert("Your link does not resolve to a chordpro file, sorry.");
             });
             return;
@@ -357,7 +353,7 @@ export default class IndexPage extends React.Component {
             songs,
           },
         };
-        this.setState({ folders, dropboxInputValue: "" });
+        this.setState({ folders });
       })
       .catch(error => {
         throw error;
@@ -444,12 +440,10 @@ export default class IndexPage extends React.Component {
     });
     const [song, _] = this.getSongById(songId);
     console.log("setSongId", { songId, song, folderId });
-    const dropboxInputValue = folderId
-      ? folders[folderId].url
-      : songs[songId].url;
+    const url = folderId ? folders[folderId].url : songs[songId].url;
     this.dbx
       .sharingGetSharedLinkFile({
-        url: dropboxInputValue,
+        url,
         path: song[".tag"] === "file" ? `/${song.name}` : null,
       })
       .then(async response => {
@@ -663,7 +657,6 @@ export default class IndexPage extends React.Component {
       folders,
       loading,
       closedFolders,
-      dropboxInputValue,
       preferences,
       preferencesOpen,
       saving,
@@ -752,9 +745,7 @@ export default class IndexPage extends React.Component {
         >
           <Header
             className="header"
-            dropboxInputValue={dropboxInputValue}
             loadDropboxLink={this.loadDropboxLink}
-            onChangeDropboxInput={this.onChangeDropboxInput}
             readOnly={readOnly}
             setSmallScreenMode={this.setSmallScreenMode}
             signOut={this.signOut}
