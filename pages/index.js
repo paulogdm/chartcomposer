@@ -940,10 +940,11 @@ const PromoCopy = () => (
     >
       <li style={{ marginBottom: 4 }}>Create sheet music</li>
       <li style={{ marginBottom: 4 }}>Share with friends</li>
+      <li style={{ marginBottom: 4 }}>Embed audio &amp; video</li>
       <li style={{ marginBottom: 4 }}>Save in Dropbox</li>
       <li style={{ marginBottom: 16 }}>Format using ChordPro</li>
       <li>
-        Find out <a href="/about">more</a>!
+        Find out <a href="/help">more</a>!
       </li>
     </ul>
   </div>
