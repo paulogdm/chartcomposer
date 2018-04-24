@@ -8,6 +8,7 @@ export default function chordProParse(value, userDisplayPreferences) {
       : gSong.textsize; // add "px" to integers, ow allow % and em
   return {
     __html:
+	  ( gSong.duration ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 20px; padding: 10px'>Autoscroll</button>" : "" ) +
       "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
       gSong.textcolour +
       "; font-size: " +
@@ -48,6 +49,62 @@ export function parseChordProString(text, userDisplayPreferences) {
 
   return gSong;
 }
+
+
+window.bAutoscroll = false;
+window.autoscrollTimer;
+window.tAutoscrollStart;
+window.nSongTop;
+window.below;
+window.toggleAutoScroll = function() {
+	bAutoscroll = ! bAutoscroll;
+	if ( bAutoscroll ) {
+		// start autoscroll
+		console.log("toggleAutoScroll: start");
+		window.tAutoscrollStart = Number(new Date());
+		var songView = document.getElementsByClassName('panel-song-view')[0];
+		window.nSongTop = document.getElementsByClassName('songverse')[0].getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
+		var nSongHeight = songView.scrollHeight - window.nSongTop;
+		var docHeight = document.documentElement.clientHeight;
+		window.below = window.nSongTop + nSongHeight - docHeight;
+		if ( window.below <= 0 ) {
+			// it fits in the viewport - no need to autoscroll
+			console.log("no need to autoscroll - it all fits");
+			bAutoScroll = false;
+			return;
+		}
+		
+		autoScroll();
+	}
+	else {
+		console.log("toggleAutoScroll: stop");
+	}
+};
+
+
+window.autoScroll = function() {
+	if ( ! bAutoscroll ) {
+		// stop autoscrolling
+		return;
+	}
+
+	// By 20 seconds before the end of the song we want the last line to be at the bottom of the viewport.
+	// So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
+	var delta = Number(new Date()) - tAutoscrollStart;
+	var duration = (gSong.duration-20) * 1000;
+	if ( ! duration || delta >= duration ) {
+		// done scrolling
+		console.log("done autoscrolling");
+		bAutoscroll = false;
+		return;
+	}
+
+	var scrollTo = window.nSongTop + (delta / duration)*window.below;
+	document.getElementsByClassName('panel-song-view')[0].scrollTo(0, scrollTo);
+
+	setTimeout(autoScroll, 20);
+};
+
 
 //   closingdirective - a single string or an array of strings
 function doBlock(type, closingdirectives) {
@@ -265,6 +322,7 @@ function doDirective(line) {
     case "key":
     case "tempo":
     case "capo":
+    case "duration":
     case "textfont":
     case "textsize":
     case "textcolour":
@@ -316,7 +374,6 @@ function doDirective(line) {
     case "album":
     case "year":
     case "time":
-    case "duration":
     case "meta":
     case "comment_italic":
     case "ci":
@@ -372,6 +429,7 @@ function exportHtml(song) {
     "key",
     "tempo",
     "capo",
+    "duration",
 	// These are properties that we do NOT want to show in the viewer.
     //"textfont",
     //"textsize",
@@ -609,11 +667,11 @@ function parseParameters(sParams) {
 				if ( ! aMatches ) {
 					break;
 				}
-				else { console.log("aMatches 3:", aMatches); }
+				//else { console.log("aMatches 3:", aMatches); }
 			}
-			else { console.log("aMatches 2:", aMatches); }
+			//else { console.log("aMatches 2:", aMatches); }
 		}
-		else { console.log("aMatches 1:", aMatches); }
+		//else { console.log("aMatches 1:", aMatches); }
 
 		var sKey = aMatches[1].toLowerCase();
 		var sVal = cleanQuotes(aMatches[2]);
