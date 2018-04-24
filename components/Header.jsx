@@ -119,6 +119,8 @@ const Header = ({
               <SignInAsGuest />
               <div style={{ margin: "0 5px" }}>|</div>
               <a href="/about">About</a>
+              <div style={{ margin: "0 5px" }}>|</div>
+              <a href="/help">Help</a>
             </div>
           )}
         />
