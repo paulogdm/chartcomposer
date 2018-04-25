@@ -69,7 +69,7 @@ const SongFolder = ({
           cursor: "pointer",
           display: "flex",
           fontWeight: "bold",
-          padding: "2px 10px",
+          padding: "4px 10px",
         }}
         title="Toggle folder"
       >

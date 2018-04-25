@@ -891,7 +891,10 @@ export default class IndexPage extends React.Component {
                     height: "100%",
                     overflow: "auto",
                     padding: "8px 0",
-                    width: `${songEditorPercentWidth}%`,
+                    width:
+                      renderSongEditor && renderSongView
+                        ? `${songEditorPercentWidth}%`
+                        : "100%",
                   }}
                 >
                   <SongEditor

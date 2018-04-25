@@ -25,14 +25,7 @@ const AddFolder = ({ loadDropboxLink }) => (
       extensions={[]}
       folderselect
     >
-      <button
-        title="Choose a folder on Dropbox"
-        style={{
-          backgroundColor: "transparent",
-        }}
-      >
-        + 📁
-      </button>
+      <button title="Choose a folder on Dropbox">+ 📁</button>
     </DropboxChooser>
   </div>
 );
