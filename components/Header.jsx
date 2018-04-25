@@ -1,5 +1,3 @@
-
-
 import { Sender, SignInAsGuest } from "../components/Page";
 import UserMenu from "../components/UserMenu";
 
@@ -117,10 +115,6 @@ const Header = ({
               <a href={url}>Sign in</a>
               <div style={{ margin: "0 5px" }}>|</div>
               <SignInAsGuest />
-              <div style={{ margin: "0 5px" }}>|</div>
-              <a href="/about">About</a>
-              <div style={{ margin: "0 5px" }}>|</div>
-              <a href="/help">Help</a>
             </div>
           )}
         />

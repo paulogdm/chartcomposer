@@ -55,6 +55,7 @@ const SongFolder = ({
         button {
           background: rgba(0, 0, 0, 0.1);
           border: 1px solid rgba(0, 0, 0, 0.1);
+          line-height: 0;
         }
       `}</style>
       <div
@@ -68,7 +69,7 @@ const SongFolder = ({
           cursor: "pointer",
           display: "flex",
           fontWeight: "bold",
-          paddingLeft: 10,
+          padding: "2px 10px",
         }}
         title="Toggle folder"
       >

@@ -572,9 +572,8 @@ export default class IndexPage extends React.Component {
 
   copyShareLink = folderUrl => {
     var msgbox = document.createElement("div");
-    folderUrl = `${
-      window.location.origin
-    }/?share=` + encodeURIComponent(folderUrl);
+    folderUrl =
+      `${window.location.origin}/?share=` + encodeURIComponent(folderUrl);
     msgbox.innerHTML =
       "<div id=msgbox style='margin: 1em; padding: 1em; border: 1px solid black; background: #EEE;'><div style='margin-bottom: 0.4em;'><input value='" +
       folderUrl +
@@ -795,8 +794,19 @@ export default class IndexPage extends React.Component {
                       }}
                     >
                       <div style={{ padding: 10 }}>♫ Songs</div>
-                      <div style={{ alignItems: "center", display: "flex" }}>
-                        <AddFolder loadDropboxLink={this.loadDropboxLink} />
+                      <div
+                        style={{
+                          alignItems: "center",
+                          display: "flex",
+                        }}
+                      >
+                        <div
+                          style={{
+                            paddingRight: smallScreenMode !== null ? 10 : 0,
+                          }}
+                        >
+                          <AddFolder loadDropboxLink={this.loadDropboxLink} />
+                        </div>
                         {smallScreenMode === null ? (
                           <div
                             onClick={this.toggleSidebarClosed}
@@ -815,6 +825,7 @@ export default class IndexPage extends React.Component {
                       background: "#eee",
                       flex: 1,
                       overflow: "auto",
+                      fontSize: smallScreenMode === "SongList" ? "1.4em" : null,
                     }}
                   >
                     <SongList
@@ -943,8 +954,9 @@ const PromoCopy = () => (
       <li style={{ marginBottom: 4 }}>Embed audio &amp; video</li>
       <li style={{ marginBottom: 4 }}>Save in Dropbox</li>
       <li style={{ marginBottom: 16 }}>Format using ChordPro</li>
-      <li>
-        Find out <a href="/help">more</a>!
+
+      <li style={{ marginBottom: 4 }}>
+        <a href="/about">About</a> | <a href="/help">Help</a>
       </li>
     </ul>
   </div>
