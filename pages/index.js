@@ -865,6 +865,7 @@ export default class IndexPage extends React.Component {
                     left: 0,
                     bottom: 0,
                     right: 0,
+					display: "none" // CVSNO - this seems to break SongView scrolling
                   }}
                 >
                   <Draggable axis="x" onDrag={this.onPanelResizeDrag}>
