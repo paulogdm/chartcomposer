@@ -573,15 +573,35 @@ function exportHtmlPart(aParts, i) {
       } else if ("x_audio" === part.type) {
         // syntax: {x_audio: url="url" [title="name"]}
         var hParams = parseParameters(line);
-        if (!hParams["url"]) {
+		var url = hParams["url"];
+        if ( ! url ) {
           continue; // must have URL
+		}
+		// When people copy the Spotify link it is not in the format necessary to embed.
+		// The only way to get the correct format is to copy the "embed code", but people
+		// typically do not know that and anyway that would be too combursome to put into ChordPro.
+		// If they DO get the embed code and give us just the embed URL, that should work fine
+		// in the first "embed.spotify.com" block.
+		// If instead they have the web page URL we try to convert it.
+		// I have found that without the "user" part it will only play 20 seconds.
+		else if ( 0 === url.indexOf("https://embed.spotify.com/") ) {
+			line = "<iframe src='" + url + "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
+		}
+		else if ( 0 === url.indexOf("https://open.spotify.com/") ) {
+			// Extract the URI and convert "/" to ":".
+			var uri = url.substring("https://open.spotify.com/".length).replace(/\//g, ":");
+			if ( uri ) {
+				// Here is an example that works and actually plays the entire song:
+				// line = "<iframe src='https://embed.spotify.com/?uri=spotify:user:richardcook2:playlist:7opdOnDak9hMWlOeGcuk02' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
+				line = "<iframe src='https://embed.spotify.com/?uri=spotify:" + uri + "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
+			}
         } else {
           line =
             (hParams["title"]
               ? "<span style='float: left;'>" + hParams["title"] + ": </span>"
               : "") +
             "<audio src='" +
-            fixDropboxUrl(hParams["url"]) +
+            fixDropboxUrl(url) +
             "' controls style='width: 80%'></audio>";
         }
       } else if ("x_video" === part.type) {
