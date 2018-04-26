@@ -65,20 +65,20 @@ export function setUpAutoscroll() {
       console.log("toggleAutoScroll: start");
       window.tAutoscrollStart = Number(new Date());
       var songView = document.getElementsByClassName("panel-song-view")[0];
-      window.nSongTop = document
-        .getElementsByClassName("songverse")[0]
-        .getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
-      var nSongHeight = songView.scrollHeight - window.nSongTop;
-      var docHeight = document.documentElement.clientHeight;
-      window.below = window.nSongTop + nSongHeight - docHeight;
-      if (window.below <= 0) {
-        // it fits in the viewport - no need to autoscroll
-        console.log("no need to autoscroll - it all fits");
-        bAutoScroll = false;
-        return;
-      }
-
-      autoScroll();
+	  var startElement = ( document.getElementsByClassName("songverse")[0] || document.getElementsByClassName("songimage")[0] );
+	  if ( startElement ) {
+		  window.nSongTop = startElement.getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
+		  var nSongHeight = songView.scrollHeight - window.nSongTop;
+		  var docHeight = document.documentElement.clientHeight;
+		  window.below = window.nSongTop + nSongHeight - docHeight;
+		  if (window.below <= 0) {
+			  // it fits in the viewport - no need to autoscroll
+			  console.log("no need to autoscroll - it all fits");
+			  bAutoScroll = false;
+			  return;
+		  }
+		  autoScroll();
+	  }
     } else {
       console.log("toggleAutoScroll: stop");
     }
