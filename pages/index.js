@@ -52,6 +52,7 @@ export default class IndexPage extends React.Component {
       smallScreenMode: null,
       resizerPosition: { x: 0, y: 0 },
       sidebarClosed: false,
+      editorClosed: false,
       songEditorPercentWidth: 50,
       songId: null,
       songs: {},
@@ -570,6 +571,14 @@ export default class IndexPage extends React.Component {
     });
   };
 
+	// Can not get this to work but leaving the code so Lindsey can help me.
+  toggleEditorClosed = () => {
+    console.log("toggleEditorClosed");
+    this.setState({
+      editorClosed: !this.state.editorClosed,
+    });
+  };
+
   copyShareLink = folderUrl => {
     var msgbox = document.createElement("div");
     folderUrl =
@@ -661,6 +670,7 @@ export default class IndexPage extends React.Component {
       preferencesOpen,
       saving,
       sidebarClosed,
+      editorClosed,
       smallScreenMode,
       songs,
       songEditorPercentWidth,
@@ -892,6 +902,7 @@ export default class IndexPage extends React.Component {
                     height: "100%",
                     overflow: "auto",
                     padding: "8px 0",
+				    display: editorClosed ? "none" : "block",
                     width:
                       renderSongEditor && renderSongView
                         ? `${songEditorPercentWidth}%`
@@ -905,6 +916,7 @@ export default class IndexPage extends React.Component {
                     saving={saving}
                     serverModified={song.server_modified}
                     value={chordPro[songId]}
+					toggleEditorClosed={this.toggleEditorClosed}
                   />
                 </div>
               )}
