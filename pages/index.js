@@ -916,7 +916,6 @@ export default class IndexPage extends React.Component {
                     saving={saving}
                     serverModified={song.server_modified}
                     value={chordPro[songId]}
-					toggleEditorClosed={this.toggleEditorClosed}
                   />
                 </div>
               )}
@@ -933,6 +932,7 @@ export default class IndexPage extends React.Component {
                   <SongView
                     preferences={preferences.display}
                     value={chordPro[songId]}
+					toggleEditorClosed={this.toggleEditorClosed}
                   />
                 </div>
               ) : null}
