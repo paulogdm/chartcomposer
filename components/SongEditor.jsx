@@ -4,7 +4,7 @@ import LoadingIndicator from "./LoadingIndicator";
 class SongEditor extends React.Component {
   constructor(props) {
     super();
-    this.state = { value: props.value, editorClosed: false };
+    this.state = { value: props.value };
   }
 
   onChange = e => {
@@ -15,7 +15,7 @@ class SongEditor extends React.Component {
 
   render() {
     const { readOnly, saving, serverModified } = this.props;
-    const { value, editorClosed } = this.state;
+    const { value } = this.state;
     return (
       <div
         style={{
@@ -63,13 +63,6 @@ class SongEditor extends React.Component {
 
 export default SongEditor;
 
-// This is a hack.
-function toggleEditorClosedHack() {
-	console.log("toggleEditorClosed3");
-	var se = document.getElementsByClassName("panel-song-editor")[0].style.display = "none";
-}
-
-
 const LastSaved = ({ timestamp }) => (
   <div style={{ display: "flex", alignItems: "center", padding: 5 }}>
     <div>Last edited {moment(timestamp).fromNow()}</div>
@@ -83,12 +76,6 @@ const LastSaved = ({ timestamp }) => (
       }}
     >
       ✔
-    </div>
-    <div
-       onClick={toggleEditorClosedHack}
-       style={{ cursor: "pointer", padding: 10, "fontWeight": "bold", "fontSize": "13px" }}
-       >
-      X
     </div>
   </div>
 );
