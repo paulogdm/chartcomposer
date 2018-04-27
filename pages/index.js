@@ -60,7 +60,7 @@ export default class IndexPage extends React.Component {
     };
     this.dbx = null;
     this.debouncedOnWindowResize = _.debounce(this.onWindowResize, 300);
-    this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 8000);
+    this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 1000);
   }
 
   componentDidMount() {
@@ -360,7 +360,7 @@ export default class IndexPage extends React.Component {
       .catch(error => {
         throw error;
       })
-      .finally(() => {
+      .then(() => {
         this.setState({ loading: false });
       });
   };
@@ -461,7 +461,7 @@ export default class IndexPage extends React.Component {
       .catch(error => {
         throw error;
       })
-      .finally(() => {
+      .then(() => {
         this.setState({ loading: false });
       });
   };
@@ -533,7 +533,7 @@ export default class IndexPage extends React.Component {
       .catch(error => {
         throw error;
       })
-      .finally(() => {
+      .then(() => {
         this.setState({ saving: false });
       });
   };
@@ -571,7 +571,7 @@ export default class IndexPage extends React.Component {
     });
   };
 
-	// Can not get this to work but leaving the code so Lindsey can help me.
+  // Can not get this to work but leaving the code so Lindsey can help me.
   toggleEditorClosed = () => {
     console.log("toggleEditorClosed");
     this.setState({
@@ -650,7 +650,7 @@ export default class IndexPage extends React.Component {
       .catch(error => {
         throw error;
       })
-      .finally(() => {
+      .then(() => {
         this.setState({ loading: false });
       });
   };
@@ -875,7 +875,7 @@ export default class IndexPage extends React.Component {
                     left: 0,
                     bottom: 0,
                     right: 0,
-					display: "none" // CVSNO - this seems to break SongView scrolling
+                    display: "none", // CVSNO - this seems to break SongView scrolling
                   }}
                 >
                   <Draggable axis="x" onDrag={this.onPanelResizeDrag}>
@@ -902,7 +902,7 @@ export default class IndexPage extends React.Component {
                     height: "100%",
                     overflow: "auto",
                     padding: "8px 0",
-				    display: editorClosed ? "none" : "block",
+                    display: editorClosed ? "none" : "block",
                     width:
                       renderSongEditor && renderSongView
                         ? `${songEditorPercentWidth}%`
@@ -932,7 +932,7 @@ export default class IndexPage extends React.Component {
                   <SongView
                     preferences={preferences.display}
                     value={chordPro[songId]}
-					toggleEditorClosed={this.toggleEditorClosed}
+                    toggleEditorClosed={this.toggleEditorClosed}
                   />
                 </div>
               ) : null}
