@@ -376,7 +376,6 @@ function doDirective(line) {
     case "copyright":
     case "album":
     case "year":
-    case "time":
     case "meta":
     case "comment_italic":
     case "ci":
