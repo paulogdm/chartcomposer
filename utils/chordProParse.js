@@ -6,12 +6,18 @@ export default function chordProParse(value, userDisplayPreferences) {
     gSong.textsize == parseInt(gSong.textsize)
       ? gSong.textsize + "px"
       : gSong.textsize; // add "px" to integers, ow allow % and em
+  let outersongClassNames = ["outersong"];
+  if ("above" === gSong.x_chordposition) {
+    outersongClassNames.push("chord-position-above");
+  }
   return {
     __html:
       (gSong.duration
         ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 80px; padding: 10px'>Autoscroll</button>"
         : "") +
-      "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
+      "<div class='" +
+      outersongClassNames.join(" ") +
+      "' style='font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
       gSong.textcolour +
       "; font-size: " +
       sTextSize +
@@ -64,21 +70,23 @@ export function setUpAutoscroll() {
       console.log("toggleAutoScroll: start");
       window.tAutoscrollStart = Number(new Date());
       var songView = document.getElementsByClassName("panel-song-view")[0];
-	  var startElement = ( document.getElementsByClassName("songverse")[0] || document.getElementsByClassName("songimage")[0] );
-	  if ( startElement ) {
-		  window.nSongTop = startElement.getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
-		  window.nSongTop -= ( window.nSongTop > 60 ? 60 : window.nSongTop );
-		  var nSongHeight = songView.scrollHeight - window.nSongTop;
-		  var docHeight = document.documentElement.clientHeight;
-		  window.below = window.nSongTop + nSongHeight - docHeight;
-		  if (window.below <= 0) {
-			  // it fits in the viewport - no need to autoscroll
-			  console.log("no need to autoscroll - it all fits");
-			  window.bAutoScroll = false;
-			  return;
-		  }
-		  autoScroll();
-	  }
+      var startElement =
+        document.getElementsByClassName("songverse")[0] ||
+        document.getElementsByClassName("songimage")[0];
+      if (startElement) {
+        window.nSongTop = startElement.getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
+        window.nSongTop -= window.nSongTop > 60 ? 60 : window.nSongTop;
+        var nSongHeight = songView.scrollHeight - window.nSongTop;
+        var docHeight = document.documentElement.clientHeight;
+        window.below = window.nSongTop + nSongHeight - docHeight;
+        if (window.below <= 0) {
+          // it fits in the viewport - no need to autoscroll
+          console.log("no need to autoscroll - it all fits");
+          window.bAutoScroll = false;
+          return;
+        }
+        autoScroll();
+      }
     } else {
       console.log("toggleAutoScroll: stop");
     }
@@ -102,14 +110,13 @@ export function setUpAutoscroll() {
     }
 
     var scrollTo = window.nSongTop + delta / duration * window.below;
-	var songView = document.getElementsByClassName("panel-song-view")[0];
-	if ( songView ) {
-		songView.scrollTo(0, scrollTo);
-	}
-	else {
-		window.bAutoScroll = false;
-		return;
-	}
+    var songView = document.getElementsByClassName("panel-song-view")[0];
+    if (songView) {
+      songView.scrollTo(0, scrollTo);
+    } else {
+      window.bAutoScroll = false;
+      return;
+    }
 
     setTimeout(autoScroll, 20);
   };
@@ -152,7 +159,7 @@ function doBlock(type, closingdirectives) {
     } else if (isComment(line)) {
       // do nothing
     } else {
-		block.lines.push( line ? line : "&nbsp;" );
+      block.lines.push(line ? line : "&nbsp;");
     }
   }
 
@@ -429,7 +436,7 @@ function doDirective(line) {
 function exportHtml(song) {
   var aResults = [];
 
-  aResults.push("<div class=songproperties style='margin-bottom: 1em;'>");
+  aResults.push("<div class=songproperties>");
   var aProperties = [
     "title",
     "subtitle",
@@ -456,10 +463,7 @@ function exportHtml(song) {
       switch (prop) {
         default:
           aResults.push(
-            "<div class=song" +
-              prop +
-              getCss(prop) +
-              ">" +
+            "<div class=song>" +
               ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
               song[prop] +
               "</div>",
@@ -476,27 +480,6 @@ function exportHtml(song) {
   aResults.push("</div>");
 
   return aResults.join("\n");
-}
-
-// Need this cause CSS rules are missing
-function getCss(prop) {
-  switch (prop) {
-    case "title":
-      return " style='font-size: 1.5em; font-weight: bold;'";
-    case "artist":
-      return " style='font-size: 1.1em;'";
-    case "composer":
-      return " style='font-size: 1.1em;'";
-    case "verse":
-    case "chorus":
-      return " style='padding-top: 0.5em; margin-bottom: 0.5em; padding-left: 0.5em;'";
-    case "tab":
-      return " style='padding-top: 0.5em; margin-bottom: 0.5em; padding-left: 0.5em; font-family: monospace;'";
-    case "comment":
-      return " style='padding-top: 0.5em; padding-bottom: 0.5em;'";
-  }
-
-  return "";
 }
 
 function exportHtmlPart(aParts, i) {
@@ -516,26 +499,20 @@ function exportHtmlPart(aParts, i) {
     sStyle = " style='margin-bottom: -0.5em; padding-top: 0.5em;'";
   }
 
-  aResults.push(
-				"<div class=song" + part.type + sStyle + getCss(part.type) + ">",
-  );
+  aResults.push("<div class=song" + part.type + sStyle + ">");
 
   var sChordSize =
     gSong.chordsize == parseInt(gSong.chordsize)
       ? gSong.chordsize + "px"
       : gSong.chordsize; // add "px" to integers, ow allow % and em
   var sChordStyle =
-    " style='top: -0.5em; line-height: 1; position: relative; margin: 0 2px 0 4px; color: " +
+    " style='color: " +
     gSong.chordcolour +
     "; font-size: " +
     sChordSize +
     "; font-family: " +
     gSong.chordfont +
     ";'";
-  var sChordPosition =
-    "above" === gSong.x_chordposition ? " style='position: absolute;'" : "";
-  var sLineHeight = "above" === gSong.x_chordposition ? "2.3" : "1.8";
-  var sTextStyle = " style='line-height: " + sLineHeight + ";'";
   if (part.lines) {
     for (var i = 0; i < part.lines.length; i++) {
       var line = part.lines[i];
@@ -552,9 +529,7 @@ function exportHtmlPart(aParts, i) {
             "[" + sChord + "]",
             "<code class='chord settingschord'" +
               sChordStyle +
-              "><span" +
-              sChordPosition +
-              ">" +
+              "><span>" +
               sChordNew +
               "</span></code>",
           );
@@ -564,11 +539,7 @@ function exportHtmlPart(aParts, i) {
         line = line
           .replace(
             /\[/g,
-            "<code class='chord settingschord'" +
-              sChordStyle +
-              "><span" +
-              sChordPosition +
-              ">",
+            "<code class='chord settingschord'" + sChordStyle + "><span>",
           )
           .replace(/\]/g, "</span></code>");
       }
@@ -576,34 +547,41 @@ function exportHtmlPart(aParts, i) {
       // Special CSS for comment and choruscomment.
       if ("comment" === part.type || "choruscomment" === part.type) {
         line =
-          "<div class=lyriccomment style='float: left; padding: 4px 8px; padding-bottom: 0.2em; background: #DDD; line-height: 1;'>" +
+          "<div class=lyriccomment>" +
           line +
           "</div><div style='clear: both;'></div>";
       } else if ("x_audio" === part.type) {
         // syntax: {x_audio: url="url" [title="name"]}
         var hParams = parseParameters(line);
-		var url = hParams["url"];
-        if ( ! url ) {
+        var url = hParams["url"];
+        if (!url) {
           continue; // must have URL
-		}
-		// When people copy the Spotify link it is not in the format necessary to embed.
-		// The only way to get the correct format is to copy the "embed code", but people
-		// typically do not know that and anyway that would be too combursome to put into ChordPro.
-		// If they DO get the embed code and give us just the embed URL, that should work fine
-		// in the first "embed.spotify.com" block.
-		// If instead they have the web page URL we try to convert it.
-		// I have found that without the "user" part it will only play 20 seconds.
-		else if ( 0 === url.indexOf("https://embed.spotify.com/") ) {
-			line = "<iframe src='" + url + "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
-		}
-		else if ( 0 === url.indexOf("https://open.spotify.com/") ) {
-			// Extract the URI and convert "/" to ":".
-			var uri = url.substring("https://open.spotify.com/".length).replace(/\//g, ":");
-			if ( uri ) {
-				// Here is an example that works and actually plays the entire song:
-				// line = "<iframe src='https://embed.spotify.com/?uri=spotify:user:richardcook2:playlist:7opdOnDak9hMWlOeGcuk02' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
-				line = "<iframe src='https://embed.spotify.com/?uri=spotify:" + uri + "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
-			}
+        }
+        // When people copy the Spotify link it is not in the format necessary to embed.
+        // The only way to get the correct format is to copy the "embed code", but people
+        // typically do not know that and anyway that would be too combursome to put into ChordPro.
+        // If they DO get the embed code and give us just the embed URL, that should work fine
+        // in the first "embed.spotify.com" block.
+        // If instead they have the web page URL we try to convert it.
+        // I have found that without the "user" part it will only play 20 seconds.
+        else if (0 === url.indexOf("https://embed.spotify.com/")) {
+          line =
+            "<iframe src='" +
+            url +
+            "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
+        } else if (0 === url.indexOf("https://open.spotify.com/")) {
+          // Extract the URI and convert "/" to ":".
+          var uri = url
+            .substring("https://open.spotify.com/".length)
+            .replace(/\//g, ":");
+          if (uri) {
+            // Here is an example that works and actually plays the entire song:
+            // line = "<iframe src='https://embed.spotify.com/?uri=spotify:user:richardcook2:playlist:7opdOnDak9hMWlOeGcuk02' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
+            line =
+              "<iframe src='https://embed.spotify.com/?uri=spotify:" +
+              uri +
+              "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
+          }
         } else {
           line =
             (hParams["title"]
@@ -650,9 +628,7 @@ function exportHtmlPart(aParts, i) {
       }
 
       // Add this line to the results.
-      aResults.push(
-        "<div class=lyricline" + sTextStyle + ">" + line + "</div>",
-      );
+      aResults.push("<div class=lyricline>" + line + "</div>");
     }
   }
 

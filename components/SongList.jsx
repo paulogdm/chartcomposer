@@ -81,7 +81,7 @@ const SongFolder = ({
               e.stopPropagation();
               newSong(folder.id);
             }}
-            style={{ padding: 10 }}
+            style={{ padding: 10, borderColor: "#bbb", borderRight: 0 }}
             title="New song"
           >
             +
@@ -92,7 +92,7 @@ const SongFolder = ({
             e.stopPropagation();
             copyShareLink(folder.url);
           }}
-          style={{ padding: 10 }}
+          style={{ padding: 10, borderColor: "#bbb", borderRight: 0 }}
           title="Share folder"
         >
           &#x02197;
@@ -104,7 +104,7 @@ const SongFolder = ({
               removeFolder(folder.id);
             }
           }}
-          style={{ padding: 10 }}
+          style={{ padding: 10, borderColor: "#bbb" }}
           title="Remove folder"
         >
           ×

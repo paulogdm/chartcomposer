@@ -25,18 +25,23 @@ const AddFolder = ({ loadDropboxLink }) => (
       extensions={[]}
       folderselect
     >
-      <button title="Choose a folder on Dropbox">+ 📁</button>
+      <button
+        title="Choose a folder on Dropbox"
+        style={{ borderColor: "#bbb" }}
+      >
+        + 📁
+      </button>
     </DropboxChooser>
-	<button
+    <button
       onClick={e => {
-			  const url = window.prompt("Dropbox shared folder URL");
-			  if (!url) {
-				  return;
-			  }
-			  loadDropboxLink(url);
-		  }}
+        const url = window.prompt("Dropbox shared folder URL");
+        if (!url) {
+          return;
+        }
+        loadDropboxLink(url);
+      }}
       title="Paste a Dropbox folder link"
-	  style={{ backgroundColor: "transparent", }}
+      style={{ borderLeft: 0, borderColor: "#bbb" }}
     >
       + 🔗
     </button>

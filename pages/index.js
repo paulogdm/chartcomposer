@@ -923,6 +923,7 @@ export default class IndexPage extends React.Component {
                 <div
                   className="panel-song-view"
                   style={{
+                    borderLeft: "1px solid #ccc",
                     height: "100%",
                     flex: 1,
                     overflow: "auto",
