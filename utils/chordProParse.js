@@ -53,14 +53,13 @@ export function parseChordProString(text, userDisplayPreferences) {
 }
 
 export function setUpAutoscroll() {
-  window.bAutoscroll = false;
-  window.autoscrollTimer;
-  window.tAutoscrollStart;
-  window.nSongTop;
-  window.below;
+  window.bAutoScroll = false;
+  window.tAutoscrollStart = 0;
+  window.nSongTop = 0;
+  window.below = 0;
   window.toggleAutoScroll = function() {
-    bAutoscroll = !bAutoscroll;
-    if (bAutoscroll) {
+    bAutoScroll = !bAutoScroll;
+    if (bAutoScroll) {
       // start autoscroll
       console.log("toggleAutoScroll: start");
       window.tAutoscrollStart = Number(new Date());
@@ -68,13 +67,14 @@ export function setUpAutoscroll() {
 	  var startElement = ( document.getElementsByClassName("songverse")[0] || document.getElementsByClassName("songimage")[0] );
 	  if ( startElement ) {
 		  window.nSongTop = startElement.getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
+		  window.nSongTop -= ( window.nSongTop > 60 ? 60 : window.nSongTop );
 		  var nSongHeight = songView.scrollHeight - window.nSongTop;
 		  var docHeight = document.documentElement.clientHeight;
 		  window.below = window.nSongTop + nSongHeight - docHeight;
 		  if (window.below <= 0) {
 			  // it fits in the viewport - no need to autoscroll
 			  console.log("no need to autoscroll - it all fits");
-			  bAutoScroll = false;
+			  window.bAutoScroll = false;
 			  return;
 		  }
 		  autoScroll();
@@ -85,7 +85,7 @@ export function setUpAutoscroll() {
   };
 
   window.autoScroll = function() {
-    if (!bAutoscroll) {
+    if (!bAutoScroll) {
       // stop autoscrolling
       return;
     }
@@ -97,12 +97,19 @@ export function setUpAutoscroll() {
     if (!duration || delta >= duration) {
       // done scrolling
       console.log("done autoscrolling");
-      bAutoscroll = false;
+      bAutoScroll = false;
       return;
     }
 
     var scrollTo = window.nSongTop + delta / duration * window.below;
-    document.getElementsByClassName("panel-song-view")[0].scrollTo(0, scrollTo);
+	var songView = document.getElementsByClassName("panel-song-view")[0];
+	if ( songView ) {
+		songView.scrollTo(0, scrollTo);
+	}
+	else {
+		window.bAutoScroll = false;
+		return;
+	}
 
     setTimeout(autoScroll, 20);
   };
