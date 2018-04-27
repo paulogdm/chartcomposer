@@ -232,6 +232,9 @@ export default class IndexPage extends React.Component {
                   <code>start_of_chorus, end_of_chorus</code>
                 </li>
                 <li>
+                  <code>start_of_tab, end_of_tab</code>
+                </li>
+                <li>
                   <code>start_of_verse, end_of_verse</code>
                 </li>
                 <li>
@@ -248,6 +251,9 @@ export default class IndexPage extends React.Component {
                 </li>
                 <li>
                   <code>textsize</code>
+                </li>
+                <li>
+                  <code>time</code>
                 </li>
                 <li>
                   <code>title</code>
