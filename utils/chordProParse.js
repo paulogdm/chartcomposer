@@ -9,7 +9,7 @@ export default function chordProParse(value, userDisplayPreferences) {
   return {
     __html:
       (gSong.duration
-        ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 20px; padding: 10px'>Autoscroll</button>"
+        ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 80px; padding: 10px'>Autoscroll</button>"
         : "") +
       "<div class=outersong style='margin: 0.5em; font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
       gSong.textcolour +
