@@ -145,7 +145,7 @@ function doBlock(type, closingdirectives) {
     } else if (isComment(line)) {
       // do nothing
     } else {
-      block.lines.push(line);
+		block.lines.push( line ? line : "&nbsp;" );
     }
   }
 
@@ -323,6 +323,7 @@ function doDirective(line) {
     case "artist":
     case "key":
     case "tempo":
+    case "time":
     case "capo":
     case "duration":
     case "textfont":
@@ -430,6 +431,7 @@ function exportHtml(song) {
     "artist",
     "key",
     "tempo",
+    "time",
     "capo",
     "duration",
     // These are properties that we do NOT want to show in the viewer.
@@ -481,8 +483,9 @@ function getCss(prop) {
       return " style='font-size: 1.1em;'";
     case "verse":
     case "chorus":
-    case "tab":
       return " style='padding-top: 0.5em; margin-bottom: 0.5em; padding-left: 0.5em;'";
+    case "tab":
+      return " style='padding-top: 0.5em; margin-bottom: 0.5em; padding-left: 0.5em; font-family: monospace;'";
     case "comment":
       return " style='padding-top: 0.5em; padding-bottom: 0.5em;'";
   }
@@ -508,7 +511,7 @@ function exportHtmlPart(aParts, i) {
   }
 
   aResults.push(
-    "<div class=song" + part.type + sStyle + getCss(part.type) + ">",
+				"<div class=song" + part.type + sStyle + getCss(part.type) + ">",
   );
 
   var sChordSize =
