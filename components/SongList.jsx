@@ -1,5 +1,6 @@
 import React from "react";
 import _ from "lodash";
+import ButtonToolbarGroup from "./ButtonToolbarGroup";
 
 const SongList = ({
   closedFolders,
@@ -49,6 +50,37 @@ const SongFolder = ({
   toggleFolderOpen,
 }) => {
   const canCreateNewSong = !!folder.path_lower;
+
+  let toolbarButtons = [];
+  if (canCreateNewSong) {
+    toolbarButtons.push({
+      onClick: e => {
+        e.stopPropagation();
+        newSong(folder.id);
+      },
+      title: "New song",
+      content: "+",
+    });
+  }
+  toolbarButtons.push({
+    onClick: e => {
+      e.stopPropagation();
+      copyShareLink(folder.url);
+    },
+    title: "Share folder",
+    content: "↗",
+  });
+  toolbarButtons.push({
+    onClick: e => {
+      e.stopPropagation();
+      if (confirm("Remove this folder?")) {
+        removeFolder(folder.id);
+      }
+    },
+    title: "Remove folder",
+    content: "×",
+  });
+
   return (
     <div>
       <style jsx>{`
@@ -75,40 +107,8 @@ const SongFolder = ({
       >
         <div style={{ marginRight: 5 }}>📁</div>
         <div style={{ flex: 1 }}>{folder.name}</div>
-        {canCreateNewSong ? (
-          <button
-            onClick={e => {
-              e.stopPropagation();
-              newSong(folder.id);
-            }}
-            style={{ padding: 10, borderColor: "#bbb", borderRight: 0 }}
-            title="New song"
-          >
-            +
-          </button>
-        ) : null}
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            copyShareLink(folder.url);
-          }}
-          style={{ padding: 10, borderColor: "#bbb", borderRight: 0 }}
-          title="Share folder"
-        >
-          &#x02197;
-        </button>
-        <button
-          onClick={e => {
-            e.stopPropagation();
-            if (confirm("Remove this folder?")) {
-              removeFolder(folder.id);
-            }
-          }}
-          style={{ padding: 10, borderColor: "#bbb" }}
-          title="Remove folder"
-        >
-          ×
-        </button>
+
+        <ButtonToolbarGroup buttons={toolbarButtons} />
       </div>
       {isOpen ? (
         <SongOrderedList

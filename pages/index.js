@@ -6,6 +6,7 @@ import "whatwg-fetch";
 import _ from "lodash";
 
 import AddFolder from "../components/AddFolder";
+import ButtonToolbarGroup from "../components/ButtonToolbarGroup";
 import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
 import Page from "../components/Page";
@@ -42,6 +43,7 @@ export default class IndexPage extends React.Component {
     this.state = {
       chordPro: {},
       closedFolders: {},
+      componentDidMount: false,
       dirty: {},
       folders: {},
       loading: false,
@@ -51,9 +53,10 @@ export default class IndexPage extends React.Component {
       saving: false,
       smallScreenMode: null,
       resizerPosition: { x: 0, y: 0 },
-      sidebarClosed: false,
-      editorClosed: false,
+      songListClosed: false,
+      songEditorClosed: false,
       songEditorPercentWidth: 50,
+      songViewClosed: false,
       songId: null,
       songs: {},
       user: null,
@@ -116,6 +119,7 @@ export default class IndexPage extends React.Component {
           this.loadDropboxLink(shareLink, true);
         }
       }
+      this.setState({ componentDidMount: true });
     }
 
     const onLine = navigator.onLine;
@@ -564,18 +568,23 @@ export default class IndexPage extends React.Component {
     this.setState({ closedFolders });
   };
 
-  toggleSidebarClosed = () => {
-    console.log("toggleSidebarClosed");
+  toggleSongListClosed = () => {
+    console.log("toggleSongListClosed");
     this.setState({
-      sidebarClosed: !this.state.sidebarClosed,
+      songListClosed: !this.state.songListClosed,
     });
   };
 
-  // Can not get this to work but leaving the code so Lindsey can help me.
-  toggleEditorClosed = () => {
-    console.log("toggleEditorClosed");
+  toggleSongEditorClosed = () => {
+    console.log("toggleSongEditorClosed");
     this.setState({
-      editorClosed: !this.state.editorClosed,
+      songEditorClosed: !this.state.songEditorClosed,
+    });
+  };
+  toggleSongViewClosed = () => {
+    console.log("toggleSongViewClosed");
+    this.setState({
+      songViewClosed: !this.state.songViewClosed,
     });
   };
 
@@ -666,11 +675,13 @@ export default class IndexPage extends React.Component {
       folders,
       loading,
       closedFolders,
+      componentDidMount,
       preferences,
       preferencesOpen,
       saving,
-      sidebarClosed,
-      editorClosed,
+      songListClosed,
+      songEditorClosed,
+      songViewClosed,
       smallScreenMode,
       songs,
       songEditorPercentWidth,
@@ -689,6 +700,20 @@ export default class IndexPage extends React.Component {
     const renderSongView =
       chordPro[songId] &&
       (smallScreenMode === "SongView" || smallScreenMode === null);
+
+    if (!componentDidMount) {
+      return (
+        <LoadingIndicator
+          style={{
+            position: "fixed",
+            left: "50%",
+            top: "50%",
+            transform: "translate3d(-50%, -50%, 0)",
+            zIndex: 2,
+          }}
+        />
+      );
+    }
     return (
       <Page>
         <style jsx global>{`
@@ -755,6 +780,35 @@ export default class IndexPage extends React.Component {
         >
           <Header
             className="header"
+            paneViewButtonGroup={
+              smallScreenMode === null && user && songId ? (
+                <ButtonToolbarGroup
+                  buttons={[
+                    {
+                      onClick: this.toggleSongListClosed,
+                      title: "List",
+                      content: "=",
+                      active: songListClosed,
+                    },
+                    {
+                      onClick: this.toggleSongEditorClosed,
+                      title: "Editor",
+                      content: "E",
+                      active: songEditorClosed,
+                    },
+                    /*
+                    {
+                      onClick: this.toggleSongViewClosed,
+                      title: "View",
+                      content: "V",
+                      active: songViewClosed,
+                    },
+                    */
+                  ]}
+                  size="small"
+                />
+              ) : null
+            }
             readOnly={readOnly}
             setSmallScreenMode={this.setSmallScreenMode}
             signOut={this.signOut}
@@ -765,7 +819,7 @@ export default class IndexPage extends React.Component {
           <div style={{ display: "flex", flex: 1 }}>
             {smallScreenMode === "PromoCopy" ? (
               <PromoCopy />
-            ) : (
+            ) : songListClosed ? null : (
               <div
                 className="panel-song-list"
                 style={{
@@ -778,58 +832,27 @@ export default class IndexPage extends React.Component {
                   flex: smallScreenMode === "SongList" ? 1 : null,
                   flexDirection: "column",
                   width:
-                    sidebarClosed || smallScreenMode === "SongList"
+                    songListClosed || smallScreenMode === "SongList"
                       ? null
                       : "300px",
                 }}
               >
                 <div
                   style={{
+                    alignItems: "center",
+                    borderBottom: "1px solid #ccc",
                     color: "#666",
+                    display: "flex",
                     fontWeight: 600,
+
+                    justifyContent: "space-between",
+                    padding: 10,
                   }}
                 >
-                  {sidebarClosed ? (
-                    <div
-                      onClick={this.toggleSidebarClosed}
-                      style={{ cursor: "pointer", padding: 10 }}
-                    >
-                      ♫ ►
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <div style={{ padding: 10 }}>♫ Songs</div>
-                      <div
-                        style={{
-                          alignItems: "center",
-                          display: "flex",
-                        }}
-                      >
-                        <div
-                          style={{
-                            paddingRight: smallScreenMode !== null ? 10 : 0,
-                          }}
-                        >
-                          <AddFolder loadDropboxLink={this.loadDropboxLink} />
-                        </div>
-                        {smallScreenMode === null ? (
-                          <div
-                            onClick={this.toggleSidebarClosed}
-                            style={{ cursor: "pointer", padding: 10 }}
-                          >
-                            ◀
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-                  )}
+                  <div>♫ Songs</div>
+                  <AddFolder loadDropboxLink={this.loadDropboxLink} />
                 </div>
-                {sidebarClosed ? null : (
+                {songListClosed ? null : (
                   <div
                     style={{
                       background: "#eee",
@@ -902,7 +925,7 @@ export default class IndexPage extends React.Component {
                     height: "100%",
                     overflow: "auto",
                     padding: "8px 0",
-                    display: editorClosed ? "none" : "block",
+                    display: songEditorClosed ? "none" : "block",
                     width:
                       renderSongEditor && renderSongView
                         ? `${songEditorPercentWidth}%`
@@ -933,7 +956,6 @@ export default class IndexPage extends React.Component {
                   <SongView
                     preferences={preferences.display}
                     value={chordPro[songId]}
-                    toggleEditorClosed={this.toggleEditorClosed}
                   />
                 </div>
               ) : null}

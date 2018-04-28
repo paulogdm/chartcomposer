@@ -1,6 +1,6 @@
 import chordProParse, { parseChordProString } from "../utils/chordProParse.js";
 
-const SongView = ({ preferences, value, toggleEditorClosed }) => {
+const SongView = ({ preferences, value }) => {
   //const obj = parseChordProString(value, preferences);
   return (
     <div>
@@ -65,17 +65,6 @@ const SongView = ({ preferences, value, toggleEditorClosed }) => {
           margin-bottom: 0.6em;
         }
       `}</style>
-      <div
-        onClick={toggleEditorClosed}
-        style={{
-          cursor: "pointer",
-          padding: "0 10px 0 10px",
-          fontWeight: "bold",
-          float: "right",
-        }}
-      >
-        &#x027F7;
-      </div>
       <div
         className="SongView"
         dangerouslySetInnerHTML={chordProParse(value, preferences)}

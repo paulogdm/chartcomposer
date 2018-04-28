@@ -3,6 +3,7 @@ import UserMenu from "../components/UserMenu";
 
 const Header = ({
   className,
+  paneViewButtonGroup,
   readOnly,
   setSmallScreenMode,
   signOut,
@@ -73,7 +74,12 @@ const Header = ({
       </h1>
     </div>
 
-    <div style={{ display: "flex" }}>
+    <div
+      style={{
+        alignItems: "center",
+        display: "flex",
+      }}
+    >
       {smallScreenMode !== null &&
       smallScreenMode !== "SongList" &&
       smallScreenMode !== "PromoCopy" &&
@@ -88,6 +94,13 @@ const Header = ({
         >
           {smallScreenMode == "SongView" ? "Edit" : "View"}
         </button>
+      ) : null}
+
+      {paneViewButtonGroup ? (
+        <div style={{ display: "flex", alignItems: "center", marginRight: 30 }}>
+          <div style={{ marginRight: 10 }}>View</div>
+          {paneViewButtonGroup}
+        </div>
       ) : null}
 
       {user ? (
