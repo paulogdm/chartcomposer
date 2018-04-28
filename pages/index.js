@@ -1,6 +1,7 @@
 import React from "react";
 import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
+import FaMusic from "react-icons/lib/fa/music";
 import Draggable from "react-draggable";
 import dropbox from "dropbox";
 import localforage from "localforage";
@@ -851,7 +852,15 @@ export default class IndexPage extends React.Component {
                     padding: 10,
                   }}
                 >
-                  <div>♫ Songs</div>
+                  <div
+                    style={{
+                      alignItems: "center",
+                      display: "flex",
+                    }}
+                  >
+                    <FaMusic size={14} />
+                    <div style={{ paddingLeft: 6 }}>Songs</div>
+                  </div>
                   <AddFolder loadDropboxLink={this.loadDropboxLink} />
                 </div>
                 {songListClosed ? null : (
