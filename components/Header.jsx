@@ -1,3 +1,4 @@
+import { Button } from "react-bootstrap";
 import { Sender, SignInAsGuest } from "../components/Page";
 import UserMenu from "../components/UserMenu";
 
@@ -84,7 +85,7 @@ const Header = ({
       smallScreenMode !== "SongList" &&
       smallScreenMode !== "PromoCopy" &&
       !readOnly ? (
-        <button
+        <Button
           onClick={() => {
             setSmallScreenMode(
               smallScreenMode == "SongView" ? "SongEditor" : "SongView",
@@ -93,7 +94,7 @@ const Header = ({
           style={{ marginRight: 10 }}
         >
           {smallScreenMode == "SongView" ? "Edit" : "View"}
-        </button>
+        </Button>
       ) : null}
 
       {paneViewButtonGroup ? (

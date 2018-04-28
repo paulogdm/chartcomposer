@@ -1,14 +1,14 @@
 import React from "react";
 import { ButtonGroup, ButtonToolbar, Button } from "react-bootstrap";
 
-const ButtonToolbarGroup = ({ buttons, size = "xsmall" }) => (
+const ButtonToolbarGroup = ({ buttons, size = "small" }) => (
   <ButtonToolbar>
     <ButtonGroup>
       {buttons.map(b => (
         <Button
           bsSize={size}
           key={b.title}
-          className={b.active ? "active" : null}
+          active={!!b.active}
           onClick={b.onClick}
           title={b.title}
         >

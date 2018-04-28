@@ -1,3 +1,7 @@
+import FaChain from "react-icons/lib/fa/chain";
+import FaPlus from "react-icons/lib/fa/plus";
+import FaFolderOpen from "react-icons/lib/fa/folder-open";
+
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
 import DropboxChooser from "./DropboxChooser";
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
@@ -31,7 +35,7 @@ const AddFolder = ({ loadDropboxLink }) => (
               extensions={[]}
               folderselect
             >
-              + 📁
+              + <FaFolderOpen />
             </DropboxChooser>
           ),
         },
@@ -44,7 +48,11 @@ const AddFolder = ({ loadDropboxLink }) => (
             loadDropboxLink(url);
           },
           title: "Paste a Dropbox folder link",
-          content: "+ 🔗",
+          content: (
+            <div>
+              + <FaChain />
+            </div>
+          ),
         },
       ]}
     />

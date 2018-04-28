@@ -1,5 +1,6 @@
 import React from "react";
 import _ from "lodash";
+import { Button } from "react-bootstrap";
 
 import Background from "./Background";
 import {
@@ -227,12 +228,13 @@ export default class Preferences extends React.Component {
                 Reset to defaults
               </span>
               <div style={{ width: 20 }} />
-              <button
+              <Button
                 onClick={this.onClickSave}
-                style={{ fontSize: isSmallScreen ? 20 : null }}
+                bsStyle="primary"
+                bsSize="large"
               >
                 Save
-              </button>
+              </Button>
             </div>
           </div>
         </div>

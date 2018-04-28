@@ -1,4 +1,6 @@
 import React from "react";
+import FaBars from "react-icons/lib/fa/bars";
+import FaEdit from "react-icons/lib/fa/edit";
 import Draggable from "react-draggable";
 import dropbox from "dropbox";
 import localforage from "localforage";
@@ -787,14 +789,14 @@ export default class IndexPage extends React.Component {
                     {
                       onClick: this.toggleSongListClosed,
                       title: "List",
-                      content: "=",
-                      active: songListClosed,
+                      content: <FaBars />,
+                      active: !songListClosed,
                     },
                     {
                       onClick: this.toggleSongEditorClosed,
                       title: "Editor",
-                      content: "E",
-                      active: songEditorClosed,
+                      content: <FaEdit />,
+                      active: !songEditorClosed,
                     },
                     /*
                     {

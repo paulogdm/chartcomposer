@@ -1,4 +1,7 @@
 import React from "react";
+import FaClose from "react-icons/lib/fa/close";
+import FaPlus from "react-icons/lib/fa/plus";
+import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
 
@@ -59,7 +62,7 @@ const SongFolder = ({
         newSong(folder.id);
       },
       title: "New song",
-      content: "+",
+      content: <FaPlus color="#666" />,
     });
   }
   toolbarButtons.push({
@@ -68,7 +71,7 @@ const SongFolder = ({
       copyShareLink(folder.url);
     },
     title: "Share folder",
-    content: "↗",
+    content: <FaShareAlt color="#666" />,
   });
   toolbarButtons.push({
     onClick: e => {
@@ -78,7 +81,7 @@ const SongFolder = ({
       }
     },
     title: "Remove folder",
-    content: "×",
+    content: <FaClose color="#666" />,
   });
 
   return (
