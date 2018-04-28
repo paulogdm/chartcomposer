@@ -512,7 +512,7 @@ function exportHtmlPart(aParts, i) {
     sChordSize +
     "; font-family: " +
     gSong.chordfont +
-    ";'";
+    "; background: transparent;'";
   if (part.lines) {
     for (var i = 0; i < part.lines.length; i++) {
       var line = part.lines[i];
