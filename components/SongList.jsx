@@ -1,5 +1,7 @@
 import React from "react";
 import FaClose from "react-icons/lib/fa/close";
+import FaFolder from "react-icons/lib/fa/folder";
+import FaFolderOpen from "react-icons/lib/fa/folder-open";
 import FaPlus from "react-icons/lib/fa/plus";
 import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
@@ -108,7 +110,9 @@ const SongFolder = ({
         }}
         title="Toggle folder"
       >
-        <div style={{ marginRight: 5 }}>📁</div>
+        <div style={{ marginRight: 5 }}>
+          {isOpen ? <FaFolderOpen /> : <FaFolder />}
+        </div>
         <div style={{ flex: 1 }}>{folder.name}</div>
 
         <ButtonToolbarGroup buttons={toolbarButtons} />
