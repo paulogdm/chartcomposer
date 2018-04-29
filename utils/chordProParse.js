@@ -501,7 +501,7 @@ function exportHtmlPart(aParts, i) {
     sStyle = " style='margin-bottom: -0.5em; padding-top: 0.5em;'";
   }
 
-  aResults.push("<div class=song" + part.type + sStyle + ">");
+  aResults.push("<div class=" + part.type + sStyle + ">");
 
   var sChordSize =
     gSong.chordsize == parseInt(gSong.chordsize)
