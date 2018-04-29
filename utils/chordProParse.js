@@ -74,18 +74,20 @@ export function setUpAutoscroll() {
         document.getElementsByClassName("songverse")[0] ||
         document.getElementsByClassName("songimage")[0];
       if (startElement) {
-        window.nSongTop = startElement.getBoundingClientRect().y; // "top" is the first verse so we skip over YouTube videos etc.
-        window.nSongTop -= window.nSongTop > 60 ? 60 : window.nSongTop;
-        var nSongHeight = songView.scrollHeight - window.nSongTop;
-        var docHeight = document.documentElement.clientHeight;
-        window.below = window.nSongTop + nSongHeight - docHeight;
-        if (window.below <= 0) {
-          // it fits in the viewport - no need to autoscroll
-          console.log("no need to autoscroll - it all fits");
-          window.bAutoScroll = false;
-          return;
-        }
-        autoScroll();
+		  // scrollTo parameters are relative to the SongView, but 
+		  // getBoundingClientRect is relative to the viewport.
+		  // So we have to offset by the top of the SongView relative to viewport.
+		  var songViewTop = songView.getBoundingClientRect().y;
+		  window.nSongTop = startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
+		  var nSongHeight = songView.scrollHeight - window.nSongTop;
+		  window.below = nSongHeight - songView.clientHeight;
+		  if (window.below <= 0) {
+			  // it fits in the viewport - no need to autoscroll
+			  console.log("no need to autoscroll - it all fits");
+			  window.bAutoScroll = false;
+			  return;
+		  }
+		  autoScroll();
       }
     } else {
       console.log("toggleAutoScroll: stop");
@@ -109,7 +111,7 @@ export function setUpAutoscroll() {
       return;
     }
 
-    var scrollTo = window.nSongTop + delta / duration * window.below;
+    var scrollTo = Math.round(window.nSongTop + ((delta / duration) * window.below));
     var songView = document.getElementsByClassName("panel-song-view")[0];
     if (songView) {
       songView.scrollTo(0, scrollTo);
@@ -463,7 +465,7 @@ function exportHtml(song) {
       switch (prop) {
         default:
           aResults.push(
-            "<div class=song>" +
+            "<div class=song" + prop + ">" +
               ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
               song[prop] +
               "</div>",
@@ -603,7 +605,7 @@ function exportHtmlPart(aParts, i) {
             line =
               "<iframe width='560' height='315' src='" +
               youtubeUrl +
-              "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen style='padding-left: 5%'></iframe>";
+				"' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen style='padding-left: 5%;'></iframe>";
           } else {
             line =
               "<video src='" +
