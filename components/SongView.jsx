@@ -23,6 +23,7 @@ const SongView = ({ preferences, value }) => {
           padding-top: 0.5em;
           margin-bottom: 0.5em;
           padding-left: 0.5em;
+		  clear: both;
         }
         .SongView .tab {
           padding-top: 0.5em;
@@ -43,8 +44,8 @@ const SongView = ({ preferences, value }) => {
         .SongView .chord-position-above .chord > span {
           position: absolute;
         }
-        .SongView .lyriccoment {
-          float: left;
+        .SongView .lyriccomment {
+		  float: left;
           padding: 4px 8px;
           padding-bottom: 0.2em;
           background: #ddd;
