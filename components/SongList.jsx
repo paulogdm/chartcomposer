@@ -78,11 +78,11 @@ const SongFolder = ({
   toolbarButtons.push({
     onClick: e => {
       e.stopPropagation();
-      if (confirm("Remove this folder?")) {
+      if (confirm("Hide this folder?")) {
         removeFolder(folder.id);
       }
     },
-    title: "Remove folder",
+    title: "Hide folder",
     content: <FaClose color="#666" />,
   });
 
