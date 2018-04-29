@@ -170,13 +170,10 @@ export default class IndexPage extends React.Component {
 				&#123;composer: John Newton&#125;<br/>
 				&#123;key: D&#125;<br/>
 				&nbsp;<br/>
-				&#123;start_of_verse&#125;<br/>
-				&#123;comment: Verse 1&#125;<br/>
 				[D]Amazing grace! (how [G]sweet the [D]sound)<br/>
 				That [D]saved a wretch like [A7]me!<br/>
 				I [D]once was lost, but [G]now am [D]found,<br/>
 				Was [D]blind, but [A7]now I [D]see.<br/>
-				&#123;end_of_verse&#125;<br/>
 			  </pre>
 
 			  <p>
