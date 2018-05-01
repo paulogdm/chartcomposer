@@ -951,7 +951,7 @@ export default class IndexPage extends React.Component {
                         : "100%",
                   }}
                 >
-				<button onClick={convertToChordPro} style={{position: "fixed", right: "80px", padding: "10px", display: isChordProFormat(chordPro[songId]) ? "none" : "block" }}>Convert to ChordPro</button>
+				  <button onClick={convertToChordPro} style={{position: "fixed", right: "80px", padding: "10px", display: isChordProFormat(chordPro[songId]) ? "none" : "block" }}>Convert to ChordPro</button>
                   <SongEditor
                     key={songId}
                     onChange={this.onChangeSongChordPro}
@@ -1025,7 +1025,8 @@ const PromoCopy = () => (
 // Return true if we find any chords in square brackets.
 function isChordProFormat(text) {
 	return ( text.match(/\[[A-G]\]/) || text.match(/\[[A-G]b\]/)
-			 || text.match(/\[[A-G]#\]/) || text.match(/\[[A-G]m\]/) || text.match(/\[[A-G]7\]/) );
+			 || text.match(/\[[A-G]#\]/) || text.match(/\[[A-G]m\]/) || text.match(/\[[A-G]7\]/) 
+			 || text.match(/{image/) );
 }
 
 
