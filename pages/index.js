@@ -801,7 +801,7 @@ export default class IndexPage extends React.Component {
                     },
 					/*
                     {
-                      onClick: convertToChordpro,
+                      onClick: convertToChordPro,
                       title: "View",
                       content: "V",
                       active: songViewClosed,
@@ -951,6 +951,7 @@ export default class IndexPage extends React.Component {
                         : "100%",
                   }}
                 >
+				<button onClick={convertToChordPro} style={{position: "fixed", right: "80px", padding: "10px", display: isChordProFormat(chordPro[songId]) ? "none" : "block" }}>Convert to ChordPro</button>
                   <SongEditor
                     key={songId}
                     onChange={this.onChangeSongChordPro}
@@ -1021,17 +1022,22 @@ const PromoCopy = () => (
 );
 
 
-function convertToChordpro(text) {
+// Return true if we find any chords in square brackets.
+function isChordProFormat(text) {
+	return ( text.match(/\[[A-G]\]/) || text.match(/\[[A-G]b\]/)
+			 || text.match(/\[[A-G]#\]/) || text.match(/\[[A-G]m\]/) || text.match(/\[[A-G]7\]/) );
+}
+
+
+function convertToChordPro(text) {
 	var bGetit = ! text;
 	bGetit = true; // TODO - hack
 	if ( bGetit ) {
 		text = document.getElementsByClassName('panel-song-editor')[0].getElementsByTagName('textarea')[0].value;
 	}
 
-	if ( text.match(/\[[A-G]\]/) || text.match(/\[[A-G]b\]/)
-		 || text.match(/\[[A-G]#\]/) || text.match(/\[[A-G]m\]/) || text.match(/\[[A-G]7\]/) ) {
-		// See if the song text contains any chords.
-		console.log("convertToChordpro: found chords - bailing");
+	if ( isChordProFormat(text) ) {
+		console.log("convertToChordPro: found chords - bailing");
 		return text;
 	}
 
