@@ -40,6 +40,7 @@ const LOCAL_STORAGE_FIELDS = [
   "preferences",
 ];
 
+
 export default class IndexPage extends React.Component {
   constructor(props) {
     super();
@@ -72,6 +73,8 @@ export default class IndexPage extends React.Component {
   componentDidMount() {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const shareLink = urlSearchParams.get("share");
+
+	this.redirectToBareDomain();
 
     if (localStorage) {
       let localState = {};
@@ -602,6 +605,14 @@ export default class IndexPage extends React.Component {
     msgbox.style.cssText = "position: absolute; top: 20px; left: 20px;";
     document.body.appendChild(msgbox);
   };
+
+	redirectToBareDomain = () => {
+		var href = document.location.href;
+		if ( -1 !== href.indexOf("www.chartcomposer.com") ) {
+			// Redirect to bare domain.
+			document.location = "https://chartcomposer.com/";
+		}
+	};
 
   removeFolder = folderId => {
     let folders = { ...this.state.folders };
