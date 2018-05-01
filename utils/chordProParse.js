@@ -71,8 +71,8 @@ export function setUpAutoscroll() {
       window.tAutoscrollStart = Number(new Date());
       var songView = document.getElementsByClassName("panel-song-view")[0];
       var startElement =
-        document.getElementsByClassName("songverse")[0] ||
-        document.getElementsByClassName("songimage")[0];
+        document.getElementsByClassName("verse")[0] ||
+        document.getElementsByClassName("image")[0];
       if (startElement) {
 		  // scrollTo parameters are relative to the SongView, but 
 		  // getBoundingClientRect is relative to the viewport.
@@ -103,7 +103,7 @@ export function setUpAutoscroll() {
     // By 20 seconds before the end of the song we want the last line to be at the bottom of the viewport.
     // So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
     var delta = Number(new Date()) - tAutoscrollStart;
-    var duration = (gSong.duration - 20) * 1000;
+    var duration = (durationSeconds(gSong.duration) - 20) * 1000;
     if (!duration || delta >= duration) {
       // done scrolling
       console.log("done autoscrolling");
@@ -123,6 +123,20 @@ export function setUpAutoscroll() {
     setTimeout(autoScroll, 20);
   };
 }
+
+
+// Convert the duration parameter to a number of seconds.
+function durationSeconds(dur) {
+	var matches = dur.match(/([0-9]*):([0-9]*)/);
+	if ( matches ) {
+		var mins = parseInt(matches[1]);
+		var secs = parseInt(matches[2]);
+		dur = (60*mins) + secs;
+	}
+
+	return dur;
+}
+
 
 //   closingdirective - a single string or an array of strings
 function doBlock(type, closingdirectives) {
