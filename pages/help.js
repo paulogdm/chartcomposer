@@ -65,6 +65,7 @@ export default class IndexPage extends React.Component {
 				<li> <a href="#faq">FAQ</a> </li>
 			  </ul>
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/P50ialcr7TQ" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
 			  <h2 style={{"margin-top": "2.5em", "margin-left": "-2em"}} id="getting-started">Getting Started</h2>
 
