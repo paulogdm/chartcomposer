@@ -118,7 +118,7 @@ const Header = ({
           render={({ url }) => (
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src="/static/dropbox.png"
+                src="/static/notes.png"
                 height={20}
                 width={20}
                 alt=""
