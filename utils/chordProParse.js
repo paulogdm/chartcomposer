@@ -84,11 +84,15 @@ export function setUpAutoscroll() {
 		  if (window.below <= 0) {
 			  // it fits in the viewport - no need to autoscroll
 			  console.log("no need to autoscroll - it all fits");
+			  songView.scrollTo(0, window.nSongTop);
 			  window.bAutoScroll = false;
 			  return;
 		  }
 		  autoScroll();
       }
+	  else {
+		  console.log("WARNING: Could not find first song element.");
+	  }
     } else {
       console.log("toggleAutoScroll: stop");
     }
@@ -631,7 +635,7 @@ function exportHtmlPart(aParts, i) {
         // syntax: {image: src=filename options }
         // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
         // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
-        line = "<img " + fixDropboxUrl(line) + " style='width: 100%'>";
+		  line = "<img " + fixDropboxUrl(line) + ( -1 === line.indexOf("width") ? " style='width: 100%'" : "" ) + ">";
         /*
 		  var hParams = parseParameters(line);
 		  if ( ! hParams['src'] ) {
