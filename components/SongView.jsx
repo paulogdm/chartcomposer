@@ -5,6 +5,11 @@ const SongView = ({ preferences, value }) => {
   return (
     <div>
       <style jsx global>{`
+          @media print {
+            .x_video {
+              display: none !important;
+            }
+          }
         .SongView .songproperties {
           margin-bottom: 1em;
         }
