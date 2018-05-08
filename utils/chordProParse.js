@@ -68,32 +68,41 @@ export function setUpAutoscroll() {
     if (bAutoScroll) {
       // start autoscroll
       console.log("toggleAutoScroll: start");
-      window.tAutoscrollStart = Number(new Date());
-      var songView = document.getElementsByClassName("panel-song-view")[0];
-      var startElement =
-        document.getElementsByClassName("verse")[0] ||
-        document.getElementsByClassName("image")[0];
-      if (startElement) {
-		  // scrollTo parameters are relative to the SongView, but 
-		  // getBoundingClientRect is relative to the viewport.
-		  // So we have to offset by the top of the SongView relative to viewport.
-		  var songViewTop = songView.getBoundingClientRect().y;
-		  window.nSongTop = startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
-		  var nSongHeight = songView.scrollHeight - window.nSongTop;
-		  window.below = nSongHeight - songView.clientHeight;
-		  if (window.below <= 0) {
-			  // it fits in the viewport - no need to autoscroll
-			  console.log("no need to autoscroll - it all fits");
-			  songView.scrollTo(0, window.nSongTop);
-			  window.bAutoScroll = false;
-			  return;
-		  }
+	  if ( window.tAutoscrollStart ) {
+		  // Resume autoscroll.
+		  window.tAutoscrollStart += Number(new Date()) - window.tAutoscrollStop; // add paused time
 		  autoScroll();
-      }
+	  }
 	  else {
-		  console.log("WARNING: Could not find first song element.");
+		  // Start autoscroll for the very first time.
+		  window.tAutoscrollStart = Number(new Date());
+		  var songView = document.getElementsByClassName("panel-song-view")[0];
+		  var startElement =
+			  document.getElementsByClassName("verse")[0] ||
+			  document.getElementsByClassName("image")[0];
+		  if (startElement) {
+			  // scrollTo parameters are relative to the SongView, but 
+			  // getBoundingClientRect is relative to the viewport.
+			  // So we have to offset by the top of the SongView relative to viewport.
+			  var songViewTop = songView.getBoundingClientRect().y;
+			  window.nSongTop = startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
+			  var nSongHeight = songView.scrollHeight - window.nSongTop;
+			  window.below = nSongHeight - songView.clientHeight;
+			  if (window.below <= 0) {
+				  // it fits in the viewport - no need to autoscroll
+				  console.log("no need to autoscroll - it all fits");
+				  songView.scrollTo(0, window.nSongTop);
+				  window.bAutoScroll = false;
+				  return;
+			  }
+			  autoScroll();
+		  }
+		  else {
+			  console.log("WARNING: Could not find first song element.");
+		  }
 	  }
     } else {
+		window.tAutoscrollStop = Number(new Date());
       console.log("toggleAutoScroll: stop");
     }
   };
@@ -104,10 +113,10 @@ export function setUpAutoscroll() {
       return;
     }
 
-    // By 20 seconds before the end of the song we want the last line to be at the bottom of the viewport.
+    // By 30 seconds before the end of the song we want the last line to be at the bottom of the viewport.
     // So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
     var delta = Number(new Date()) - tAutoscrollStart;
-    var duration = (durationSeconds(gSong.duration) - 20) * 1000;
+    var duration = (durationSeconds(gSong.duration) - 30) * 1000;
     if (!duration || delta >= duration) {
       // done scrolling
       console.log("done autoscrolling");
