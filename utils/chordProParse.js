@@ -10,6 +10,10 @@ export default function chordProParse(value, userDisplayPreferences) {
   if ("above" === gSong.x_chordposition) {
     outersongClassNames.push("chord-position-above");
   }
+
+  // Initialize the Autoscroll globals.
+  initAutoscroll();
+
   return {
     __html:
       (gSong.duration
@@ -58,23 +62,30 @@ export function parseChordProString(text, userDisplayPreferences) {
   return gSong;
 }
 
-export function setUpAutoscroll() {
+
+
+export function initAutoscroll() {
   window.bAutoScroll = false;
   window.tAutoscrollStart = 0;
   window.nSongTop = 0;
   window.below = 0;
+}
+
+
+export function setUpAutoscroll() {
   window.toggleAutoScroll = function() {
     bAutoScroll = !bAutoScroll;
     if (bAutoScroll) {
       // start autoscroll
-      console.log("toggleAutoScroll: start");
 	  if ( window.tAutoscrollStart ) {
 		  // Resume autoscroll.
+		  console.log("toggleAutoScroll: resume");
 		  window.tAutoscrollStart += Number(new Date()) - window.tAutoscrollStop; // add paused time
 		  autoScroll();
 	  }
 	  else {
 		  // Start autoscroll for the very first time.
+		  console.log("toggleAutoScroll: start");
 		  window.tAutoscrollStart = Number(new Date());
 		  var songView = document.getElementsByClassName("panel-song-view")[0];
 		  var startElement =
