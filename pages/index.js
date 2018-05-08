@@ -1053,6 +1053,10 @@ function convertToChordPro(text) {
 		return text;
 	}
 
+	// convert [Verse] and [Chorus]
+	text = text.replace(/\[Verse\]/gi, "{comment: Verse}");
+	text = text.replace(/\[Chorus\]/gi, "{comment: Chorus}");
+
 	// actually convert line-by-line
 	var aLines = text.split("\n");
 	var newLines = [];
