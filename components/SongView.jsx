@@ -6,6 +6,8 @@ const SongView = ({ preferences, value }) => {
     <div>
       <style jsx global>{`
           @media print {
+			#autoscrollbtn,
+			.x_audio,
             .x_video {
               display: none !important;
             }
