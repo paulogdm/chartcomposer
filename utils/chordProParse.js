@@ -17,7 +17,7 @@ export default function chordProParse(value, userDisplayPreferences) {
   return {
     __html:
       (gSong.duration
-        ? "<button onclick='toggleAutoScroll()' style='position: fixed; right: 80px; padding: 10px'>Autoscroll</button>"
+        ? "<button id=autoscrollbtn onclick='toggleAutoScroll()' style='position: fixed; right: 80px; padding: 10px'>Autoscroll</button>"
         : "") +
       "<div class='" +
       outersongClassNames.join(" ") +
@@ -106,7 +106,8 @@ export function setUpAutoscroll() {
 				  window.bAutoScroll = false;
 				  return;
 			  }
-			  autoScroll();
+			  // Start after 10 seconds so the first line is visible for a while
+			  setTimeout(autoScroll, 10*1000);
 		  }
 		  else {
 			  console.log("WARNING: Could not find first song element.");
@@ -127,7 +128,7 @@ export function setUpAutoscroll() {
     // By 30 seconds before the end of the song we want the last line to be at the bottom of the viewport.
     // So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
     var delta = Number(new Date()) - tAutoscrollStart;
-    var duration = (durationSeconds(gSong.duration) - 30) * 1000;
+    var duration = (durationSeconds(gSong.duration) - 40) * 1000;
     if (!duration || delta >= duration) {
       // done scrolling
       console.log("done autoscrolling");
