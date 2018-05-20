@@ -451,8 +451,8 @@ export default class IndexPage extends React.Component {
       songEditorPercentWidth: 50,
     });
     const [song, _] = this.getSongById(songId);
-    console.log("setSongId", { songId, song, folderId });
     const url = folderId ? folders[folderId].url : songs[songId].url;
+    console.log("setSongId", { songId, song, folderId, url });
     this.dbx
       .sharingGetSharedLinkFile({
         url,
