@@ -5,13 +5,13 @@ const SongView = ({ preferences, value }) => {
   return (
     <div>
       <style jsx global>{`
-          @media print {
-			#autoscrollbtn,
-			.x_audio,
-            .x_video {
-              display: none !important;
-            }
+        @media print {
+          #autoscrollbtn,
+          .x_audio,
+          .x_video {
+            display: none !important;
           }
+        }
         .SongView .songproperties {
           margin-bottom: 1em;
         }
@@ -30,7 +30,7 @@ const SongView = ({ preferences, value }) => {
           padding-top: 0.5em;
           margin-bottom: 0.5em;
           padding-left: 0.5em;
-		  clear: both;
+          clear: both;
         }
         .SongView .tab {
           padding-top: 0.5em;
@@ -51,8 +51,9 @@ const SongView = ({ preferences, value }) => {
         .SongView .chord-position-above .chord > span {
           position: absolute;
         }
+
         .SongView .lyriccomment {
-		  float: left;
+          float: left;
           padding: 4px 8px;
           padding-bottom: 0.2em;
           background: #ddd;
@@ -65,6 +66,7 @@ const SongView = ({ preferences, value }) => {
 
         .SongView .chord-position-above .chord {
           margin: 0;
+          padding: 0;
         }
         .SongView .chord-position-above .lyricline {
           line-height: 2.3;

@@ -17,6 +17,7 @@
   "author": "Lindsey Simon <elsigh@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "classnames": "^2.2.5",
     "create-next": "^0.1.4",
     "dropbox": "^4.0.3",
     "localforage": "^1.6.0",

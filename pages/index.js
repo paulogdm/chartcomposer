@@ -1,4 +1,5 @@
 import React from "react";
+import classNames from "classnames";
 import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
@@ -40,7 +41,6 @@ const LOCAL_STORAGE_FIELDS = [
   "preferences",
 ];
 
-
 export default class IndexPage extends React.Component {
   constructor(props) {
     super();
@@ -74,7 +74,7 @@ export default class IndexPage extends React.Component {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const shareLink = urlSearchParams.get("share");
 
-	this.redirectToBareDomain();
+    this.redirectToBareDomain();
 
     if (localStorage) {
       let localState = {};
@@ -606,13 +606,13 @@ export default class IndexPage extends React.Component {
     document.body.appendChild(msgbox);
   };
 
-	redirectToBareDomain = () => {
-		var href = document.location.href;
-		if ( -1 !== href.indexOf("www.chartcomposer.com") ) {
-			// Redirect to bare domain.
-			document.location = "https://chartcomposer.com/";
-		}
-	};
+  redirectToBareDomain = () => {
+    var href = document.location.href;
+    if (-1 !== href.indexOf("www.chartcomposer.com")) {
+      // Redirect to bare domain.
+      document.location = "https://chartcomposer.com/";
+    }
+  };
 
   removeFolder = folderId => {
     let folders = { ...this.state.folders };
@@ -737,6 +737,9 @@ export default class IndexPage extends React.Component {
           }
         `}</style>
         <style jsx>{`
+          .panel-container {
+            height: 100vh;
+          }
           @media print {
             .header,
             .panel-song-list,
@@ -745,6 +748,9 @@ export default class IndexPage extends React.Component {
             }
             .panel-song-view {
               width: 100% !important;
+            }
+            .panel-container {
+              height: auto;
             }
           }
         `}</style>
@@ -783,13 +789,12 @@ export default class IndexPage extends React.Component {
           />
         ) : null}
         <div
-          className={
-            smallScreenMode ? `smallScreenMode-${smallScreenMode}` : null
-          }
+          className={classNames("panel-container", {
+            [`smallScreenMode-${smallScreenMode}`]: !!smallScreenMode,
+          })}
           style={{
             display: "flex",
             flexDirection: "column",
-            height: "100vh",
           }}
         >
           <Header
@@ -810,7 +815,7 @@ export default class IndexPage extends React.Component {
                       content: <FaEdit />,
                       active: !songEditorClosed,
                     },
-					/*
+                    /*
                     {
                       onClick: convertToChordPro,
                       title: "View",
@@ -962,14 +967,26 @@ export default class IndexPage extends React.Component {
                         : "100%",
                   }}
                 >
-				  <button onClick={convertToChordPro} style={{position: "fixed", right: "80px", padding: "10px", display: isChordProFormat(chordPro[songId]) ? "none" : "block" }}>Convert to ChordPro</button>
+                  <button
+                    onClick={convertToChordPro}
+                    style={{
+                      position: "fixed",
+                      right: "80px",
+                      padding: "10px",
+                      display: isChordProFormat(chordPro[songId])
+                        ? "none"
+                        : "block",
+                    }}
+                  >
+                    Convert to ChordPro
+                  </button>
                   <SongEditor
                     key={songId}
                     onChange={this.onChangeSongChordPro}
                     readOnly={readOnly}
                     saving={saving}
                     serverModified={song.server_modified}
-				    value={chordPro[songId]}
+                    value={chordPro[songId]}
                   />
                 </div>
               )}
@@ -1032,122 +1049,132 @@ const PromoCopy = () => (
   </div>
 );
 
-
 // Return true if we find any chords in square brackets.
 function isChordProFormat(text) {
-	return ( text.match(/\[[A-G]\]/) || text.match(/\[[A-G]b\]/)
-			 || text.match(/\[[A-G]#\]/) || text.match(/\[[A-G]m\]/) || text.match(/\[[A-G]7\]/) 
-			 || text.match(/{image/) );
+  return (
+    text.match(/\[[A-G]\]/) ||
+    text.match(/\[[A-G]b\]/) ||
+    text.match(/\[[A-G]#\]/) ||
+    text.match(/\[[A-G]m\]/) ||
+    text.match(/\[[A-G]7\]/) ||
+    text.match(/{image/)
+  );
 }
 
-
 function convertToChordPro(text) {
-	var bGetit = ! text;
-	bGetit = true; // TODO - hack
-	if ( bGetit ) {
-		text = document.getElementsByClassName('panel-song-editor')[0].getElementsByTagName('textarea')[0].value;
-	}
+  var bGetit = !text;
+  bGetit = true; // TODO - hack
+  if (bGetit) {
+    text = document
+      .getElementsByClassName("panel-song-editor")[0]
+      .getElementsByTagName("textarea")[0].value;
+  }
 
-	if ( isChordProFormat(text) ) {
-		console.log("convertToChordPro: found chords - bailing");
-		return text;
-	}
+  if (isChordProFormat(text)) {
+    console.log("convertToChordPro: found chords - bailing");
+    return text;
+  }
 
-	// convert [Verse] and [Chorus]
-	text = text.replace(/\[Verse\]/gi, "{comment: Verse}");
-	text = text.replace(/\[Chorus\]/gi, "{comment: Chorus}");
+  // convert [Verse] and [Chorus]
+  text = text.replace(/\[Verse\]/gi, "{comment: Verse}");
+  text = text.replace(/\[Chorus\]/gi, "{comment: Chorus}");
 
-	// actually convert line-by-line
-	var aLines = text.split("\n");
-	var newLines = [];
-	var iLine = 0;
-	for ( var iLine = 0; iLine < aLines.length; iLine++ ) {
-		var line = aLines[iLine];
-		if ( isLineAllChords(line) ) {
-			if ( iLine+1 === aLines.length ) {
-				// This is the last line - just wrap the chords.
-				newLines.push(wrapChords(line));
-			}
-			else {
-				var nextLine = aLines[iLine+1];
-				if ( isLineAllChords(nextLine) ) {
-					// Two lines of chords in-a-row so just wrap these chords with brackets.
-					newLines.push(wrapChords(line));
-				}
-				else {
-					// Smash the chords into the line of lyrics.
-					newLines.push( smashChords(line, nextLine) );
-					iLine++; // avoid adding "nextLine" twice
-				}
-			}
-		}
-		else { 
-			newLines.push(line.trim());
-		}
-	}
+  // actually convert line-by-line
+  var aLines = text.split("\n");
+  var newLines = [];
+  var iLine = 0;
+  for (var iLine = 0; iLine < aLines.length; iLine++) {
+    var line = aLines[iLine];
+    if (isLineAllChords(line)) {
+      if (iLine + 1 === aLines.length) {
+        // This is the last line - just wrap the chords.
+        newLines.push(wrapChords(line));
+      } else {
+        var nextLine = aLines[iLine + 1];
+        if (isLineAllChords(nextLine)) {
+          // Two lines of chords in-a-row so just wrap these chords with brackets.
+          newLines.push(wrapChords(line));
+        } else {
+          // Smash the chords into the line of lyrics.
+          newLines.push(smashChords(line, nextLine));
+          iLine++; // avoid adding "nextLine" twice
+        }
+      }
+    } else {
+      newLines.push(line.trim());
+    }
+  }
 
-	if ( bGetit ) {
-		document.getElementsByClassName('panel-song-editor')[0].getElementsByTagName('textarea')[0].value = newLines.join("\n");
-	}
+  if (bGetit) {
+    document
+      .getElementsByClassName("panel-song-editor")[0]
+      .getElementsByTagName("textarea")[0].value = newLines.join("\n");
+  }
 
-	return newLines.join("\n");
-};
-
+  return newLines.join("\n");
+}
 
 // We assume chords are uppercase, so we search for lowercase letters in the line.
 // Chords can have the following lowercase letters: b, dim, sus, add, m, aug, maj.
 // So we search for lower case letters _not_ in that list.
 function isLineAllChords(line) {
-	return ( ! line.match(/[elnoprtw]/) && line.match(/[A-G]/) );
+  return !line.match(/[elnoprtw]/) && line.match(/[A-G]/);
 }
-
 
 // The line has nothing but chords so just wrap them with square brackets.
 function wrapChords(line) {
-	// Replace all gaps with a single space character.
-	// Add spaces at the beginning and end so our replace works
-	// There _must_ be at least one chord because this line passed isLineAllChords().
-	return '[' + line.trim().replace(/ /g, '] [').replace(/ \[\]/g, '') + ']';
+  // Replace all gaps with a single space character.
+  // Add spaces at the beginning and end so our replace works
+  // There _must_ be at least one chord because this line passed isLineAllChords().
+  return (
+    "[" +
+    line
+      .trim()
+      .replace(/ /g, "] [")
+      .replace(/ \[\]/g, "") +
+    "]"
+  );
 }
 
-
 // Assume monospace so the chord is exactly above the letter/word in the lyrics.
-// Add the chord (incl. brackets) at that exact character. 
+// Add the chord (incl. brackets) at that exact character.
 function smashChords(chords, lyrics) {
-	var hChords = {}; // hash where the key is the character position and the value is the chord 
-	chords += ' '; // add a space at the end so our parser finds the last chord
-	for ( var i = 0; i < chords.length; i++ ) {
-		var char = chords.charAt(i);
-		if ( ' ' !== char ) {
-			// We found a chord!
-			var sChord = char;
-			for ( var j = i+1; j < chords.length; j++ ) {
-				char = chords.charAt(j);
-				if ( ' ' !== char ) {
-					// more chord
-					sChord += char;
-				}
-				else {
-					// end of chord - save the chord at the character position at which it should be inserted
-					hChords[i] = sChord;
-					break;
-				}
-			}
-			i += sChord.length - 1; // skip over the chord characters
-		}
-	}
+  var hChords = {}; // hash where the key is the character position and the value is the chord
+  chords += " "; // add a space at the end so our parser finds the last chord
+  for (var i = 0; i < chords.length; i++) {
+    var char = chords.charAt(i);
+    if (" " !== char) {
+      // We found a chord!
+      var sChord = char;
+      for (var j = i + 1; j < chords.length; j++) {
+        char = chords.charAt(j);
+        if (" " !== char) {
+          // more chord
+          sChord += char;
+        } else {
+          // end of chord - save the chord at the character position at which it should be inserted
+          hChords[i] = sChord;
+          break;
+        }
+      }
+      i += sChord.length - 1; // skip over the chord characters
+    }
+  }
 
-	// Stuff the chords into the right position in the lyrics.
-	lyrics += "                                                                        ";
-	var aKeys = Object.keys(hChords).sort(function (a, b) { return a - b; });
-	// Do it from end to start so the character positions are true.
-	for ( var i = aKeys.length-1; i >= 0; i-- ) {
-		var pos = aKeys[i];
-		var sChord = hChords[pos];
-		var lyricsBefore = lyrics.substring(0, pos);
-		var lyricsAfter = lyrics.substring(pos);
-		lyrics = lyricsBefore + "[" + sChord + "]" + lyricsAfter;
-	}
+  // Stuff the chords into the right position in the lyrics.
+  lyrics +=
+    "                                                                        ";
+  var aKeys = Object.keys(hChords).sort(function(a, b) {
+    return a - b;
+  });
+  // Do it from end to start so the character positions are true.
+  for (var i = aKeys.length - 1; i >= 0; i--) {
+    var pos = aKeys[i];
+    var sChord = hChords[pos];
+    var lyricsBefore = lyrics.substring(0, pos);
+    var lyricsAfter = lyrics.substring(pos);
+    lyrics = lyricsBefore + "[" + sChord + "]" + lyricsAfter;
+  }
 
-	return lyrics.trim();
+  return lyrics.trim();
 }
