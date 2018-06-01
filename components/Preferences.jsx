@@ -179,8 +179,9 @@ export default class Preferences extends React.Component {
                         .map(key => {
                           const prefInfo = displayPreferenceMap[section][key];
                           const selected =
-                            preferences.display[key] ||
-                            displayPreferenceDefaults[key];
+                            preferences && preferences.display
+                              ? preferences.display[key]
+                              : displayPreferenceDefaults[key];
                           return (
                             <div key={key} className="pref">
                               <div className="label-c">
