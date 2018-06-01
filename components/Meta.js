@@ -2,6 +2,7 @@ import Head from "next/head";
 export default () => (
   <div>
     <Head>
+      <link rel="stylesheet" href="/static/bootstrap.min.css" />
       <meta
         name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=no"
