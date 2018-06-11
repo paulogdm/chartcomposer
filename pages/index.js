@@ -1057,7 +1057,7 @@ function isChordProFormat(text) {
     text.match(/\[[A-G]#\]/) ||
     text.match(/\[[A-G]m\]/) ||
     text.match(/\[[A-G]7\]/) ||
-    text.match(/{image/)
+    text.match(/{image/) || text.match(/{x_pdf/)
   );
 }
 
