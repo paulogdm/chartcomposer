@@ -86,11 +86,16 @@ export function setUpAutoscroll() {
 	  else {
 		  // Start autoscroll for the very first time.
 		  console.log("toggleAutoScroll: start");
-		  window.tAutoscrollStart = Number(new Date());
 		  var songView = document.getElementsByClassName("panel-song-view")[0];
-		  var startElement =
-			  document.getElementsByClassName("verse")[0] ||
-			  document.getElementsByClassName("image")[0];
+		  var startElement = document.getElementsByClassName("verse")[0];
+		  var startImage = document.getElementsByClassName("image")[0] || document.getElementsByClassName("x_pdf")[0];
+		  if ( startImage && 
+			   ( ! startElement || 
+				 startImage.getBoundingClientRect().y < startElement.getBoundingClientRect().y ) ) {
+			  // If there is both a "verse" and an "image", choose the one closest to the top.
+			  startElement = startImage;
+		  }
+
 		  if (startElement) {
 			  // scrollTo parameters are relative to the SongView, but 
 			  // getBoundingClientRect is relative to the viewport.
@@ -99,14 +104,15 @@ export function setUpAutoscroll() {
 			  window.nSongTop = startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
 			  var nSongHeight = songView.scrollHeight - window.nSongTop;
 			  window.below = nSongHeight - songView.clientHeight;
+			  songView.scrollTo(0, window.nSongTop);
 			  if (window.below <= 0) {
 				  // it fits in the viewport - no need to autoscroll
 				  console.log("no need to autoscroll - it all fits");
-				  songView.scrollTo(0, window.nSongTop);
 				  window.bAutoScroll = false;
 				  return;
 			  }
 			  // Start after 10 seconds so the first line is visible for a while
+			  window.tAutoscrollStart = Number(new Date()) + 10*1000;
 			  setTimeout(autoScroll, 10*1000);
 		  }
 		  else {
@@ -400,6 +406,7 @@ function doDirective(line) {
     case "x_audio":
     case "x_video":
     case "image":
+    case "x_pdf":
       gSong.parts.push({ type: directive, lines: [parameters] });
       break;
 
@@ -632,7 +639,23 @@ function exportHtmlPart(aParts, i) {
             fixDropboxUrl(url) +
             "' controls style='width: 80%'></audio>";
         }
-      } else if ("x_video" === part.type) {
+      } 
+	  else if ( "x_pdf" === part.type ) {
+        // syntax: {x_pdf: url="url"}
+        var hParams = parseParameters(line);
+        if (!hParams["url"]) {
+          continue; // must have URL
+        } 
+		else {
+			var songView = document.getElementsByClassName("panel-song-editor")[0];
+			var width = Math.min( 800, ( songView && 0 < songView.clientWidth ? songView.clientWidth : 800 ) );
+			var height = Math.round( 1100 * width / 800 ) * ( hParams["pages"] ? hParams["pages"] : 1 );
+		  line = "<object data='" + hParams["url"] + "' type='application/pdf' width='95%' height='" + height + "'>" +
+			  "<p>You don't have a PDF plugin, but you can <a href='" + hParams["url"] + "'>download the PDF file.</a></p></object>";
+		  //line = "<iframe src='http://docs.google.com/viewer?url=http://ukulelecraig.com/tennessee.pdf&embedded=true' width='100%' height='12000' style='border: none;'></iframe>";
+        }
+	  }
+	  else if ("x_video" === part.type) {
         // syntax: {x_video: url="url" [title="name"]}
         var hParams = parseParameters(line);
         if (!hParams["url"]) {
