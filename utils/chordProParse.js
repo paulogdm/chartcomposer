@@ -647,11 +647,12 @@ function exportHtmlPart(aParts, i) {
           continue; // must have URL
         } 
 		else {
+			var url = fixDropboxUrl(hParams["url"]);
 			var songView = document.getElementsByClassName("panel-song-editor")[0];
 			var width = Math.min( 800, ( songView && 0 < songView.clientWidth ? songView.clientWidth : 800 ) );
 			var height = Math.round( 1100 * width / 800 ) * ( hParams["pages"] ? hParams["pages"] : 1 );
-		  line = "<object data='" + hParams["url"] + "' type='application/pdf' width='95%' height='" + height + "'>" +
-			  "<p>You don't have a PDF plugin, but you can <a href='" + hParams["url"] + "'>download the PDF file.</a></p></object>";
+		  line = "<object data='" + url + "' type='application/pdf' width='95%' height='" + height + "'>" +
+			  "<p>You don't have a PDF plugin, but you can <a href='" + url + "'>download the PDF file.</a></p></object>";
 		  //line = "<iframe src='http://docs.google.com/viewer?url=http://ukulelecraig.com/tennessee.pdf&embedded=true' width='100%' height='12000' style='border: none;'></iframe>";
         }
 	  }
