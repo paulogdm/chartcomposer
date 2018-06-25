@@ -407,6 +407,7 @@ function doDirective(line) {
     case "x_video":
     case "image":
     case "x_pdf":
+    case "x_url":
       gSong.parts.push({ type: directive, lines: [parameters] });
       break;
 
@@ -655,8 +656,7 @@ function exportHtmlPart(aParts, i) {
 			  "<p>You don't have a PDF plugin, but you can <a href='" + url + "'>download the PDF file.</a></p></object>";
 		  //line = "<iframe src='http://docs.google.com/viewer?url=http://ukulelecraig.com/tennessee.pdf&embedded=true' width='100%' height='12000' style='border: none;'></iframe>";
         }
-	  }
-	  else if ("x_video" === part.type) {
+	  } else if ("x_video" === part.type) {
         // syntax: {x_video: url="url" [title="name"]}
         var hParams = parseParameters(line);
         if (!hParams["url"]) {
@@ -676,6 +676,15 @@ function exportHtmlPart(aParts, i) {
               "' controls style='width: 80%'></video>";
           }
         }
+	  } else if ("x_url" === part.type) {
+        // syntax: {x_url: url="url" [title="name"]}
+        var hParams = parseParameters(line);
+        if (!hParams["url"]) {
+          continue; // must have URL
+        } 
+		line = "<a href='" + hParams["url"] + "'>" +
+            ( hParams["title"] ? hParams["title"] : hParams["url"] ) +
+			"</a>";
       } else if ("image" === part.type) {
         // syntax: {image: src=filename options }
         // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
