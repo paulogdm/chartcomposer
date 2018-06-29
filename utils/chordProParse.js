@@ -682,7 +682,7 @@ function exportHtmlPart(aParts, i) {
         if (!hParams["url"]) {
           continue; // must have URL
         } 
-		line = "<a href='" + hParams["url"] + "'>" +
+		line = "<a href='" + hParams["url"] + "' target='_blank'>" +
             ( hParams["title"] ? hParams["title"] : hParams["url"] ) +
 			"</a>";
       } else if ("image" === part.type) {
