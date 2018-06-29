@@ -12,6 +12,9 @@ const SongView = ({ preferences, value }) => {
             display: none !important;
           }
         }
+        .SongView .songtitle {
+          font-size: 2em;
+        }
         .SongView .songproperties {
           margin-bottom: 1em;
         }
@@ -29,13 +32,11 @@ const SongView = ({ preferences, value }) => {
         .SongView .chorus {
           padding-top: 0.5em;
           margin-bottom: 0.5em;
-          padding-left: 0.5em;
           clear: both;
         }
         .SongView .tab {
           padding-top: 0.5em;
           margin-bottom: 0.5em;
-          padding-left: 0.5em;
           font-family: monospace;
         }
         .SongView .comment {

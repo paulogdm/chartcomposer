@@ -637,7 +637,7 @@ export default class IndexPage extends React.Component {
     };
     const containerWidth = this.resizablePanelEl.offsetWidth;
     const songEditorPercentWidth =
-      (containerWidth / 2 + resizerPosition.x) / containerWidth * 100;
+      ((containerWidth / 2 + resizerPosition.x) / containerWidth) * 100;
     /*
     console.warn(
       "DRAG",
@@ -746,8 +746,13 @@ export default class IndexPage extends React.Component {
             .panel-song-editor {
               display: none !important;
             }
+            .panel-wrapper {
+              border-top: 0 !important;
+            }
             .panel-song-view {
               width: 100% !important;
+              border-top: 0 !important;
+              border-left: 0 !important;
             }
             .panel-container {
               height: auto;
@@ -913,6 +918,7 @@ export default class IndexPage extends React.Component {
               </div>
             )}
             <div
+              className="panel-wrapper"
               ref={el => (this.resizablePanelEl = el)}
               style={{
                 background: "#fff",
@@ -1057,7 +1063,8 @@ function isChordProFormat(text) {
     text.match(/\[[A-G]#\]/) ||
     text.match(/\[[A-G]m\]/) ||
     text.match(/\[[A-G]7\]/) ||
-    text.match(/{image/) || text.match(/{x_pdf/)
+    text.match(/{image/) ||
+    text.match(/{x_pdf/)
   );
 }
 

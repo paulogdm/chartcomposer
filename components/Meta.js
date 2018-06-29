@@ -14,6 +14,14 @@ export default () => (
         font: 13px menlo, sans-serif;
         margin: 0;
       }
+      @media print {
+        @page {
+          margin: 0;
+        }
+        body {
+          padding: 2em;
+        }
+      }
     `}</style>
   </div>
 );
