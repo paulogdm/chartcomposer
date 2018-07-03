@@ -12,6 +12,164 @@ const SongView = ({ preferences, value }) => {
             display: none !important;
           }
         }
+
+.chordsmall, .chordmedium, .chordlarge { float: left; margin: 10px; }
+
+.chordsmall .name, .chordmedium .name, .chordlarge .name, .fingering, .bar {
+  clear: both;
+}
+
+.chordsmall .name {
+  text-align: center;
+  font-size: 10px;
+  margin-left: 5px;
+  margin-bottom: 1px;
+}
+
+.chordmedium .name {
+  text-align: center;
+  font-size: 13px;
+  margin-left: 8px;
+  margin-bottom: 1px;
+}
+
+.chordlarge .name {
+  text-align: center;
+  font-size: 16px;
+  margin-left: 10px;
+  margin-bottom: 2px;
+}
+
+.fret, .note {
+  box-sizing: border-box;
+}
+
+.finger {
+  float: left;
+  position: relative;
+}
+
+.chordsmall .finger {
+  width: 2px;
+  height: 6px;
+  margin-left: 4px;
+  font-size: 9px;
+  text-align: right;
+}
+
+.chordmedium .finger {
+  width: 3px;
+  height: 9px;
+  margin-left: 6px;
+  font-size: 10px;
+  text-align: right;
+}
+
+.chordlarge .finger {
+  width: 4px;
+  height: 12px;
+  margin-left: 8px;
+  font-size: 12px;
+  text-align: right;
+}
+
+.fret {
+  float: left;
+  position: relative;
+  border-top: 0px solid transparent;
+  border-right: 1px solid #555;
+  border-bottom: 1px solid #555;
+  border-left: 0px solid transparent;
+}
+
+.chordsmall .fret {
+  width: 6px;
+  height: 6px;
+}
+
+.chordmedium .fret {
+  width: 9px;
+  height: 9px;
+}
+
+.chordlarge .fret {
+  width: 12px;
+  height: 12px;
+}
+
+.bar:first-child .fret:not(:first-of-type) {
+  border-top: 1px solid #555;
+}
+
+.chordsmall .bar:first-child .fret:not(:first-of-type) {
+  height: 7px;
+}
+
+.chordmedium .bar:first-child .fret:not(:first-of-type) {
+  height: 11px;
+}
+
+.chordlarge .bar:first-child .fret:not(:first-of-type) {
+  height: 14px;
+}
+
+.bar:first-child .fret {
+  border-top: 1px solid transparent;
+}
+
+.chordsmall .bar:first-child .fret {
+  height: 7px;
+}
+
+.chordmedium .bar:first-child .fret {
+  height: 11px;
+}
+
+.chordlarge .bar:first-child .fret {
+  height: 14px;
+}
+
+.fret:first-child { 
+  border-top: 0px solid transparent;
+  border-right: 1px solid #555;
+  border-bottom: 1px solid transparent;
+  border-left: 0px solid transparent;
+}
+
+.fret .note {
+  position: absolute;
+  z-index: 2;
+  color: #fff;
+  background: #444;
+  text-align: center;
+  border-radius: 50%;
+}
+
+.chordsmall .fret .note {
+  width: 5px;
+  height: 5px;
+  margin-left: 3px;
+  margin-top: 0px;
+  padding-top: 2px;
+}
+
+.chordmedium .fret .note {
+  width: 8px;
+  height: 8px;
+  margin-left: 5px;
+  margin-top: 0px;
+  padding-top: 3px;
+}
+
+.chordlarge .fret .note {
+  width: 10px;
+  height: 10px;
+  margin-left: 6px;
+  margin-top: 0px;
+  padding-top: 4px;
+}
+
+
         .SongView .songtitle {
           font-size: 2em;
         }
