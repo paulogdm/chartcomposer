@@ -252,7 +252,8 @@ const gaDefaultSettings = {
   tabcolour: "black",
   x_chordposition: "inline",
   x_diagramsize: "medium",
-  x_diagramposition: "none",
+  x_diagramposition: "top",
+  x_instrument: "uke",
 };
 
 export { gaDefaultSettings as displayPreferenceDefaults };
@@ -274,6 +275,46 @@ const colorOptions = [
   { label: "Blue", value: "blue" },
   { label: "Green", value: "green" },
 ];
+const ghChords = 
+{ "uke": 
+  { 
+	"Ab" : ["4 2 3 2"],
+	"A" : ["2 1 0 0"],
+	"Am" : ["2 0 0 0"],
+	"Am7" : ["0 0 0 0"],
+	"A7" : ["0 1 0 0"],
+	"A7sus4" : ["0 2 0 0"],
+	"Bb" : ["3 2 1 1"],
+	"B" : ["4 3 2 2"],
+	"B7" : ["2 3 2 2"],
+	"Bm" : ["4 2 2 2"],
+	"C" : ["0 0 0 3"],
+	"C7" : ["0 0 0 1"],
+	"Cmaj7" : ["0 0 0 2"],
+	"Cm" : ["0 3 3 3"],
+	"m" : ["0"],
+	"C#" : ["1 1 1 4"],
+	"Db" : ["1 1 1 4"],
+	"C#m" : ["1 1 0 0"],
+	"Dbm" : ["1 1 0 0"],
+	"D" : ["2 2 2 0"],
+	"Dm" : ["2 2 1 0"],
+	"Dm7" : ["2 2 1 3"],
+	"D7" : ["2 2 2 3"],
+	"Eb" : ["3 3 3 1"],
+	"E" : ["1 4 0 2"],
+	"Em" : ["0 4 3 2"],
+	"F" : ["2 0 1 0"],
+	"F7" : ["2 3 1 3"],
+	"F#m" : ["2 1 2 0"],
+	"Gbm" : ["2 1 2 0"],
+	"G" : ["0 2 3 2"],
+	"G7" : ["0 2 1 2"],
+	"G#m" : ["4 3 4 2"],
+	"Abm" : ["4 3 4 2"],
+  }
+};
+				
 
 export const displayPreferenceMap = {
   Text: {
@@ -412,6 +453,7 @@ function doDirective(line) {
     case "x_chordposition":
     case "x_diagramsize":
     case "x_diagramposition":
+    case "x_instrument": // guitar, ukulele, uke, bass, mandolin
       gSong[directive] = parameters;
       break;
 
@@ -483,7 +525,6 @@ function doDirective(line) {
     case "col":
 
     // Custom directives
-    case "x_instrument": // guitar, ukulele, uke, bass, mandolin
     case "x_url":
     case "x_youtube_url":
       console.warn(
@@ -541,9 +582,36 @@ function exportHtml(song) {
   aResults.push("</div>");
 
   // chord diagrams
-  if ( "none" !== song.x_diagramposition ) {
+  if ( "none" !== song.x_diagramposition && ghChords[song.x_instrument] ) {
+	  var hChords = ghChords[song.x_instrument];
 	  for ( var c = 0; c < gaChords.length; c++ ) {
-		  aResults.push('<div class="chord' + song.x_diagramsize + '">  <div class="name">' + gaChords[c] + '</div>  <div class="diagram">    <div class="bar">      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"></div>    </div>    <div class="bar">      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"><div class="note"></div></div>    </div>    <div class="bar">      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"><div class="note"></div></div>      <div class="fret"></div>    </div>    <div class="bar">      <div class="fret"></div>      <div class="fret"><div class="note"></div></div>      <div class="fret"></div>      <div class="fret"></div>    </div>    <div class="fingering">      <div class="finger">o</div>      <div class="finger">3</div>      <div class="finger">2</div>      <div class="finger">1</div>    </div>  </div>  </div>');
+		  var chord = gaChords[c];
+		  var sChord = "<div class=chord" + song.x_diagramsize + "> <div class=name>" + chord + "</div>";
+		  if ( hChords[chord] ) {
+			  sChord += "<div class=diagram>";
+			  var aChord = hChords[chord];
+			  var aFrets = aChord[0].split(' ');
+			  for ( var f = 0; f < aFrets.length; f++ ) {
+				  //aFrets[f] = parseInt(aFrets[f]);
+			  }
+			  var maxFret = Math.max(...aFrets);
+			  maxFret = Math.max(maxFret, 3); // draw at least 3 frets
+			  var baseFret = 1; // TODO
+			  var fingers = "";
+			  for ( var curFret = baseFret; curFret <= maxFret; curFret++ ) {
+				  sChord += "<div class=bar>";
+				  for ( var f = 0; f < aFrets.length; f++ ) {
+					  sChord += "<div class=fret>" +
+						  ( curFret == aFrets[f] ? "<div class=note></div>" : "" ) +
+						  "</div>";
+				  }
+				  sChord += "</div>";
+			  }
+			  sChord += "</div>"; // diagram
+			  sChord += ""; // TODO - fingers
+		  }
+		  sChord += "</div>"; // chord
+		  aResults.push(sChord);
 	  }
 	  aResults.push('<div style="clear: both;"></div>');
   }
