@@ -1,6 +1,20 @@
+var gaChords;
+
 export default function chordProParse(value, userDisplayPreferences) {
   gSong = parseChordProString(value, userDisplayPreferences);
   console.debug({ chordProParsed: gSong });
+
+  // Get a list of all chords in this line before we start modifying the line.
+  var hChords = {}; // reset
+  var matches;
+  if ( matches = value.match(/\[([^\/|]*?)\]/g) ) {
+	  for ( var c = 0; c < matches.length; c++ ) {
+		  var sChord = matches[c].replace('[', '').replace(']', '');
+		  hChords[sChord] = 1;
+	  }
+  }
+  gaChords = Object.keys(hChords);
+
   var sHtml = exportHtml(gSong);
   var sTextSize =
     gSong.textsize == parseInt(gSong.textsize)
@@ -237,6 +251,8 @@ const gaDefaultSettings = {
   tabsize: 14,
   tabcolour: "black",
   x_chordposition: "inline",
+  x_diagramsize: "medium",
+  x_diagramposition: "none",
 };
 
 export { gaDefaultSettings as displayPreferenceDefaults };
@@ -394,6 +410,8 @@ function doDirective(line) {
     case "chordsize":
     case "chordcolour":
     case "x_chordposition":
+    case "x_diagramsize":
+    case "x_diagramposition":
       gSong[directive] = parameters;
       break;
 
@@ -522,6 +540,14 @@ function exportHtml(song) {
   }
   aResults.push("</div>");
 
+  // chord diagrams
+  if ( "none" !== song.x_diagramposition ) {
+	  for ( var c = 0; c < gaChords.length; c++ ) {
+		  aResults.push('<div class="chord' + song.x_diagramsize + '">  <div class="name">' + gaChords[c] + '</div>  <div class="diagram">    <div class="bar">      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"></div>    </div>    <div class="bar">      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"><div class="note"></div></div>    </div>    <div class="bar">      <div class="fret"></div>      <div class="fret"></div>      <div class="fret"><div class="note"></div></div>      <div class="fret"></div>    </div>    <div class="bar">      <div class="fret"></div>      <div class="fret"><div class="note"></div></div>      <div class="fret"></div>      <div class="fret"></div>    </div>    <div class="fingering">      <div class="finger">o</div>      <div class="finger">3</div>      <div class="finger">2</div>      <div class="finger">1</div>    </div>  </div>  </div>');
+	  }
+	  aResults.push('<div style="clear: both;"></div>');
+  }
+
   aResults.push("<div class=songparts>");
   for (var i = 0; i < song.parts.length; i++) {
     aResults.push(exportHtmlPart(song.parts, i));
@@ -567,7 +593,7 @@ function exportHtmlPart(aParts, i) {
       var line = part.lines[i];
       if (capo) {
         // If a capo was specified then transpose each chord.
-        var matches;
+		var matches;
         while ((matches = line.match(/\[(.*?)\]/))) {
           // TODO - Should we do a map to cache chords that are already transposed?
           var sChord = matches[1];
