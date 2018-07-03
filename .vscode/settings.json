@@ -3,6 +3,7 @@
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "git.autofetch": false,
+  "files.autoSave": "off",
   "files.exclude": {
     "**/dist": true,
     "**/app.ele": true

@@ -1,17 +1,20 @@
 var gaChords;
 
-export default function chordProParse(value, userDisplayPreferences) {
-  gSong = parseChordProString(value, userDisplayPreferences);
-  console.debug({ chordProParsed: gSong });
+export default function chordProParse(value, preferences) {
+  gSong = parseChordProString(value, preferences);
+
+  Object.keys(preferences).forEach(name => {
+    gSong[name] = preferences[name];
+  });
 
   // Get a list of all chords in this line before we start modifying the line.
   var hChords = {}; // reset
   var matches;
-  if ( matches = value.match(/\[([^\/|]*?)\]/g) ) {
-	  for ( var c = 0; c < matches.length; c++ ) {
-		  var sChord = matches[c].replace('[', '').replace(']', '');
-		  hChords[sChord] = 1;
-	  }
+  if ((matches = value.match(/\[([^\/|]*?)\]/g))) {
+    for (var c = 0; c < matches.length; c++) {
+      var sChord = matches[c].replace("[", "").replace("]", "");
+      hChords[sChord] = 1;
+    }
   }
   gaChords = Object.keys(hChords);
 
@@ -50,9 +53,8 @@ export default function chordProParse(value, userDisplayPreferences) {
 var gSong; // the song object is a global
 var giLine; // the current line number being parsed
 var gaLines; // the array of lines
-export function parseChordProString(text, userDisplayPreferences) {
-  gSong = createSong(userDisplayPreferences);
-  gSong.chordprotext = text;
+export function parseChordProString(text) {
+  gSong = { parts: [] };
 
   gaLines = text.split("\n");
   giLine = 0;
@@ -76,8 +78,6 @@ export function parseChordProString(text, userDisplayPreferences) {
   return gSong;
 }
 
-
-
 export function initAutoscroll() {
   window.bAutoScroll = false;
   window.tAutoscrollStart = 0;
@@ -85,56 +85,59 @@ export function initAutoscroll() {
   window.below = 0;
 }
 
-
 export function setUpAutoscroll() {
   window.toggleAutoScroll = function() {
     bAutoScroll = !bAutoScroll;
     if (bAutoScroll) {
       // start autoscroll
-	  if ( window.tAutoscrollStart ) {
-		  // Resume autoscroll.
-		  console.log("toggleAutoScroll: resume");
-		  window.tAutoscrollStart += Number(new Date()) - window.tAutoscrollStop; // add paused time
-		  autoScroll();
-	  }
-	  else {
-		  // Start autoscroll for the very first time.
-		  console.log("toggleAutoScroll: start");
-		  var songView = document.getElementsByClassName("panel-song-view")[0];
-		  var startElement = document.getElementsByClassName("verse")[0];
-		  var startImage = document.getElementsByClassName("image")[0] || document.getElementsByClassName("x_pdf")[0];
-		  if ( startImage && 
-			   ( ! startElement || 
-				 startImage.getBoundingClientRect().y < startElement.getBoundingClientRect().y ) ) {
-			  // If there is both a "verse" and an "image", choose the one closest to the top.
-			  startElement = startImage;
-		  }
+      if (window.tAutoscrollStart) {
+        // Resume autoscroll.
+        console.log("toggleAutoScroll: resume");
+        window.tAutoscrollStart += Number(new Date()) - window.tAutoscrollStop; // add paused time
+        autoScroll();
+      } else {
+        // Start autoscroll for the very first time.
+        console.log("toggleAutoScroll: start");
+        var songView = document.getElementsByClassName("panel-song-view")[0];
+        var startElement = document.getElementsByClassName("verse")[0];
+        var startImage =
+          document.getElementsByClassName("image")[0] ||
+          document.getElementsByClassName("x_pdf")[0];
+        if (
+          startImage &&
+          (!startElement ||
+            startImage.getBoundingClientRect().y <
+              startElement.getBoundingClientRect().y)
+        ) {
+          // If there is both a "verse" and an "image", choose the one closest to the top.
+          startElement = startImage;
+        }
 
-		  if (startElement) {
-			  // scrollTo parameters are relative to the SongView, but 
-			  // getBoundingClientRect is relative to the viewport.
-			  // So we have to offset by the top of the SongView relative to viewport.
-			  var songViewTop = songView.getBoundingClientRect().y;
-			  window.nSongTop = startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
-			  var nSongHeight = songView.scrollHeight - window.nSongTop;
-			  window.below = nSongHeight - songView.clientHeight;
-			  songView.scrollTo(0, window.nSongTop);
-			  if (window.below <= 0) {
-				  // it fits in the viewport - no need to autoscroll
-				  console.log("no need to autoscroll - it all fits");
-				  window.bAutoScroll = false;
-				  return;
-			  }
-			  // Start after 10 seconds so the first line is visible for a while
-			  window.tAutoscrollStart = Number(new Date()) + 10*1000;
-			  setTimeout(autoScroll, 10*1000);
-		  }
-		  else {
-			  console.log("WARNING: Could not find first song element.");
-		  }
-	  }
+        if (startElement) {
+          // scrollTo parameters are relative to the SongView, but
+          // getBoundingClientRect is relative to the viewport.
+          // So we have to offset by the top of the SongView relative to viewport.
+          var songViewTop = songView.getBoundingClientRect().y;
+          window.nSongTop =
+            startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
+          var nSongHeight = songView.scrollHeight - window.nSongTop;
+          window.below = nSongHeight - songView.clientHeight;
+          songView.scrollTo(0, window.nSongTop);
+          if (window.below <= 0) {
+            // it fits in the viewport - no need to autoscroll
+            console.log("no need to autoscroll - it all fits");
+            window.bAutoScroll = false;
+            return;
+          }
+          // Start after 10 seconds so the first line is visible for a while
+          window.tAutoscrollStart = Number(new Date()) + 10 * 1000;
+          setTimeout(autoScroll, 10 * 1000);
+        } else {
+          console.log("WARNING: Could not find first song element.");
+        }
+      }
     } else {
-		window.tAutoscrollStop = Number(new Date());
+      window.tAutoscrollStop = Number(new Date());
       console.log("toggleAutoScroll: stop");
     }
   };
@@ -156,7 +159,9 @@ export function setUpAutoscroll() {
       return;
     }
 
-    var scrollTo = Math.round(window.nSongTop + ((delta / duration) * window.below));
+    var scrollTo = Math.round(
+      window.nSongTop + (delta / duration) * window.below,
+    );
     var songView = document.getElementsByClassName("panel-song-view")[0];
     if (songView) {
       songView.scrollTo(0, scrollTo);
@@ -169,19 +174,17 @@ export function setUpAutoscroll() {
   };
 }
 
-
 // Convert the duration parameter to a number of seconds.
 function durationSeconds(dur) {
-	var matches = dur.match(/([0-9]*):([0-9]*)/);
-	if ( matches ) {
-		var mins = parseInt(matches[1]);
-		var secs = parseInt(matches[2]);
-		dur = (60*mins) + secs;
-	}
+  var matches = dur.match(/([0-9]*):([0-9]*)/);
+  if (matches) {
+    var mins = parseInt(matches[1]);
+    var secs = parseInt(matches[2]);
+    dur = 60 * mins + secs;
+  }
 
-	return dur;
+  return dur;
 }
-
 
 //   closingdirective - a single string or an array of strings
 function doBlock(type, closingdirectives) {
@@ -202,6 +205,7 @@ function doBlock(type, closingdirectives) {
   var block = {};
   block.type = type || "verse";
   block.lines = []; // lines in this block
+  block.linesParsed = [];
   while (giLine < gaLines.length) {
     var line = gaLines[giLine].trim();
     giLine++;
@@ -221,10 +225,41 @@ function doBlock(type, closingdirectives) {
       // do nothing
     } else {
       block.lines.push(line ? line : "&nbsp;");
+      // TODO: remove `lines` in favor if `linesParsed`.
+      if (line) {
+        block.linesParsed.push(parseLine(line, gSong.capo));
+      }
     }
   }
 
   gSong.parts.push(block);
+}
+
+export function parseLine(line, capo = undefined) {
+  let parsedLine = [];
+  line.match(/(\[(.*?)\])|(\w+)/g).forEach(chordOrWord => {
+    const matchesIfChord = chordOrWord.match(/\[(.*?)\]/);
+    if (matchesIfChord) {
+      const originalChord = matchesIfChord[1];
+      let text = originalChord;
+      if (capo) {
+        var baseChord = originalChord.substr(0, 1);
+        var baseChordTransposed = transpose(baseChord, capo);
+        text = originalChord.replace(baseChord, baseChordTransposed);
+      }
+      parsedLine.push({
+        type: "chord",
+        originalChord,
+        text,
+      });
+    } else {
+      parsedLine.push({
+        type: "word",
+        text: chordOrWord,
+      });
+    }
+  });
+  return parsedLine;
 }
 
 function matchesClosingDirectives(line, aClosingDirectives) {
@@ -275,46 +310,44 @@ const colorOptions = [
   { label: "Blue", value: "blue" },
   { label: "Green", value: "green" },
 ];
-const ghChords = 
-{ "uke": 
-  { 
-	"Ab" : ["4 2 3 2"],
-	"A" : ["2 1 0 0"],
-	"Am" : ["2 0 0 0"],
-	"Am7" : ["0 0 0 0"],
-	"A7" : ["0 1 0 0"],
-	"A7sus4" : ["0 2 0 0"],
-	"Bb" : ["3 2 1 1"],
-	"B" : ["4 3 2 2"],
-	"B7" : ["2 3 2 2"],
-	"Bm" : ["4 2 2 2"],
-	"C" : ["0 0 0 3"],
-	"C7" : ["0 0 0 1"],
-	"Cmaj7" : ["0 0 0 2"],
-	"Cm" : ["0 3 3 3"],
-	"m" : ["0"],
-	"C#" : ["1 1 1 4"],
-	"Db" : ["1 1 1 4"],
-	"C#m" : ["1 1 0 0"],
-	"Dbm" : ["1 1 0 0"],
-	"D" : ["2 2 2 0"],
-	"Dm" : ["2 2 1 0"],
-	"Dm7" : ["2 2 1 3"],
-	"D7" : ["2 2 2 3"],
-	"Eb" : ["3 3 3 1"],
-	"E" : ["1 4 0 2"],
-	"Em" : ["0 4 3 2"],
-	"F" : ["2 0 1 0"],
-	"F7" : ["2 3 1 3"],
-	"F#m" : ["2 1 2 0"],
-	"Gbm" : ["2 1 2 0"],
-	"G" : ["0 2 3 2"],
-	"G7" : ["0 2 1 2"],
-	"G#m" : ["4 3 4 2"],
-	"Abm" : ["4 3 4 2"],
-  }
+const ghChords = {
+  uke: {
+    Ab: ["4 2 3 2"],
+    A: ["2 1 0 0"],
+    Am: ["2 0 0 0"],
+    Am7: ["0 0 0 0"],
+    A7: ["0 1 0 0"],
+    A7sus4: ["0 2 0 0"],
+    Bb: ["3 2 1 1"],
+    B: ["4 3 2 2"],
+    B7: ["2 3 2 2"],
+    Bm: ["4 2 2 2"],
+    C: ["0 0 0 3"],
+    C7: ["0 0 0 1"],
+    Cmaj7: ["0 0 0 2"],
+    Cm: ["0 3 3 3"],
+    m: ["0"],
+    "C#": ["1 1 1 4"],
+    Db: ["1 1 1 4"],
+    "C#m": ["1 1 0 0"],
+    Dbm: ["1 1 0 0"],
+    D: ["2 2 2 0"],
+    Dm: ["2 2 1 0"],
+    Dm7: ["2 2 1 3"],
+    D7: ["2 2 2 3"],
+    Eb: ["3 3 3 1"],
+    E: ["1 4 0 2"],
+    Em: ["0 4 3 2"],
+    F: ["2 0 1 0"],
+    F7: ["2 3 1 3"],
+    "F#m": ["2 1 2 0"],
+    Gbm: ["2 1 2 0"],
+    G: ["0 2 3 2"],
+    G7: ["0 2 1 2"],
+    "G#m": ["4 3 4 2"],
+    Abm: ["4 3 4 2"],
+  },
 };
-				
 
 export const displayPreferenceMap = {
   Text: {
@@ -367,20 +400,6 @@ export const displayPreferenceMap = {
     },
   },
 };
-
-function createSong(userDisplayPreferences = {}) {
-  var song = {};
-
-  // placeholder for the parts of the song
-  song.parts = [];
-
-  // Initialize some settings:
-  Object.keys(gaDefaultSettings).forEach(name => {
-    song[name] = userDisplayPreferences[name] || gaDefaultSettings[name];
-  });
-
-  return song;
-}
 
 function isDirective(line) {
   return "{" === line.charAt(0) && "}" === line.charAt(line.length - 1);
@@ -571,7 +590,9 @@ function exportHtml(song) {
       switch (prop) {
         default:
           aResults.push(
-            "<div class=song" + prop + ">" +
+            "<div class=song" +
+              prop +
+              ">" +
               ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
               song[prop] +
               "</div>",
@@ -582,38 +603,44 @@ function exportHtml(song) {
   aResults.push("</div>");
 
   // chord diagrams
-  if ( "none" !== song.x_diagramposition && ghChords[song.x_instrument] ) {
-	  var hChords = ghChords[song.x_instrument];
-	  for ( var c = 0; c < gaChords.length; c++ ) {
-		  var chord = gaChords[c];
-		  var sChord = "<div class=chord" + song.x_diagramsize + "> <div class=name>" + chord + "</div>";
-		  if ( hChords[chord] ) {
-			  sChord += "<div class=diagram>";
-			  var aChord = hChords[chord];
-			  var aFrets = aChord[0].split(' ');
-			  for ( var f = 0; f < aFrets.length; f++ ) {
-				  //aFrets[f] = parseInt(aFrets[f]);
-			  }
-			  var maxFret = Math.max(...aFrets);
-			  maxFret = Math.max(maxFret, 3); // draw at least 3 frets
-			  var baseFret = 1; // TODO
-			  var fingers = "";
-			  for ( var curFret = baseFret; curFret <= maxFret; curFret++ ) {
-				  sChord += "<div class=bar>";
-				  for ( var f = 0; f < aFrets.length; f++ ) {
-					  sChord += "<div class=fret>" +
-						  ( curFret == aFrets[f] ? "<div class=note></div>" : "" ) +
-						  "</div>";
-				  }
-				  sChord += "</div>";
-			  }
-			  sChord += "</div>"; // diagram
-			  sChord += ""; // TODO - fingers
-		  }
-		  sChord += "</div>"; // chord
-		  aResults.push(sChord);
-	  }
-	  aResults.push('<div style="clear: both;"></div>');
+  if ("none" !== song.x_diagramposition && ghChords[song.x_instrument]) {
+    var hChords = ghChords[song.x_instrument];
+    for (var c = 0; c < gaChords.length; c++) {
+      var chord = gaChords[c];
+      var sChord =
+        "<div class=chord" +
+        song.x_diagramsize +
+        "> <div class=name>" +
+        chord +
+        "</div>";
+      if (hChords[chord]) {
+        sChord += "<div class=diagram>";
+        var aChord = hChords[chord];
+        var aFrets = aChord[0].split(" ");
+        for (var f = 0; f < aFrets.length; f++) {
+          //aFrets[f] = parseInt(aFrets[f]);
+        }
+        var maxFret = Math.max(...aFrets);
+        maxFret = Math.max(maxFret, 3); // draw at least 3 frets
+        var baseFret = 1; // TODO
+        var fingers = "";
+        for (var curFret = baseFret; curFret <= maxFret; curFret++) {
+          sChord += "<div class=bar>";
+          for (var f = 0; f < aFrets.length; f++) {
+            sChord +=
+              "<div class=fret>" +
+              (curFret == aFrets[f] ? "<div class=note></div>" : "") +
+              "</div>";
+          }
+          sChord += "</div>";
+        }
+        sChord += "</div>"; // diagram
+        sChord += ""; // TODO - fingers
+      }
+      sChord += "</div>"; // chord
+      aResults.push(sChord);
+    }
+    aResults.push('<div style="clear: both;"></div>');
   }
 
   aResults.push("<div class=songparts>");
@@ -661,7 +688,7 @@ function exportHtmlPart(aParts, i) {
       var line = part.lines[i];
       if (capo) {
         // If a capo was specified then transpose each chord.
-		var matches;
+        var matches;
         while ((matches = line.match(/\[(.*?)\]/))) {
           // TODO - Should we do a map to cache chords that are already transposed?
           var sChord = matches[1];
@@ -734,23 +761,35 @@ function exportHtmlPart(aParts, i) {
             fixDropboxUrl(url) +
             "' controls style='width: 80%'></audio>";
         }
-      } 
-	  else if ( "x_pdf" === part.type ) {
+      } else if ("x_pdf" === part.type) {
         // syntax: {x_pdf: url="url"}
         var hParams = parseParameters(line);
         if (!hParams["url"]) {
           continue; // must have URL
-        } 
-		else {
-			var url = fixDropboxUrl(hParams["url"]);
-			var songView = document.getElementsByClassName("panel-song-editor")[0];
-			var width = Math.min( 800, ( songView && 0 < songView.clientWidth ? songView.clientWidth : 800 ) );
-			var height = Math.round( 1100 * width / 800 ) * ( hParams["pages"] ? hParams["pages"] : 1 );
-		  line = "<object data='" + url + "' type='application/pdf' width='95%' height='" + height + "'>" +
-			  "<p>You don't have a PDF plugin, but you can <a href='" + url + "'>download the PDF file.</a></p></object>";
-		  //line = "<iframe src='http://docs.google.com/viewer?url=http://ukulelecraig.com/tennessee.pdf&embedded=true' width='100%' height='12000' style='border: none;'></iframe>";
+        } else {
+          var url = fixDropboxUrl(hParams["url"]);
+          var songView = document.getElementsByClassName(
+            "panel-song-editor",
+          )[0];
+          var width = Math.min(
+            800,
+            songView && 0 < songView.clientWidth ? songView.clientWidth : 800,
+          );
+          var height =
+            Math.round((1100 * width) / 800) *
+            (hParams["pages"] ? hParams["pages"] : 1);
+          line =
+            "<object data='" +
+            url +
+            "' type='application/pdf' width='95%' height='" +
+            height +
+            "'>" +
+            "<p>You don't have a PDF plugin, but you can <a href='" +
+            url +
+            "'>download the PDF file.</a></p></object>";
+          //line = "<iframe src='http://docs.google.com/viewer?url=http://ukulelecraig.com/tennessee.pdf&embedded=true' width='100%' height='12000' style='border: none;'></iframe>";
         }
-	  } else if ("x_video" === part.type) {
+      } else if ("x_video" === part.type) {
         // syntax: {x_video: url="url" [title="name"]}
         var hParams = parseParameters(line);
         if (!hParams["url"]) {
@@ -762,7 +801,7 @@ function exportHtmlPart(aParts, i) {
             line =
               "<iframe width='560' height='315' src='" +
               youtubeUrl +
-				"' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen style='padding-left: 5%;'></iframe>";
+              "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen style='padding-left: 5%;'></iframe>";
           } else {
             line =
               "<video src='" +
@@ -770,20 +809,27 @@ function exportHtmlPart(aParts, i) {
               "' controls style='width: 80%'></video>";
           }
         }
-	  } else if ("x_url" === part.type) {
+      } else if ("x_url" === part.type) {
         // syntax: {x_url: url="url" [title="name"]}
         var hParams = parseParameters(line);
         if (!hParams["url"]) {
           continue; // must have URL
-        } 
-		line = "<a href='" + hParams["url"] + "' target='_blank'>" +
-            ( hParams["title"] ? hParams["title"] : hParams["url"] ) +
-			"</a>";
+        }
+        line =
+          "<a href='" +
+          hParams["url"] +
+          "'>" +
+          (hParams["title"] ? hParams["title"] : hParams["url"]) +
+          "</a>";
       } else if ("image" === part.type) {
         // syntax: {image: src=filename options }
         // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
         // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
-		  line = "<img " + fixDropboxUrl(line) + ( -1 === line.indexOf("width") ? " style='width: 100%'" : "" ) + ">";
+        line =
+          "<img " +
+          fixDropboxUrl(line) +
+          (-1 === line.indexOf("width") ? " style='width: 100%'" : "") +
+          ">";
         /*
 		  var hParams = parseParameters(line);
 		  if ( ! hParams['src'] ) {
