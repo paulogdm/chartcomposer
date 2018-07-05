@@ -1,18 +1,21 @@
 var gaChords;
+var gSong; // the song object is a global
 
 export default function chordProParse(value, preferences) {
   gSong = parseChordProString(value, preferences);
 
+  /* CVSNO
   Object.keys(preferences).forEach(name => {
     gSong[name] = preferences[name];
   });
+  */
 
   // Get a list of all chords in this line before we start modifying the line.
   var hChords = {}; // reset
   var matches;
   if ((matches = value.match(/\[([^\/|]*?)\]/g))) {
     for (var c = 0; c < matches.length; c++) {
-      var sChord = matches[c].replace("[", "").replace("]", "");
+	  var sChord = matches[c].replace("[", "").replace("]", "").replace("run", "");
       hChords[sChord] = 1;
     }
   }
@@ -50,11 +53,14 @@ export default function chordProParse(value, preferences) {
   };
 }
 
-var gSong; // the song object is a global
 var giLine; // the current line number being parsed
 var gaLines; // the array of lines
-export function parseChordProString(text) {
+export function parseChordProString(text, preferences) {
   gSong = { parts: [] };
+
+  Object.keys(preferences).forEach(name => {
+    gSong[name] = preferences[name];
+  });
 
   gaLines = text.split("\n");
   giLine = 0;
@@ -227,7 +233,7 @@ function doBlock(type, closingdirectives) {
       block.lines.push(line ? line : "&nbsp;");
       // TODO: remove `lines` in favor if `linesParsed`.
       if (line) {
-        block.linesParsed.push(parseLine(line, gSong.capo));
+		  //CVSNO block.linesParsed.push(parseLine(line, gSong.capo));
       }
     }
   }
@@ -288,7 +294,7 @@ const gaDefaultSettings = {
   x_chordposition: "inline",
   x_diagramsize: "medium",
   x_diagramposition: "top",
-  x_instrument: "uke",
+  x_instrument: "guitar",
 };
 
 export { gaDefaultSettings as displayPreferenceDefaults };
@@ -322,11 +328,11 @@ const ghChords = {
     B: ["4 3 2 2"],
     B7: ["2 3 2 2"],
     Bm: ["4 2 2 2"],
-    C: ["0 0 0 3"],
+	C: ["0 0 0 3", "0 0 0 3"],
+    //C: ["5 4 3 3", "3 2 1 1", 3],
     C7: ["0 0 0 1"],
     Cmaj7: ["0 0 0 2"],
     Cm: ["0 3 3 3"],
-    m: ["0"],
     "C#": ["1 1 1 4"],
     Db: ["1 1 1 4"],
     "C#m": ["1 1 0 0"],
@@ -346,6 +352,42 @@ const ghChords = {
     G7: ["0 2 1 2"],
     "G#m": ["4 3 4 2"],
     Abm: ["4 3 4 2"],
+  },
+  guitar: {
+    Ab: ["1 3 3 2 1 1"],
+    A: ["0 0 2 2 2 0"],
+    Am: ["0 0 2 2 1 0"],
+    Am7: ["0 0 2 0 1 0"],
+    A7: ["0 0 2 0 2 0"],
+    Bb: ["0 1 3 3 3 0"],
+    B: ["0 2 4 4 4 2"],
+    B7: ["0 2 1 2 0 2"],
+    Bm: ["0 2 4 4 3 0"],
+    C: ["0 3 2 0 1 0"],
+    C7: ["0 3 2 3 1 0"],
+    Cmaj7: ["0 3 2 0 0 0"],
+    Cm: ["0 1 3 3 2 1"],
+    "C#": ["0 0 3 1 2 1"],
+    "Db": ["0 0 3 1 2 1"],
+    "C#m": ["0 0 2 1 2 0"],
+	Dbm: ["0 0 2 1 2 0"],
+    D: ["0 0 0 2 3 2"],
+    Dm: ["0 0 0 2 3 1"],
+    Dm7: ["0 0 0 2 1 1"],
+    D7: ["0 0 0 2 1 2"],
+    Eb: ["0 0 3 1 2 1"],
+    E: ["0 2 2 1 0 0"],
+    Em: ["0 2 2 0 0 0"],
+    E7: ["0 2 0 1 0 0"],
+    Em7: ["0 2 0 0 0 0"],
+    F: ["0 0 3 2 1 1"],
+    F7: ["1 3 1 2 1 1"],
+    "F#m": ["2 4 4 2 2 2"],
+	Gbm: ["2 4 4 2 2 2"],
+    G: ["3 2 0 0 0 3"],
+    G7: ["3 2 0 0 0 0"],
+    "G#m": ["1 2 2 1 1 1"],
+	Abm: ["1 2 2 1 1 1"],
   },
 };
 
@@ -574,6 +616,9 @@ function exportHtml(song) {
     "time",
     "capo",
     "duration",
+	//"x_diagramposition",
+	//"x_diagramsize",
+	//"x_instrument",
     // These are properties that we do NOT want to show in the viewer.
     //"textfont",
     //"textsize",
@@ -622,13 +667,14 @@ function exportHtml(song) {
         }
         var maxFret = Math.max(...aFrets);
         maxFret = Math.max(maxFret, 3); // draw at least 3 frets
-        var baseFret = 1; // TODO
+        var baseFret = ( "undefined" === typeof(aChord[2]) ? 1 : parseInt(aChord[2]) );
         var fingers = "";
         for (var curFret = baseFret; curFret <= maxFret; curFret++) {
           sChord += "<div class=bar>";
           for (var f = 0; f < aFrets.length; f++) {
             sChord +=
               "<div class=fret>" +
+				( curFret === baseFret && baseFret != 1 && f === 0 ? "<div class=basefret>" + baseFret + "</div>" : "" ) +
               (curFret == aFrets[f] ? "<div class=note></div>" : "") +
               "</div>";
           }
