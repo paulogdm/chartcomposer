@@ -532,6 +532,10 @@ function doDirective(line) {
       gSong.parts.push({ type: directive, lines: [parameters] });
       break;
 
+    case "define":
+		addChord(parameters);
+		break;
+
     // blocks of lyrics
     case "start_of_chorus":
     case "soc":
@@ -565,7 +569,6 @@ function doDirective(line) {
     case "ci":
     case "comment_box":
     case "cb":
-    case "define":
     case "chord":
 
     // no plan to support these
@@ -599,6 +602,48 @@ function doDirective(line) {
       console.warn('Warning: No handler for directive "' + directive + '".');
   }
 }
+
+
+function addChord(parameters) {
+	parameters = parameters.trim();
+	var sChord, sFrets, sFingers, sBaseFret, matches;
+	if ( matches = parameters.match(/^([^ ]*)/) ) {
+		sChord = matches[1].trim();
+	}
+	else {
+		// chord name is required
+		return;
+	}
+
+	if ( matches = parameters.match(/frets ([ 0-9]*)/) ) {
+		sFrets = matches[1].trim();
+	}
+	else {
+		// frets is required
+		return;
+	}
+
+	if ( matches = parameters.match(/fingers ([ 0-9]*)/) ) {
+		sFingers = matches[1].trim();
+	}
+	if ( matches = parameters.match(/base-fret ([ 0-9]*)/) ) {
+		sBaseFret = matches[1].trim();
+	}
+
+	if ( "undefined" === typeof(gSong.hChords) ) {
+		// initialize the object to store "define" chords
+		gSong.hChords = {};
+	}
+
+	gSong.hChords[sChord] = [sFrets];
+	if ( sFingers ) {
+		gSong.hChords[sChord][1] = sFingers;
+	}
+	if ( sBaseFret ) {
+		gSong.hChords[sChord][2] = sBaseFret;
+	}
+}
+
 
 ///////////////////////////////////////////////////
 
@@ -649,7 +694,11 @@ function exportHtml(song) {
 
   // chord diagrams
   if ("none" !== song.x_diagramposition && ghChords[song.x_instrument]) {
-    var hChords = ghChords[song.x_instrument];
+	var hChords = ghChords[song.x_instrument];
+	// add "define" chords
+	for ( var chordname in song.hChords ) {
+		hChords[chordname] = song.hChords[chordname];
+	}
     for (var c = 0; c < gaChords.length; c++) {
       var chord = gaChords[c];
       var sChord =
