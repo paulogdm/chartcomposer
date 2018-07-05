@@ -197,6 +197,24 @@ const SongView = ({ preferences = {}, value = "" }) => {
           padding-top: 4px;
         }
 
+		.chordsmall .bar .basefret {
+		  font-size: 9px;
+		  float: left;
+		  line-height: 1;
+		}
+
+		.chordmedium .bar .basefret {
+		  font-size: 10px;
+		  float: left;
+		  line-height: 1;
+		}
+
+		.chordlarge .bar .basefret {
+		  font-size: 12px;
+		  float: left;
+		  line-height: 1;
+		}
+
         .SongView .songtitle {
           font-size: 2em;
         }
