@@ -533,6 +533,7 @@ function doDirective(line) {
       break;
 
     case "define":
+    case "chord": // really "chord" is supposed to put it in the middle of the song, but will treat it like "define"
 		addChord(parameters);
 		break;
 
@@ -569,7 +570,6 @@ function doDirective(line) {
     case "ci":
     case "comment_box":
     case "cb":
-    case "chord":
 
     // no plan to support these
     case "start_of_grid":
