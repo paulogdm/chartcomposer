@@ -4,12 +4,6 @@ var gSong; // the song object is a global
 export default function chordProParse(value, preferences) {
   gSong = parseChordProString(value, preferences);
 
-  /* CVSNO
-  Object.keys(preferences).forEach(name => {
-    gSong[name] = preferences[name];
-  });
-  */
-
   // Get a list of all chords in this line before we start modifying the line.
   var hChords = {}; // reset
   var matches;
@@ -236,7 +230,7 @@ function doBlock(type, closingdirectives) {
       block.lines.push(line ? line : "&nbsp;");
       // TODO: remove `lines` in favor if `linesParsed`.
       if (line) {
-        //CVSNO block.linesParsed.push(parseLine(line, gSong.capo));
+		  // block.linesParsed.push(parseLine(line, gSong.capo));
       }
     }
   }
@@ -398,21 +392,7 @@ const ghChords = {
 };
 
 export const displayPreferenceMap = {
-  Text: {
-    textfont: {
-      label: "Font",
-      options: fontOptions,
-    },
-    textsize: {
-      label: "Size",
-      options: sizeOptions,
-    },
-    textcolour: {
-      label: "Color",
-      options: colorOptions,
-    },
-  },
-  Chord: {
+  Chords: {
     chordfont: {
       label: "Font",
       options: fontOptions,
@@ -433,6 +413,46 @@ export const displayPreferenceMap = {
       ],
     },
   },
+  Text: {
+    textfont: {
+      label: "Font",
+      options: fontOptions,
+    },
+    textsize: {
+      label: "Size",
+      options: sizeOptions,
+    },
+    textcolour: {
+      label: "Color",
+      options: colorOptions,
+    },
+  },
+  Diagrams: {
+	x_diagramposition: {
+      label: "Position",
+	  options: [ 
+        { label: "None", value: "none" },
+        { label: "Top", value: "top" },
+        { label: "Right", value: "right" },
+      ]
+	},
+	x_diagramsize: {
+      label: "Size",
+	  options: [ 
+        { label: "Small", value: "small" },
+        { label: "Medium", value: "medium" },
+        { label: "Large", value: "large" },
+      ]
+	},
+	x_instrument: {
+      label: "Instrument",
+	  options: [ 
+        { label: "Guitar", value: "guitar" },
+        { label: "Ukulele", value: "uke" },
+      ]
+	},
+  },
+  /*
   Tab: {
     tabfont: {
       label: "Font",
@@ -447,6 +467,7 @@ export const displayPreferenceMap = {
       options: colorOptions,
     },
   },
+  */
 };
 
 function isDirective(line) {
@@ -696,11 +717,14 @@ function exportHtml(song) {
 
   // chord diagrams
   if ("none" !== song.x_diagramposition && ghChords[song.x_instrument]) {
-    var hChords = ghChords[song.x_instrument];
-    // add "define" chords
-    for (var chordname in song.hChords) {
-      hChords[chordname] = song.hChords[chordname];
-    }
+	var hChords = ghChords[song.x_instrument];
+	// add "define" chords
+	for ( var chordname in song.hChords ) {
+		hChords[chordname] = song.hChords[chordname];
+	}
+	var sChordDiagrams = "<div class=chorddiagrams" +
+		( "right" === song.x_diagramposition ? " style='float: right; width: 100px;'" : "" ) +  // TODO - better width
+		">";
     for (var c = 0; c < gaChords.length; c++) {
       var chord = gaChords[c];
       var sChord =
@@ -718,36 +742,38 @@ function exportHtml(song) {
         }
         var maxFret = Math.max(...aFrets);
         maxFret = Math.max(maxFret, 3); // draw at least 3 frets
-        var baseFret =
-          "undefined" === typeof aChord[2] ? 1 : parseInt(aChord[2]);
+        var baseFret = ( "undefined" === typeof(aChord[2]) ? 1 : parseInt(aChord[2]) );
         var fingers = "";
         for (var curFret = baseFret; curFret <= maxFret; curFret++) {
           sChord += "<div class=bar>";
           for (var f = 0; f < aFrets.length; f++) {
             sChord +=
               "<div class=fret>" +
-              (curFret === baseFret && baseFret != 1 && f === 0
-                ? "<div class=basefret>" + baseFret + "</div>"
-                : "") +
+				( curFret === baseFret && baseFret != 1 && f === 0 ? "<div class=basefret>" + baseFret + "</div>" : "" ) +
               (curFret == aFrets[f] ? "<div class=note></div>" : "") +
               "</div>";
           }
           sChord += "</div>";
         }
         sChord += "</div>"; // diagram
-        sChord += ""; // TODO - fingers
       }
       sChord += "</div>"; // chord
-      aResults.push(sChord);
+	  sChordDiagrams += sChord;
     }
-    aResults.push('<div style="clear: both;"></div>');
+	sChordDiagrams += '</div><div style="clear: both;"></div>'; // TODO - need clear both?
+	if ( "top" === song.x_diagramposition ) {
+		aResults.push(sChordDiagrams);
+	}
   }
 
-  aResults.push("<div class=songparts>");
+  aResults.push("<div class=songparts style='float: left;'>");
   for (var i = 0; i < song.parts.length; i++) {
     aResults.push(exportHtmlPart(song.parts, i));
   }
   aResults.push("</div>");
+  if ( "right" === song.x_diagramposition ) {
+	  aResults.push(sChordDiagrams);
+  }
 
   return aResults.join("\n");
 }
