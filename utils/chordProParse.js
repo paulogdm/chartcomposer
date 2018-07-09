@@ -15,7 +15,10 @@ export default function chordProParse(value, preferences) {
   var matches;
   if ((matches = value.match(/\[([^\/|]*?)\]/g))) {
     for (var c = 0; c < matches.length; c++) {
-	  var sChord = matches[c].replace("[", "").replace("]", "").replace("run", "");
+      var sChord = matches[c]
+        .replace("[", "")
+        .replace("]", "")
+        .replace("run", "");
       hChords[sChord] = 1;
     }
   }
@@ -233,7 +236,7 @@ function doBlock(type, closingdirectives) {
       block.lines.push(line ? line : "&nbsp;");
       // TODO: remove `lines` in favor if `linesParsed`.
       if (line) {
-		  //CVSNO block.linesParsed.push(parseLine(line, gSong.capo));
+        //CVSNO block.linesParsed.push(parseLine(line, gSong.capo));
       }
     }
   }
@@ -243,6 +246,8 @@ function doBlock(type, closingdirectives) {
 
 export function parseLine(line, capo = undefined) {
   let parsedLine = [];
+  return []; // TODO(elsigh): fix later
+  /*
   line.match(/(\[(.*?)\])|(\w+)/g).forEach(chordOrWord => {
     const matchesIfChord = chordOrWord.match(/\[(.*?)\]/);
     if (matchesIfChord) {
@@ -266,6 +271,7 @@ export function parseLine(line, capo = undefined) {
     }
   });
   return parsedLine;
+  */
 }
 
 function matchesClosingDirectives(line, aClosingDirectives) {
@@ -328,7 +334,7 @@ const ghChords = {
     B: ["4 3 2 2"],
     B7: ["2 3 2 2"],
     Bm: ["4 2 2 2"],
-	C: ["0 0 0 3", "0 0 0 3"],
+    C: ["0 0 0 3", "0 0 0 3"],
     //C: ["5 4 3 3", "3 2 1 1", 3],
     C7: ["0 0 0 1"],
     Cmaj7: ["0 0 0 2"],
@@ -368,9 +374,9 @@ const ghChords = {
     Cmaj7: ["0 3 2 0 0 0"],
     Cm: ["0 1 3 3 2 1"],
     "C#": ["0 0 3 1 2 1"],
-    "Db": ["0 0 3 1 2 1"],
+    Db: ["0 0 3 1 2 1"],
     "C#m": ["0 0 2 1 2 0"],
-	Dbm: ["0 0 2 1 2 0"],
+    Dbm: ["0 0 2 1 2 0"],
     D: ["0 0 0 2 3 2"],
     Dm: ["0 0 0 2 3 1"],
     Dm7: ["0 0 0 2 1 1"],
@@ -383,11 +389,11 @@ const ghChords = {
     F: ["0 0 3 2 1 1"],
     F7: ["1 3 1 2 1 1"],
     "F#m": ["2 4 4 2 2 2"],
-	Gbm: ["2 4 4 2 2 2"],
+    Gbm: ["2 4 4 2 2 2"],
     G: ["3 2 0 0 0 3"],
     G7: ["3 2 0 0 0 0"],
     "G#m": ["1 2 2 1 1 1"],
-	Abm: ["1 2 2 1 1 1"],
+    Abm: ["1 2 2 1 1 1"],
   },
 };
 
@@ -534,8 +540,8 @@ function doDirective(line) {
 
     case "define":
     case "chord": // really "chord" is supposed to put it in the middle of the song, but will treat it like "define"
-		addChord(parameters);
-		break;
+      addChord(parameters);
+      break;
 
     // blocks of lyrics
     case "start_of_chorus":
@@ -603,47 +609,43 @@ function doDirective(line) {
   }
 }
 
-
 function addChord(parameters) {
-	parameters = parameters.trim();
-	var sChord, sFrets, sFingers, sBaseFret, matches;
-	if ( matches = parameters.match(/^([^ ]*)/) ) {
-		sChord = matches[1].trim();
-	}
-	else {
-		// chord name is required
-		return;
-	}
+  parameters = parameters.trim();
+  var sChord, sFrets, sFingers, sBaseFret, matches;
+  if ((matches = parameters.match(/^([^ ]*)/))) {
+    sChord = matches[1].trim();
+  } else {
+    // chord name is required
+    return;
+  }
 
-	if ( matches = parameters.match(/frets ([ 0-9]*)/) ) {
-		sFrets = matches[1].trim();
-	}
-	else {
-		// frets is required
-		return;
-	}
+  if ((matches = parameters.match(/frets ([ 0-9]*)/))) {
+    sFrets = matches[1].trim();
+  } else {
+    // frets is required
+    return;
+  }
 
-	if ( matches = parameters.match(/fingers ([ 0-9]*)/) ) {
-		sFingers = matches[1].trim();
-	}
-	if ( matches = parameters.match(/base-fret ([ 0-9]*)/) ) {
-		sBaseFret = matches[1].trim();
-	}
+  if ((matches = parameters.match(/fingers ([ 0-9]*)/))) {
+    sFingers = matches[1].trim();
+  }
+  if ((matches = parameters.match(/base-fret ([ 0-9]*)/))) {
+    sBaseFret = matches[1].trim();
+  }
 
-	if ( "undefined" === typeof(gSong.hChords) ) {
-		// initialize the object to store "define" chords
-		gSong.hChords = {};
-	}
+  if ("undefined" === typeof gSong.hChords) {
+    // initialize the object to store "define" chords
+    gSong.hChords = {};
+  }
 
-	gSong.hChords[sChord] = [sFrets];
-	if ( sFingers ) {
-		gSong.hChords[sChord][1] = sFingers;
-	}
-	if ( sBaseFret ) {
-		gSong.hChords[sChord][2] = sBaseFret;
-	}
+  gSong.hChords[sChord] = [sFrets];
+  if (sFingers) {
+    gSong.hChords[sChord][1] = sFingers;
+  }
+  if (sBaseFret) {
+    gSong.hChords[sChord][2] = sBaseFret;
+  }
 }
-
 
 ///////////////////////////////////////////////////
 
@@ -661,9 +663,9 @@ function exportHtml(song) {
     "time",
     "capo",
     "duration",
-	//"x_diagramposition",
-	//"x_diagramsize",
-	//"x_instrument",
+    //"x_diagramposition",
+    //"x_diagramsize",
+    //"x_instrument",
     // These are properties that we do NOT want to show in the viewer.
     //"textfont",
     //"textsize",
@@ -694,11 +696,11 @@ function exportHtml(song) {
 
   // chord diagrams
   if ("none" !== song.x_diagramposition && ghChords[song.x_instrument]) {
-	var hChords = ghChords[song.x_instrument];
-	// add "define" chords
-	for ( var chordname in song.hChords ) {
-		hChords[chordname] = song.hChords[chordname];
-	}
+    var hChords = ghChords[song.x_instrument];
+    // add "define" chords
+    for (var chordname in song.hChords) {
+      hChords[chordname] = song.hChords[chordname];
+    }
     for (var c = 0; c < gaChords.length; c++) {
       var chord = gaChords[c];
       var sChord =
@@ -716,14 +718,17 @@ function exportHtml(song) {
         }
         var maxFret = Math.max(...aFrets);
         maxFret = Math.max(maxFret, 3); // draw at least 3 frets
-        var baseFret = ( "undefined" === typeof(aChord[2]) ? 1 : parseInt(aChord[2]) );
+        var baseFret =
+          "undefined" === typeof aChord[2] ? 1 : parseInt(aChord[2]);
         var fingers = "";
         for (var curFret = baseFret; curFret <= maxFret; curFret++) {
           sChord += "<div class=bar>";
           for (var f = 0; f < aFrets.length; f++) {
             sChord +=
               "<div class=fret>" +
-				( curFret === baseFret && baseFret != 1 && f === 0 ? "<div class=basefret>" + baseFret + "</div>" : "" ) +
+              (curFret === baseFret && baseFret != 1 && f === 0
+                ? "<div class=basefret>" + baseFret + "</div>"
+                : "") +
               (curFret == aFrets[f] ? "<div class=note></div>" : "") +
               "</div>";
           }
