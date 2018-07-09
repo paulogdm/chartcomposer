@@ -105,7 +105,6 @@ export default class Preferences extends React.Component {
     const isSmallScreen = smallScreenMode !== null;
     const { preferences } = this.state;
     const sections = Object.keys(displayPreferenceMap);
-    sections.sort();
 
     return (
       <div>
