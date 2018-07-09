@@ -1084,7 +1084,15 @@ function convertToChordPro(text) {
 
   // convert [Verse] and [Chorus]
   text = text.replace(/\[Verse\]/gi, "{comment: Verse}");
+  text = text.replace(/\[Verse 1\]/gi, "{comment: Verse 1}");
+  text = text.replace(/\[Verse 2\]/gi, "{comment: Verse 2}");
+  text = text.replace(/\[Verse 3\]/gi, "{comment: Verse 3}");
   text = text.replace(/\[Chorus\]/gi, "{comment: Chorus}");
+  text = text.replace(/\[Chorus 1\]/gi, "{comment: Chorus 1}");
+  text = text.replace(/\[Chorus 2\]/gi, "{comment: Chorus 2}");
+  text = text.replace(/\[Chorus 3\]/gi, "{comment: Chorus 3}");
+  text = text.replace(/\[Bridge\]/gi, "{comment: Bridge}");
+  text = text.replace(/\[Interlude\]/gi, "{comment: Interlude}");
 
   // actually convert line-by-line
   var aLines = text.split("\n");
