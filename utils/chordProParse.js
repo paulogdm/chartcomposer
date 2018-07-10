@@ -768,7 +768,7 @@ function exportHtml(song) {
 	}
   }
 
-  aResults.push("<div class=songparts style='float: left;'>");
+  aResults.push("<div class=songparts style='float: left; min-width: 95%;'>");
   for (var i = 0; i < song.parts.length; i++) {
     aResults.push(exportHtmlPart(song.parts, i));
   }
