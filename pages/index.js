@@ -365,13 +365,11 @@ export default class IndexPage extends React.Component {
             songs,
           },
         };
-        this.setState({ folders });
+        this.setState({ folders, loading: false });
       })
       .catch(error => {
-        throw error;
-      })
-      .then(() => {
         this.setState({ loading: false });
+        throw error;
       });
   };
 
@@ -465,14 +463,12 @@ export default class IndexPage extends React.Component {
           ...this.state.chordPro,
           [songId]: songChordPro,
         };
-        this.setState({ chordPro });
+        this.setState({ chordPro, loading: false });
         //console.log({ chordPro });
       })
       .catch(error => {
-        throw error;
-      })
-      .then(() => {
         this.setState({ loading: false });
+        throw error;
       });
   };
 
@@ -533,18 +529,19 @@ export default class IndexPage extends React.Component {
           ...folders[folderId],
           songs: {
             ...folders[folderId].songs,
-            [songId]: response,
+            [songId]: {
+              ".tag": "file",
+              ...response,
+            },
           },
         };
 
         chordPro[songId] = songChordPro;
-        this.setState({ chordPro, dirty, folders, songId });
+        this.setState({ chordPro, dirty, folders, saving: false, songId });
       })
       .catch(error => {
-        throw error;
-      })
-      .then(() => {
         this.setState({ saving: false });
+        throw error;
       });
   };
 
@@ -667,14 +664,12 @@ export default class IndexPage extends React.Component {
     this.dbx
       .filesUpload(filesCommitInfo)
       .then(response => {
-        console.log({ response });
-        console.log("SAVED PREFERENCES!");
+        console.log("SAVED PREFERENCES!", { response });
+        this.setState({ loading: false });
       })
       .catch(error => {
-        throw error;
-      })
-      .then(() => {
         this.setState({ loading: false });
+        throw error;
       });
   };
 
