@@ -31,6 +31,7 @@ const SongView = ({ preferences = {}, value = "" }) => {
           }
         }
 
+        .x_pdf { width: 95%; }
         .chordsmall,
         .chordmedium,
         .chordlarge {
