@@ -120,6 +120,7 @@ export function setUpAutoscroll() {
           // scrollTo parameters are relative to the SongView, but
           // getBoundingClientRect is relative to the viewport.
           // So we have to offset by the top of the SongView relative to viewport.
+		  songView.scrollTo(0, 0); // Reset SongView so all coordinates are relative to 0
           var songViewTop = songView.getBoundingClientRect().y;
           window.nSongTop =
             startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
@@ -165,6 +166,9 @@ export function setUpAutoscroll() {
     var scrollTo = Math.round(
       window.nSongTop + (delta / duration) * window.below,
     );
+	if ( 0 > scrollTo ) {
+		return;
+	}
     var songView = document.getElementsByClassName("panel-song-view")[0];
     if (songView) {
       songView.scrollTo(0, scrollTo);
