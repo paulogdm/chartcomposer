@@ -1,5 +1,6 @@
 import moment from "moment";
 import LoadingIndicator from "./LoadingIndicator";
+import textToChordPro, { isChordProFormat } from "../utils/textToChordPro";
 
 class SongEditor extends React.Component {
   constructor(props) {
@@ -10,6 +11,12 @@ class SongEditor extends React.Component {
   onChange = e => {
     const { onChange } = this.props;
     const value = e.target.value;
+    this.setState({ value }, () => onChange(value));
+  };
+
+  convertValueToChordPro = () => {
+    const { onChange } = this.props;
+    const value = textToChordPro(this.state.value);
     this.setState({ value }, () => onChange(value));
   };
 
@@ -24,6 +31,18 @@ class SongEditor extends React.Component {
           height: "100%",
         }}
       >
+        {isChordProFormat(value) ? null : (
+          <button
+            onClick={this.convertValueToChordPro}
+            style={{
+              position: "fixed",
+              right: "80px",
+              padding: "10px",
+            }}
+          >
+            Convert to ChordPro
+          </button>
+        )}
         <div
           style={{
             display: "flex",

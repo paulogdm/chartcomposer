@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import loadScript from "load-script";
 
+// TODO(elsigh): maybe we should just copy locally? There was some reason
+// I can't remember about why it was better to do it this way.
 const DROPBOX_SDK_URL = "https://www.dropbox.com/static/api/2/dropins.js";
 const SCRIPT_ID = "dropboxjs";
 
