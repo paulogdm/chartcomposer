@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "",
   "main": "index.js",
-  "now": {
+  "now-deprecated": {
     "name": "chartcomposer",
     "alias": "chartcomposer.com"
   },
