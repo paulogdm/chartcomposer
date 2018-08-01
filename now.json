@@ -1,0 +1,17 @@
+{
+  "name": "chartcomposer",
+  "alias": "chartcomposer.com",
+  "scale": {
+    "sfo1": {
+      "min": 1,
+      "max": 5
+    }
+  },
+  "build": {
+    "env": {
+      "DROPBOX_APP_KEY": "@dropbox_app_key",
+      "DROPBOX_APP_SECRET": "@dropbox_app_secret",
+      "ROPBOX_PUBLIC_TOKEN": "@dropbox_public_token"
+    }
+  }
+}
