@@ -12,8 +12,7 @@
     "test": "NODE_ENV=test jest",
     "build": "next build",
     "start": "next start",
-    "deploy": "now --token=$NOW_TOKEN",
-    "alias": "now alias --team chartcomposer --token=$NOW_TOKEN"
+    "deploy": "now --team chartcomposer --token=$NOW_TOKEN"
   },
   "author": "Lindsey Simon <elsigh@gmail.com>",
   "license": "ISC",
