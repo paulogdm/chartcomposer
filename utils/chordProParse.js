@@ -120,7 +120,7 @@ export function setUpAutoscroll() {
           // scrollTo parameters are relative to the SongView, but
           // getBoundingClientRect is relative to the viewport.
           // So we have to offset by the top of the SongView relative to viewport.
-		  songView.scrollTo(0, 0); // Reset SongView so all coordinates are relative to 0
+          songView.scrollTo(0, 0); // Reset SongView so all coordinates are relative to 0
           var songViewTop = songView.getBoundingClientRect().y;
           window.nSongTop =
             startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
@@ -166,9 +166,9 @@ export function setUpAutoscroll() {
     var scrollTo = Math.round(
       window.nSongTop + (delta / duration) * window.below,
     );
-	if ( 0 > scrollTo ) {
-		return;
-	}
+    if (0 > scrollTo) {
+      return;
+    }
     var songView = document.getElementsByClassName("panel-song-view")[0];
     if (songView) {
       songView.scrollTo(0, scrollTo);
@@ -234,7 +234,7 @@ function doBlock(type, closingdirectives) {
       block.lines.push(line ? line : "&nbsp;");
       // TODO: remove `lines` in favor if `linesParsed`.
       if (line) {
-		  // block.linesParsed.push(parseLine(line, gSong.capo));
+        block.linesParsed.push(parseLine(line, gSong.capo));
       }
     }
   }
@@ -244,9 +244,8 @@ function doBlock(type, closingdirectives) {
 
 export function parseLine(line, capo = undefined) {
   let parsedLine = [];
-  return []; // TODO(elsigh): fix later
-  /*
-  line.match(/(\[(.*?)\])|(\w+)/g).forEach(chordOrWord => {
+  const matches = line.match(/(\[(.*?)\])|(\w+)/g) || [];
+  matches.forEach(chordOrWord => {
     const matchesIfChord = chordOrWord.match(/\[(.*?)\]/);
     if (matchesIfChord) {
       const originalChord = matchesIfChord[1];
@@ -269,7 +268,6 @@ export function parseLine(line, capo = undefined) {
     }
   });
   return parsedLine;
-  */
 }
 
 function matchesClosingDirectives(line, aClosingDirectives) {
@@ -434,29 +432,29 @@ export const displayPreferenceMap = {
     },
   },
   Diagrams: {
-	x_diagramposition: {
+    x_diagramposition: {
       label: "Position",
-	  options: [ 
+      options: [
         { label: "None", value: "none" },
         { label: "Top", value: "top" },
         { label: "Right", value: "right" },
-      ]
-	},
-	x_diagramsize: {
+      ],
+    },
+    x_diagramsize: {
       label: "Size",
-	  options: [ 
+      options: [
         { label: "Small", value: "small" },
         { label: "Medium", value: "medium" },
         { label: "Large", value: "large" },
-      ]
-	},
-	x_instrument: {
+      ],
+    },
+    x_instrument: {
       label: "Instrument",
-	  options: [ 
+      options: [
         { label: "Guitar", value: "guitar" },
         { label: "Ukulele", value: "uke" },
-      ]
-	},
+      ],
+    },
   },
   /*
   Tab: {
@@ -723,14 +721,17 @@ function exportHtml(song) {
 
   // chord diagrams
   if ("none" !== song.x_diagramposition && ghChords[song.x_instrument]) {
-	var hChords = ghChords[song.x_instrument];
-	// add "define" chords
-	for ( var chordname in song.hChords ) {
-		hChords[chordname] = song.hChords[chordname];
-	}
-	var sChordDiagrams = "<div class=chorddiagrams" +
-		( "right" === song.x_diagramposition ? " style='float: right; width: 100px;'" : "" ) +  // TODO - better width
-		">";
+    var hChords = ghChords[song.x_instrument];
+    // add "define" chords
+    for (var chordname in song.hChords) {
+      hChords[chordname] = song.hChords[chordname];
+    }
+    var sChordDiagrams =
+      "<div class=chorddiagrams" +
+      ("right" === song.x_diagramposition
+        ? " style='float: right; width: 100px;'"
+        : "") + // TODO - better width
+      ">";
     for (var c = 0; c < gaChords.length; c++) {
       var chord = gaChords[c];
       var sChord =
@@ -748,14 +749,17 @@ function exportHtml(song) {
         }
         var maxFret = Math.max(...aFrets);
         maxFret = Math.max(maxFret, 3); // draw at least 3 frets
-        var baseFret = ( "undefined" === typeof(aChord[2]) ? 1 : parseInt(aChord[2]) );
+        var baseFret =
+          "undefined" === typeof aChord[2] ? 1 : parseInt(aChord[2]);
         var fingers = "";
         for (var curFret = baseFret; curFret <= maxFret; curFret++) {
           sChord += "<div class=bar>";
           for (var f = 0; f < aFrets.length; f++) {
             sChord +=
               "<div class=fret>" +
-				( curFret === baseFret && baseFret != 1 && f === 0 ? "<div class=basefret>" + baseFret + "</div>" : "" ) +
+              (curFret === baseFret && baseFret != 1 && f === 0
+                ? "<div class=basefret>" + baseFret + "</div>"
+                : "") +
               (curFret == aFrets[f] ? "<div class=note></div>" : "") +
               "</div>";
           }
@@ -764,12 +768,12 @@ function exportHtml(song) {
         sChord += "</div>"; // diagram
       }
       sChord += "</div>"; // chord
-	  sChordDiagrams += sChord;
+      sChordDiagrams += sChord;
     }
-	sChordDiagrams += '</div><div style="clear: both;"></div>'; // TODO - need clear both?
-	if ( "top" === song.x_diagramposition ) {
-		aResults.push(sChordDiagrams);
-	}
+    sChordDiagrams += '</div><div style="clear: both;"></div>'; // TODO - need clear both?
+    if ("top" === song.x_diagramposition) {
+      aResults.push(sChordDiagrams);
+    }
   }
 
   aResults.push("<div class=songparts style='float: left; min-width: 95%;'>");
@@ -777,8 +781,8 @@ function exportHtml(song) {
     aResults.push(exportHtmlPart(song.parts, i));
   }
   aResults.push("</div>");
-  if ( "right" === song.x_diagramposition ) {
-	  aResults.push(sChordDiagrams);
+  if ("right" === song.x_diagramposition) {
+    aResults.push(sChordDiagrams);
   }
 
   return aResults.join("\n");
