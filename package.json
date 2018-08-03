@@ -1,7 +1,8 @@
 {
   "name": "chartcomposer",
   "version": "0.0.2",
-  "description": "",
+  "repository": "https://github.com/elsigh/chartcomposer",
+  "description": "ChartComposer is a website (https://chartcomposer.com) for displaying and editing ChordPro files.",
   "main": "index.js",
   "now-deprecated": {
     "name": "chartcomposer",
@@ -11,7 +12,8 @@
     "dev": "next",
     "test": "NODE_ENV=test jest",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
+    "start_orig": "next start",
     "deploy": "now --team chartcomposer --token=$NOW_TOKEN"
   },
   "author": "Lindsey Simon <elsigh@gmail.com>",
@@ -24,13 +26,14 @@
     "localforage": "^1.6.0",
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
-    "next": "^5.1.0",
+    "next": "^6.1.0",
     "prop-types": "^15.6.1",
     "raven-js": "^3.24.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-icons": "^2.2.7",
     "react-oauth-flow": "^1.1.1",
+    "sw-precache-webpack-plugin": "^0.11.5",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {

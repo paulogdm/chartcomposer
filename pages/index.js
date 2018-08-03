@@ -24,7 +24,7 @@ import getPathForSong from "../utils/getPathForSong";
 import { setUpAutoscroll } from "../utils/chordProParse";
 
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
-const { DROPBOX_PUBLIC_TOKEN } = publicRuntimeConfig;
+const { IS_DEV, DROPBOX_PUBLIC_TOKEN } = publicRuntimeConfig;
 
 const Dropbox = dropbox.Dropbox;
 
@@ -71,6 +71,17 @@ export default class IndexPage extends React.Component {
   }
 
   componentDidMount() {
+    if (!IS_DEV && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js")
+        .then(registration => {
+          console.log("service worker registration successful");
+        })
+        .catch(err => {
+          console.warn("service worker registration failed", err.message);
+        });
+    }
+
     const urlSearchParams = new URLSearchParams(window.location.search);
     const shareLink = urlSearchParams.get("share");
 
