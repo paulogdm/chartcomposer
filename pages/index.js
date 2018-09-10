@@ -70,7 +70,15 @@ export default class IndexPage extends React.Component {
     this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 1000);
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
+    if (window) {
+      // for console debugging
+      window.lodash = _;
+      window.localforage = localforage;
+    }
+
+    this.redirectToBareDomain();
+
     if (!IS_DEV && "serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/service-worker.js")
@@ -85,59 +93,54 @@ export default class IndexPage extends React.Component {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const shareLink = urlSearchParams.get("share");
 
-    this.redirectToBareDomain();
-
-    if (localStorage) {
-      let localState = {};
-      LOCAL_STORAGE_FIELDS.forEach(field => {
-        const localValue = localStorage.getItem(field);
-        if (localValue) {
-          localState[field] = JSON.parse(localValue);
-        }
-      });
-      console.log("componentDidMount localStorage", { localState });
-      this.setState(localState);
-
-      let accessToken = localStorage.getItem("db-access-token");
-      // Automatically sign a share-link visitor in as a guest
-      if (shareLink && !accessToken) {
-        accessToken = DROPBOX_PUBLIC_TOKEN;
+    let localState = {};
+    LOCAL_STORAGE_FIELDS.forEach(async field => {
+      const localValue = await localforage.getItem(field);
+      if (localValue) {
+        localState[field] = JSON.parse(localValue);
       }
-      if (accessToken) {
-        this.dbx = new Dropbox({ accessToken });
-        this.setState({
-          signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
-          smallScreenMode: this.getDefaultSmallScreenMode(),
-        });
-        if (window) {
-          // for console debugging
-          window.dbx = this.dbx;
-          window.lodash = _;
-        }
-        this.dbx.usersGetCurrentAccount().then(user => {
-          console.log({ user });
-          this.setState({ user });
-        });
+    });
+    console.log("componentDidMount", { localState });
+    this.setState(localState);
 
-        this.loadPreferencesFromDropbox();
-
-        // Sync the folder contents in the background in case there have
-        // been changes in the user's dropbox that are out of sync with local
-        // storage.
-        if (localState.folders) {
-          Object.keys(localState.folders).forEach(folderId => {
-            const folder = localState.folders[folderId];
-            console.log("Re-sync", { folder });
-            this.loadDropboxLink(folder.url, true);
-          });
-        }
-
-        if (shareLink) {
-          this.loadDropboxLink(shareLink, true);
-        }
-      }
-      this.setState({ componentDidMount: true });
+    let accessToken = await localforage.getItem("db-access-token");
+    // Automatically sign a share-link visitor in as a guest
+    if (shareLink && !accessToken) {
+      accessToken = DROPBOX_PUBLIC_TOKEN;
     }
+    if (accessToken) {
+      this.dbx = new Dropbox({ accessToken });
+      this.setState({
+        signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
+        smallScreenMode: this.getDefaultSmallScreenMode(),
+      });
+      if (window) {
+        // for console debugging
+        window.dbx = this.dbx;
+      }
+      this.dbx.usersGetCurrentAccount().then(user => {
+        console.log({ user });
+        this.setState({ user });
+      });
+
+      this.loadPreferencesFromDropbox();
+
+      // Sync the folder contents in the background in case there have
+      // been changes in the user's dropbox that are out of sync with local
+      // storage.
+      if (localState.folders) {
+        Object.keys(localState.folders).forEach(folderId => {
+          const folder = localState.folders[folderId];
+          console.log("Re-sync", { folder });
+          this.loadDropboxLink(folder.url, true);
+        });
+      }
+
+      if (shareLink) {
+        this.loadDropboxLink(shareLink, true);
+      }
+    }
+    this.setState({ componentDidMount: true });
 
     const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();
@@ -158,7 +161,7 @@ export default class IndexPage extends React.Component {
     }
 
     setUpAutoscroll();
-  }
+  };
 
   componentWillUnmount() {
     this.dbx = null;
@@ -172,9 +175,9 @@ export default class IndexPage extends React.Component {
       this.isNotFirstUpdate = true;
       return;
     }
-    LOCAL_STORAGE_FIELDS.forEach(field => {
+    LOCAL_STORAGE_FIELDS.forEach(async field => {
       if (!_.isEqual(this.state[field], nextState[field])) {
-        localStorage.setItem(field, JSON.stringify(nextState[field]));
+        await localforage.setItem(field, JSON.stringify(nextState[field]));
         console.log("updating local storage", {
           field,
           next: nextState[field],
@@ -354,7 +357,7 @@ export default class IndexPage extends React.Component {
           }
         });
 
-        // nuke any files that lingered in localStorage and aren't dirty.
+        // nuke any files that lingered in local storage and aren't dirty.
         Object.keys(songs).forEach(songId => {
           const song = songs[songId];
           if (idsOnDropbox.indexOf(songId) === -1) {
@@ -684,8 +687,8 @@ export default class IndexPage extends React.Component {
       });
   };
 
-  signOut = () => {
-    localStorage.clear();
+  signOut = async () => {
+    await localforage.clear();
     window.location.href = "/";
   };
 
@@ -708,7 +711,7 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-    //console.debug({ smallScreenMode });
+    console.debug("render", { componentDidMount, user });
     const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     const renderSongEditor =

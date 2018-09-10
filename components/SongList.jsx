@@ -144,6 +144,7 @@ const SongFolder = ({
 const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
   const padding = 10;
   const paddingLeft = padding + (folder ? 20 : 0);
+  console.debug({ songs });
   return (
     <ol
       style={{
@@ -169,7 +170,7 @@ const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
             paddingLeft,
           }}
         >
-          {removeExtension(song.name)}
+          <div>{removeExtension(song.name)}</div>
         </li>
       ))}
     </ol>

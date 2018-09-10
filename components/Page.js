@@ -1,4 +1,5 @@
 import { createOauthFlow } from "react-oauth-flow";
+import localforage from "localforage";
 
 import withSentry from "./withSentry";
 import Meta from "./Meta";
@@ -32,8 +33,8 @@ const { Sender, Receiver } = createOauthFlow({
 const SignInAsGuest = () => (
   <a
     href="/"
-    onClick={() => {
-      localStorage.setItem("db-access-token", DROPBOX_PUBLIC_TOKEN);
+    onClick={async () => {
+      await localforage.setItem("db-access-token", DROPBOX_PUBLIC_TOKEN);
       // href is "/" so letting default event go through here = refresh
     }}
   >

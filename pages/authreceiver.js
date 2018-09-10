@@ -1,12 +1,13 @@
 import React from "react";
 import Router from "next/router";
+import localforage from "localforage";
 
 import { Receiver } from "../components/Page";
 
 export default class AuthSuccessPage extends React.Component {
-  handleSuccess = accessToken => {
+  handleSuccess = async accessToken => {
     console.log("accessToken!", accessToken);
-    localStorage.setItem("db-access-token", accessToken);
+    await localforage.setItem("db-access-token", accessToken);
     Router.push("/");
   };
 
