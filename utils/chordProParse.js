@@ -242,6 +242,7 @@ function doBlock(type, closingdirectives) {
   gSong.parts.push(block);
 }
 
+// Break a line into its atomic, most granular parts.
 export function parseLine(line, capo = undefined) {
   let parsedLine = [];
   const matches = line.match(/(\[(.*?)\])|(\w+)/g) || [];
@@ -560,7 +561,11 @@ function doDirective(line) {
     case "image":
     case "x_pdf":
     case "x_url":
-      gSong.parts.push({ type: directive, lines: [parameters] });
+		// Extract each parameter and set it as a property on the "part".
+        var hPart = parseParameters(parameters);
+		hPart.type = directive;
+		hPart.lines = [parameters];
+      gSong.parts.push(hPart);
       break;
 
     case "define":
@@ -620,12 +625,6 @@ function doDirective(line) {
     case "col":
 
     // Custom directives
-    case "x_url":
-    case "x_youtube_url":
-      console.warn(
-        'Warning: Directive "' + directive + '" is not supported currently.',
-      );
-      break;
     case "tabfont":
     case "tabsize":
     case "tabcolour":
