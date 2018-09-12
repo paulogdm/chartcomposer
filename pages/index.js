@@ -331,6 +331,11 @@ export default class IndexPage extends React.Component {
   };
 
   loadFilesFromDropboxFolder = (folderId, isCheckForChanges = false) => {
+    const folder = this.state.folders[folderId];
+    if (!folder) {
+      console.error("no folder for", folderId);
+      return;
+    }
     const url = this.state.folders[folderId].url;
     console.log("loadFilesFromDropboxFolder", { url });
     if (!url) {

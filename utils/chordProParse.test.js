@@ -27,3 +27,13 @@ test("parseLine with capo", () => {
     { type: "chord", originalChord: "A#", text: "B#" },
   ]);
 });
+
+test("parseLine with punctuation", () => {
+  expect(parseLine(`[C]Make's[A#] me "sweat!"`, 2)).toEqual([
+    { type: "chord", originalChord: "C", text: "D" },
+    { type: "word", text: "Make's" },
+    { type: "chord", originalChord: "A#", text: "B#" },
+    { type: "word", text: "me" },
+    { type: "word", text: '"sweat!"' },
+  ]);
+});

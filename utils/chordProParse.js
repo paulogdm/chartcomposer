@@ -52,7 +52,7 @@ export default function chordProParse(value, preferences) {
 
 var giLine; // the current line number being parsed
 var gaLines; // the array of lines
-export function parseChordProString(text, preferences) {
+export function parseChordProString(text, preferences = {}) {
   gSong = { parts: [] };
 
   Object.keys(preferences).forEach(name => {
@@ -242,12 +242,15 @@ function doBlock(type, closingdirectives) {
   gSong.parts.push(block);
 }
 
+const CHORD_RE = /\[(.*?)\]/;
+const CHORD_OR_WORD_RE = /(\[(.*?)\])|([\w\.\,\!\"\']+)/g;
+
 // Break a line into its atomic, most granular parts.
 export function parseLine(line, capo = undefined) {
   let parsedLine = [];
-  const matches = line.match(/(\[(.*?)\])|(\w+)/g) || [];
+  const matches = line.match(CHORD_OR_WORD_RE) || [];
   matches.forEach(chordOrWord => {
-    const matchesIfChord = chordOrWord.match(/\[(.*?)\]/);
+    const matchesIfChord = chordOrWord.match(CHORD_RE);
     if (matchesIfChord) {
       const originalChord = matchesIfChord[1];
       let text = originalChord;
@@ -561,10 +564,10 @@ function doDirective(line) {
     case "image":
     case "x_pdf":
     case "x_url":
-		// Extract each parameter and set it as a property on the "part".
-        var hPart = parseParameters(parameters);
-		hPart.type = directive;
-		hPart.lines = [parameters];
+      // Extract each parameter and set it as a property on the "part".
+      var hPart = parseParameters(parameters);
+      hPart.type = directive;
+      hPart.lines = [parameters];
       gSong.parts.push(hPart);
       break;
 
