@@ -36,6 +36,11 @@ export default function textToChordPro(text) {
   text = text.replace(/\[Chorus 3\]/gi, "{comment: Chorus 3}");
   text = text.replace(/\[Bridge\]/gi, "{comment: Bridge}");
   text = text.replace(/\[Interlude\]/gi, "{comment: Interlude}");
+  
+  // found songs that used this convention for chords: [ch]G[/ch]
+  text = text.replace(/\[ch\]/gi, "");
+  text = text.replace(/\[\/ch\]/gi, "");
+
 
   // actually convert line-by-line
   var aLines = text.split("\n");
