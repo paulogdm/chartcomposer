@@ -30,13 +30,19 @@ export default function textToChordPro(text) {
   text = text.replace(/\[Verse 1\]/gi, "{comment: Verse 1}");
   text = text.replace(/\[Verse 2\]/gi, "{comment: Verse 2}");
   text = text.replace(/\[Verse 3\]/gi, "{comment: Verse 3}");
+  text = text.replace(/\[Verse 4\]/gi, "{comment: Verse 4}");
+  text = text.replace(/\[Verse 5\]/gi, "{comment: Verse 5}");
+  text = text.replace(/\[Verse 6\]/gi, "{comment: Verse 6}");
   text = text.replace(/\[Chorus\]/gi, "{comment: Chorus}");
   text = text.replace(/\[Chorus 1\]/gi, "{comment: Chorus 1}");
   text = text.replace(/\[Chorus 2\]/gi, "{comment: Chorus 2}");
   text = text.replace(/\[Chorus 3\]/gi, "{comment: Chorus 3}");
+  text = text.replace(/\[Chorus 4\]/gi, "{comment: Chorus 4}");
+  text = text.replace(/\[Chorus 5\]/gi, "{comment: Chorus 5}");
+  text = text.replace(/\[Chorus 6\]/gi, "{comment: Chorus 6}");
   text = text.replace(/\[Bridge\]/gi, "{comment: Bridge}");
   text = text.replace(/\[Interlude\]/gi, "{comment: Interlude}");
-  
+
   // found songs that used this convention for chords: [ch]G[/ch]
   text = text.replace(/\[ch\]/gi, "");
   text = text.replace(/\[\/ch\]/gi, "");
