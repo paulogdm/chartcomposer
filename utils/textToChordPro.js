@@ -70,7 +70,17 @@ export default function textToChordPro(text) {
         }
       }
     } else {
-      newLines.push(line.trim());
+		var matches;
+		if ( matches = line.match(/capo.*?([1-9])/i) ) {
+			newLines.push("{capo: " + matches[1] + "}");
+			// if the line did not start with "capo" then echo it as it might have other info
+			if ( 0 !== line.toLowerCase().indexOf("capo") ) {
+				newLines.push(line.trim());
+			}
+		}
+		else {
+			newLines.push(line.trim());
+		}
     }
   }
 
