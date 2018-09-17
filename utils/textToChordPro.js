@@ -70,13 +70,9 @@ export default function textToChordPro(text) {
         }
       }
     } else {
-		var matches;
-		if ( matches = line.match(/capo.*?([1-9])/i) ) {
-			newLines.push("{capo: " + matches[1] + "}");
-			// if the line did not start with "capo" then echo it as it might have other info
-			if ( 0 !== line.toLowerCase().indexOf("capo") ) {
-				newLines.push(line.trim());
-			}
+		var capoLine = getCapoLine(line);
+		if ( capoLine ) {
+			newLines.push(capoLine);
 		}
 		else {
 			newLines.push(line.trim());
@@ -93,11 +89,66 @@ export default function textToChordPro(text) {
   return newLines.join("\n");
 }
 
+
+// If the line appears to declare a capo, convert it to a capo directive.
+function getCapoLine(line) {
+	var lineUC = line.replace(/capo/i, "CAPO"); // do this for roman numerals later
+	var matches;
+
+	if ( -1 === lineUC.indexOf("CAPO") ) {
+		// bail - no capo in this line
+		return null;
+	}
+
+	if ( matches = lineUC.match(/CAPO.*?([1-9])/) ) {
+		// matches "capo: 5" as well as "put capo on 5th fret" 
+		return "{capo: " + matches[1] + "}";
+	}
+
+	// match ordinals
+	else if ( matches = lineUC.match(/CAPO.*?first/) ) {
+		return "{capo: 1}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?second/) ) {
+		return "{capo: 2}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?third/) ) {
+		return "{capo: 3}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?fourth/) ) {
+		return "{capo: 4}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?fifth/) ) {
+		return "{capo: 5}";
+	}
+
+	// match roman numerals
+	else if ( matches = lineUC.match(/CAPO.*?V/) ) {
+		return "{capo: 5}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?IV/) ) {
+		return "{capo: 4}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?III/) ) {
+		return "{capo: 3}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?II/) ) {
+		return "{capo: 2}";
+	}
+	else if ( matches = lineUC.match(/CAPO.*?I/) ) {
+		return "{capo: 1}";
+	}
+
+	return null;
+}
+
 // We assume chords are uppercase, so we search for lowercase letters in the line.
 // Chords can have the following lowercase letters: b, dim, sus, add, m, aug, maj.
 // So we search for lower case letters _not_ in that list.
 function isLineAllChords(line) {
-  return !line.match(/[elnoprtw]/) && line.match(/[A-G]/);
+	return !line.match(/[elnoprtw]/) // can not have these lowercase letters
+		&& !line.match(/[LNOPRTW]/)  // can not have these uppercase letters (some people type all uppercase!)
+		&& line.match(/[A-G]/);      // _must_ have at least one chord
 }
 
 // The line has nothing but chords so just wrap them with square brackets.
