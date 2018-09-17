@@ -7,7 +7,7 @@ export default function chordProParse(value, preferences) {
   // Get a list of all chords in this line before we start modifying the line.
   var hChords = {}; // reset
   var matches;
-  if ((matches = value.match(/\[([^\/|]*?)\]/g))) {
+  if ((matches = value.match(/\[([a-gA-G][^\/|]*?)\]/g))) {
     for (var c = 0; c < matches.length; c++) {
       var sChord = matches[c]
         .replace("[", "")
@@ -325,11 +325,13 @@ const colorOptions = [
 const ghChords = {
   uke: {
     Ab: ["4 2 3 2"],
+    Ab7: ["1 3 2 3"],
     A: ["2 1 0 0"],
     Am: ["2 0 0 0"],
     Am7: ["0 0 0 0"],
     A7: ["0 1 0 0"],
     A7sus4: ["0 2 0 0"],
+    A9: ["2 1 3 2", "2 1 4 3"],
     Bb: ["3 2 1 1"],
     Bbm: ["3 1 1 1"],
     B: ["4 3 2 2"],
@@ -338,6 +340,7 @@ const ghChords = {
     C: ["0 0 0 3", "0 0 0 3"],
     //C: ["5 4 3 3", "3 2 1 1", 3],
     C7: ["0 0 0 1"],
+    C9: ["3 0 0 1"],
     Cmaj7: ["0 0 0 2"],
     Cm: ["0 3 3 3"],
     "C#": ["1 1 1 4"],
@@ -345,11 +348,15 @@ const ghChords = {
     "C#m": ["1 1 0 0"],
     Dbm: ["1 1 0 0"],
     D: ["2 2 2 0"],
+    Dsus4: ["0 2 3 0"],
     Dm: ["2 2 1 0"],
     Dm7: ["2 2 1 3"],
+    Dm9: ["5 4 1 5", "3 2 1 4"],
     D7: ["2 2 2 3"],
     Eb: ["3 3 3 1"],
+    Ebmaj7: ["3 3 3 5"],
     E: ["1 4 0 2"],
+    E7: ["1 2 0 2"],
     Em: ["0 4 3 2"],
     F: ["2 0 1 0"],
     F7: ["2 3 1 3"],
@@ -357,6 +364,7 @@ const ghChords = {
     Gbm: ["2 1 2 0"],
     G: ["0 2 3 2"],
     G7: ["0 2 1 2"],
+    Gm7: ["0 2 1 1"],
     "G#m": ["4 3 4 2"],
     Abm: ["4 3 4 2"],
   },
@@ -1141,7 +1149,7 @@ function transpose(sChord, sSteps) {
   var sNewChord = "";
   if ("undefined" !== ghSteps[sChord]) {
     var hChord = ghSteps[sChord];
-    if ("undefined" !== hChord[sSteps]) {
+    if (hChord && "undefined" !== hChord[sSteps]) {
       sNewChord = hChord[sSteps];
     }
   }
