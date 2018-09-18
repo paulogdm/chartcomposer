@@ -71,7 +71,7 @@ const Header = ({
           paddingTop: 0,
         }}
       >
-        {title ? title : "ChartComposer =)"}
+        {title ? title : "ChartComposer"}
       </h1>
     </div>
 
