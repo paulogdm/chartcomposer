@@ -144,7 +144,7 @@ const SongFolder = ({
 const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
   const padding = 10;
   const paddingLeft = padding + (folder ? 20 : 0);
-  console.debug({ songs });
+  //console.debug({ songs });
   return (
     <ol
       style={{

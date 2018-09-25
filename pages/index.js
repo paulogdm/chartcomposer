@@ -15,6 +15,7 @@ import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
 import Page from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
+import ServiceWorker from "../components/ServiceWorker";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
 import SongView from "../components/SongView";
@@ -24,7 +25,7 @@ import getPathForSong from "../utils/getPathForSong";
 import { setUpAutoscroll } from "../utils/chordProParse";
 
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
-const { IS_DEV, DROPBOX_PUBLIC_TOKEN } = publicRuntimeConfig;
+const { DROPBOX_PUBLIC_TOKEN } = publicRuntimeConfig;
 
 const Dropbox = dropbox.Dropbox;
 
@@ -78,17 +79,6 @@ export default class IndexPage extends React.Component {
     }
 
     this.redirectToBareDomain();
-
-    if (!IS_DEV && "serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .then(registration => {
-          console.log("service worker registration successful");
-        })
-        .catch(err => {
-          console.warn("service worker registration failed", err.message);
-        });
-    }
 
     const urlSearchParams = new URLSearchParams(window.location.search);
     const shareLink = urlSearchParams.get("share");
@@ -716,7 +706,7 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-    console.debug("render", { componentDidMount, user });
+    //console.debug("render", { componentDidMount, user });
     const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     const renderSongEditor =
@@ -744,6 +734,7 @@ export default class IndexPage extends React.Component {
     }
     return (
       <Page>
+        <ServiceWorker />
         <style jsx global>{`
           html,
           body {

@@ -8,6 +8,7 @@ export default () => (
       />
       <meta charSet="utf-8" />
       <link rel="stylesheet" href="/static/bootstrap.min.css" />
+      <link rel="manifest" href="/static/manifest.json" />
     </Head>
     <style jsx global>{`
       body {
