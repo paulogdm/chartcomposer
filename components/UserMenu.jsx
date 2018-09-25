@@ -54,7 +54,7 @@ export default class UserMenu extends React.Component {
           <img
             alt=""
             src={user.profile_photo_url || "/static/notes.png"}
-            style={{ height: 30 }}
+            style={{ height: 30, width: 30 }}
           />
         </div>
         {isOpen ? (

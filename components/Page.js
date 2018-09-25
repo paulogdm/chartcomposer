@@ -1,3 +1,4 @@
+import React from "react";
 import { createOauthFlow } from "react-oauth-flow";
 import localforage from "localforage";
 
@@ -19,6 +20,17 @@ export default withSentry(({ children }) => (
     {children}
   </div>
 ));
+
+class HideTheMobileScrollbar extends React.PureComponent {
+  componentDidMount() {
+    window.setTimeout(() => {
+      window.scrollTo(0, 1);
+    }, 1000);
+  }
+  render() {
+    return null;
+  }
+}
 
 const { Sender, Receiver } = createOauthFlow({
   authorizeUrl: "https://www.dropbox.com/oauth2/authorize",

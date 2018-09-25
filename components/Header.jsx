@@ -119,10 +119,10 @@ const Header = ({
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
                 src="/static/notes.png"
-                height={20}
-                width={20}
                 alt=""
                 style={{
+                  height: 20,
+                  width: 20,
                   marginRight: 5,
                 }}
               />

@@ -27,7 +27,7 @@ module.exports = {
     config.plugins.push(
       new WebpackPwaManifest({
         name: "ChartComposer",
-        short_name: "ChartComposer",
+        short_name: "CC",
         description:
           "ChartComposer lets you create and share sheet music with your friends.",
         background_color: "#ffffff",
