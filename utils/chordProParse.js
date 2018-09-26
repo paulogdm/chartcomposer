@@ -1,13 +1,13 @@
-var gaChords;
+var gaSongChords;
 var gSong; // the song object is a global
 
-export default function chordProParse(value, preferences) {
-  gSong = parseChordProString(value, preferences);
+export default function chordProParse(chordprotext, preferences) {
+  gSong = parseChordProString(chordprotext, preferences);
 
   // Get a list of all chords in this line before we start modifying the line.
   var hChords = {}; // reset
   var matches;
-  if ((matches = value.match(/\[([a-gA-G][^\/|]*?)\]/g))) {
+  if ((matches = chordprotext.match(/\[([a-gA-G][^\/|]*?)\]/g))) {
     for (var c = 0; c < matches.length; c++) {
       var sChord = matches[c]
         .replace("[", "")
@@ -16,7 +16,7 @@ export default function chordProParse(value, preferences) {
       hChords[sChord] = 1;
     }
   }
-  gaChords = Object.keys(hChords);
+  gaSongChords = Object.keys(hChords);
 
   var sHtml = exportHtml(gSong);
   var sTextSize =
@@ -322,7 +322,7 @@ const colorOptions = [
   { label: "Blue", value: "blue" },
   { label: "Green", value: "green" },
 ];
-const ghChords = {
+const ghChordLibrary = {
   uke: {
     Ab: ["4 2 3 2"],
     Ab7: ["1 3 2 3"],
@@ -730,58 +730,11 @@ function exportHtml(song) {
   aResults.push("</div>");
 
   // chord diagrams
-  if ("none" !== song.x_diagramposition && ghChords[song.x_instrument]) {
-    var hChords = ghChords[song.x_instrument];
-    // add "define" chords
-    for (var chordname in song.hChords) {
-      hChords[chordname] = song.hChords[chordname];
-    }
-    var sChordDiagrams =
-      "<div class=chorddiagrams" +
-      ("right" === song.x_diagramposition
-        ? " style='float: right; width: 100px;'"
-        : "") + // TODO - better width
-      ">";
-    for (var c = 0; c < gaChords.length; c++) {
-      var chord = gaChords[c];
-      var sChord =
-        "<div class=chord" +
-        song.x_diagramsize +
-        "> <div class=name>" +
-        chord +
-        "</div>";
-      if (hChords[chord]) {
-        sChord += "<div class=diagram>";
-        var aChord = hChords[chord];
-        var aFrets = aChord[0].split(" ");
-        for (var f = 0; f < aFrets.length; f++) {
-          //aFrets[f] = parseInt(aFrets[f]);
-        }
-        var maxFret = Math.max(...aFrets);
-        maxFret = Math.max(maxFret, 3); // draw at least 3 frets
-        var baseFret =
-          "undefined" === typeof aChord[2] ? 1 : parseInt(aChord[2]);
-        var fingers = "";
-        for (var curFret = baseFret; curFret <= maxFret; curFret++) {
-          sChord += "<div class=bar>";
-          for (var f = 0; f < aFrets.length; f++) {
-            sChord +=
-              "<div class=fret>" +
-              (curFret === baseFret && baseFret != 1 && f === 0
-                ? "<div class=basefret>" + baseFret + "</div>"
-                : "") +
-              (curFret == aFrets[f] ? "<div class=note></div>" : "") +
-              "</div>";
-          }
-          sChord += "</div>";
-        }
-        sChord += "</div>"; // diagram
-      }
-      sChord += "</div>"; // chord
-      sChordDiagrams += sChord;
-    }
-    sChordDiagrams += '</div><div style="clear: both;"></div>'; // TODO - need clear both?
-    if ("top" === song.x_diagramposition) {
+  if ( "none" !== song.x_diagramposition &&   // "diagrams" is enabled
+	   ghChordLibrary[song.x_instrument] ) {        // we have chords for the chosen instrument
+	  var sChordDiagrams = getChordDiagrams(song);
+
+    if (sChordDiagrams && "top" === song.x_diagramposition) {
       aResults.push(sChordDiagrams);
     }
   }
@@ -791,12 +744,93 @@ function exportHtml(song) {
     aResults.push(exportHtmlPart(song.parts, i));
   }
   aResults.push("</div>");
-  if ("right" === song.x_diagramposition) {
+  if (sChordDiagrams && "right" === song.x_diagramposition) {
     aResults.push(sChordDiagrams);
   }
 
   return aResults.join("\n");
 }
+
+
+function getChordDiagrams(song) {
+	if ( ! ghChordLibrary[song.x_instrument] ) {
+		// we do not have chords for the chosen instrument
+		return "";
+	}
+
+	// collect the HTML for each chord diagram
+    var sChordDiagrams = "";
+    for (var c = 0; c < gaSongChords.length; c++) {
+      var chord = gaSongChords[c];
+	  sChordDiagrams += getChordDiagram(chord, song);
+    }
+
+	sChordDiagrams = "<div class=chorddiagrams" +
+		("right" === song.x_diagramposition ? " style='float: right; width: 100px;'" : "") + // TODO - better width
+		">" +
+		sChordDiagrams +
+		'</div><div style="clear: both;"></div>'; // TODO - need clear both?
+
+	return sChordDiagrams;
+}
+
+// chord - a string ex "A", "Gbm"
+// We need song to know the instrument and any custom-defined chords for the song,
+// plus prefs like size and position.
+function getChordDiagram(chord, song) {
+	if ( ! ghChordLibrary[song.x_instrument] ) {
+		// we do not have chords for the chosen instrument
+		return "";
+	}
+
+	var hChordLibraryForInstrument = ghChordLibrary[song.x_instrument]; // chords for this instrument
+
+    // add "define" chords in this song
+    for (var chordname in song.hChords) {
+      hChordLibraryForInstrument[chordname] = song.hChords[chordname];
+    }
+
+	if ( ! hChordLibraryForInstrument[chord] ) {
+		// we do not have this chord in the library
+		// TODO - return a blank diagram - at last the user could fill it out
+		return "";
+	}
+
+	// chord name header
+	var sChord = "<div class=name>" + chord + "</div>";
+
+	// start the actual diagram
+	sChord += "<div class=diagram>";
+	var aChord = hChordLibraryForInstrument[chord];
+	var aFrets = aChord[0].split(" ");
+	for (var f = 0; f < aFrets.length; f++) {
+		//aFrets[f] = parseInt(aFrets[f]);
+	}
+
+	var maxFret = Math.max(...aFrets);
+	maxFret = Math.max(maxFret, 3); // draw at least 3 frets
+	var baseFret = ( "undefined" === typeof aChord[2] ? 1 : parseInt(aChord[2]) );
+	var fingers = "";
+	for (var curFret = baseFret; curFret <= maxFret; curFret++) {
+		sChord += "<div class=bar>";
+		for (var f = 0; f < aFrets.length; f++) {
+            sChord +=
+				"<div class=fret>" +
+				(curFret === baseFret && baseFret != 1 && f === 0
+				 ? "<div class=basefret>" + baseFret + "</div>"
+				 : "") +
+				(curFret == aFrets[f] ? "<div class=note></div>" : "") +
+				"</div>";
+		}
+		sChord += "</div>";
+	}
+	sChord += "</div>"; // close the diagram
+
+	var sChord = "<div class=chord" + song.x_diagramsize + "> " + sChord + "</div>";
+
+	return sChord;
+}
+
 
 function exportHtmlPart(aParts, i) {
   var aResults = [];
