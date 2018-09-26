@@ -56,7 +56,7 @@ export default class IndexPage extends React.Component {
       preferences: defaultPreferences,
       preferencesOpen: false,
       saving: false,
-      smallScreenMode: null,
+      smallScreenMode: this.getDefaultSmallScreenMode(),
       resizerPosition: { x: 0, y: 0 },
       songListClosed: false,
       songEditorClosed: false,
@@ -77,8 +77,6 @@ export default class IndexPage extends React.Component {
       window.lodash = _;
       window.localforage = localforage;
     }
-
-    this.redirectToBareDomain();
 
     const urlSearchParams = new URLSearchParams(window.location.search);
     const shareLink = urlSearchParams.get("share");
@@ -228,6 +226,9 @@ export default class IndexPage extends React.Component {
   };
 
   getDefaultSmallScreenMode() {
+    if (!this.state || !window) {
+      return null;
+    }
     let smallScreenMode = this.state.smallScreenMode;
     if (window.innerWidth <= 768 && smallScreenMode === null) {
       smallScreenMode = this.dbx ? "SongList" : "PromoCopy";
@@ -612,14 +613,6 @@ export default class IndexPage extends React.Component {
     document.body.appendChild(msgbox);
   };
 
-  redirectToBareDomain = () => {
-    var href = document.location.href;
-    if (-1 !== href.indexOf("www.chartcomposer.com")) {
-      // Redirect to bare domain.
-      document.location = "https://chartcomposer.com/";
-    }
-  };
-
   removeFolder = folderId => {
     let folders = { ...this.state.folders };
     delete folders[folderId];
@@ -658,7 +651,7 @@ export default class IndexPage extends React.Component {
   updatePreferences = preferences => {
     this.setState({ preferences });
     if (this.state.signedInAsGuest) {
-      console.debug("Bail updatePreferences for guests");
+      console.debug("Bail saving updatePreferences for guests");
       return;
     }
     const filesCommitInfo = {

@@ -126,7 +126,6 @@ const Header = ({
                 alt=""
                 style={{
                   height: 20,
-                  width: 20,
                   marginRight: 5,
                 }}
               />

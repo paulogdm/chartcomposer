@@ -5,6 +5,7 @@ import localforage from "localforage";
 import withSentry from "./withSentry";
 import Meta from "./Meta";
 import Footer from "./Footer";
+import RedirectToBareDomain from "./RedirectToBareDomain";
 import ServiceWorker from "./ServiceWorker";
 
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
@@ -18,6 +19,7 @@ const {
 export default withSentry(({ children }) => (
   <div>
     <Meta />
+    <RedirectToBareDomain />
     <ServiceWorker />
     {children}
   </div>

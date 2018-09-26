@@ -52,7 +52,6 @@ export default class Preferences extends React.Component {
       nextProps.preferences &&
       !_.isEqual(this.state.preferences, nextProps.preferences)
     ) {
-      console.log("preferences componentWillReceiveProps", { preferences });
       this.setState({ preferences: { ...nextProps.preferences } });
     }
   }
@@ -96,7 +95,7 @@ export default class Preferences extends React.Component {
         [e.target.name]: e.target.value,
       },
     };
-    console.log("onClickSave", { preferences });
+    console.debug("Preferences.onClickSave", { preferences });
     this.props.updatePreferences(preferences);
   };
 
