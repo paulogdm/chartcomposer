@@ -22,6 +22,7 @@ import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 import getPathForSong from "../utils/getPathForSong";
 import { setUpAutoscroll } from "../utils/chordProParse";
+import { APP_NAME } from "../utils/constants";
 
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
 const { DROPBOX_PUBLIC_TOKEN } = publicRuntimeConfig;
@@ -1014,7 +1015,7 @@ const PromoCopy = () => (
       fontSize: "1.2em",
     }}
   >
-    <h1>Welcome to ChartComposer!</h1>
+    <h1>Welcome to {APP_NAME}!</h1>
     <ul
       style={{
         listStyleType: "none",

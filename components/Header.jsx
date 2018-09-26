@@ -1,6 +1,8 @@
 import { Button } from "react-bootstrap";
+
 import { Sender, SignInAsGuest } from "../components/Page";
 import UserMenu from "../components/UserMenu";
+import { APP_NAME } from "../utils/constants";
 
 const Header = ({
   className,
@@ -18,9 +20,11 @@ const Header = ({
     className={className}
     style={{
       alignItems: "center",
+      boxSizing: "border-box",
       display: "flex",
       justifyContent: "space-between",
       padding: "5px 10px",
+      width: "100%",
     }}
   >
     <style jsx>{`
@@ -71,7 +75,7 @@ const Header = ({
           paddingTop: 0,
         }}
       >
-        {title ? title : "ChartComposer"}
+        {title ? title : APP_NAME}
       </h1>
     </div>
 

@@ -23,17 +23,6 @@ export default withSentry(({ children }) => (
   </div>
 ));
 
-class HideTheMobileScrollbar extends React.PureComponent {
-  componentDidMount() {
-    window.setTimeout(() => {
-      window.scrollTo(0, 1);
-    }, 1000);
-  }
-  render() {
-    return null;
-  }
-}
-
 const { Sender, Receiver } = createOauthFlow({
   authorizeUrl: "https://www.dropbox.com/oauth2/authorize",
   tokenUrl: "https://api.dropbox.com/oauth2/token",

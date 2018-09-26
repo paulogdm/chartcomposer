@@ -13,19 +13,32 @@ class ServiceWorker extends PureComponent {
     }
     this.installPromptEvent = null;
     window.addEventListener("beforeinstallprompt", this.installPrompt);
+    window.addEventListener("click", this.onClickShowInstallPrompt);
   }
 
   componentWillUnmount() {
     this.installPromptEvent = null;
-    window.removeEventListener("beforeinstallprompt", this.installPrompt);
+    window.removeEventListener(
+      "beforeinstallprompt",
+      this.onBeforeInstallPrompt,
+    );
+    window.removeEventListener("click", this.onClickShowInstallPrompt);
   }
 
-  installPrompt = e => {
+  onBeforeInstallPrompt = e => {
     console.debug("got beforeinstallprompt!");
     // Prevent Chrome <= 67 from automatically showing the prompt
     e.preventDefault();
     // Stash the event so it can be triggered later.
     this.installPromptEvent = e;
+  };
+
+  onClickShowInstallPrompt = e => {
+    console.debug("onClickShowInstallPrompt", this.installPromptEvent);
+    if (!this.installPromptEvent) {
+      return;
+    }
+    window.removeEventListener("click", this.onClickShowInstallPrompt);
     this.installPromptEvent.prompt();
     this.installPromptEvent.userChoice.then(choice => {
       if (choice.outcome === "accepted") {

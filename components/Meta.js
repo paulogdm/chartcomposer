@@ -1,12 +1,14 @@
 import Head from "next/head";
 
+import { APP_NAME } from "../utils/constants";
+
 export default () => (
   <div>
     <Head>
-      <title>ChartComposer</title>
+      <title>{APP_NAME}</title>
       <meta
         name="Description"
-        content="ChartComposer lets you create and share sheet music with your friends."
+        content={`${APP_NAME} lets you create and share sheet music with your friends.`}
       />
       <meta
         name="viewport"

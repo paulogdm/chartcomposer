@@ -7,6 +7,7 @@ import _ from "lodash";
 import Header from "../components/Header";
 import Page from "../components/Page";
 import blobToText from "../utils/blobToText";
+import { APP_NAME } from "../utils/constants";
 
 export default class IndexPage extends React.Component {
   constructor(props) {
@@ -20,6 +21,7 @@ export default class IndexPage extends React.Component {
       <Page>
         <div
           style={{
+            alignItems: "center",
             display: "flex",
             flexDirection: "column",
           }}
@@ -28,7 +30,7 @@ export default class IndexPage extends React.Component {
             className="header"
             smallScreenMode={null} // need this to hide "View" button
             nologin={true}
-            title={"ChartComposer Help"}
+            title={`${APP_NAME} > Help`}
           />
           <div style={{ display: "flex", flex: 1 }}>
             <div
@@ -39,9 +41,9 @@ export default class IndexPage extends React.Component {
               }}
             >
               <p>
-                ChartComposer lets you create and share sheet music with your
-                friends. Here are some instructions and tips for helping you use
-                ChartComposer.
+                {APP_NAME} lets you create and share sheet music with your
+                friends. Here are some instructions and tips for helping you use{" "}
+                {APP_NAME}.
               </p>
               <ul>
                 <li>
@@ -90,7 +92,7 @@ export default class IndexPage extends React.Component {
               <iframe
                 height="315"
                 src="https://www.youtube.com/embed/P50ialcr7TQ"
-                frameborder="0"
+                frameBorder="0"
                 allow="autoplay; encrypted-media"
                 allowFullScreen
                 style={{ minWidth: 380, maxWidth: 560 }}
@@ -102,7 +104,7 @@ export default class IndexPage extends React.Component {
 
               <h3 id="guest-mode">Guest mode</h3>
               <p>
-                You can take a quick look at ChartComposer by going to{" "}
+                You can take a quick look at {APP_NAME} by going to{" "}
                 <a href="https://chartcomposer.com">
                   https://chartcomposer.com
                 </a>{" "}
@@ -121,7 +123,7 @@ export default class IndexPage extends React.Component {
               <p>
                 In guest mode you're relying on other users to create songs and
                 share them with you. For example, your bandmate or music teacher
-                can share their ChartComposer folder link with you. You can just
+                can share their {APP_NAME} folder link with you. You can just
                 click the link to go directly into their folder. See{" "}
                 <a href="sharing">Sharing</a> to learn more about shared folder
                 links.
@@ -130,13 +132,13 @@ export default class IndexPage extends React.Component {
               <h3 id="signedin-mode">Signed-in mode</h3>
               <p>
                 If you'd like to create and edit songs, you need to click "Sign
-                in". This will display the Dropbox login form which gives
-                ChartComposer the ability to access your songs in Dropbox.
-                ChartComposer only works with Dropbox. We chose this approach
+                in". This will display the Dropbox login form which gives{" "}
+                {APP_NAME} the ability to access your songs in Dropbox.{" "}
+                {APP_NAME} only works with Dropbox. We chose this approach
                 because many musicians already have their songs in Dropbox. It
                 also gives our users the confidence that no matter what happens
-                to ChartComposer, their songs will always be accessible in
-                Dropbox. If you don't have a Dropbox account, you can{" "}
+                to {APP_NAME}, their songs will always be accessible in Dropbox.
+                If you don't have a Dropbox account, you can{" "}
                 <a href="https://www.dropbox.com/">create one for free</a>.
               </p>
 
@@ -144,9 +146,9 @@ export default class IndexPage extends React.Component {
                 Sharing
               </h2>
               <p>
-                It's easy to share song folders from ChartComposer. You can
-                choose to give other people <b>View-only</b> access to your song
-                folder or <b>Edit</b> access.
+                It's easy to share song folders from {APP_NAME}. You can choose
+                to give other people <b>View-only</b> access to your song folder
+                or <b>Edit</b> access.
               </p>
 
               <p id="view-only-access">
@@ -166,7 +168,7 @@ export default class IndexPage extends React.Component {
                 </a>
                 . Note that for someone to be able to edit your songs they must
                 have a Dropbox account. When you add them to your Dropbox
-                folder, they can open that folder in ChartComposer by using the
+                folder, they can open that folder in {APP_NAME} by using the
                 "Choose a folder on Dropbox" icon at the top of the Songs list.
               </p>
 
@@ -185,14 +187,14 @@ export default class IndexPage extends React.Component {
                 Editing Songs
               </h2>
               <p>
-                ChartComposer requires that songs be written in ChordPro format.
+                {APP_NAME} requires that songs be written in ChordPro format.
                 <a href="http://www.chordpro.org/">ChordPro</a> is the closest
                 thing the sheet music industry has for a "standard". There are
-                other popular formats, but they're generally proprietary.
-                ChartComposer parses and displays ChordPro files (.pro, .crd,
-                .cho, .chopro, .chordpro, &amp; .txt). Using ChordPro means you
-                can take your songs to other websites that support ChordPro if
-                you want.
+                other popular formats, but they're generally proprietary.{" "}
+                {APP_NAME} parses and displays ChordPro files (.pro, .crd, .cho,
+                .chopro, .chordpro, &amp; .txt). Using ChordPro means you can
+                take your songs to other websites that support ChordPro if you
+                want.
               </p>
 
               <p>
@@ -250,7 +252,7 @@ export default class IndexPage extends React.Component {
                 </pre>
               </div>
 
-              <p>Here's what that ChordPro text looks like in ChartComposer:</p>
+              <p>Here's what that ChordPro text looks like in {APP_NAME}:</p>
               <div
                 style={{
                   border: "1px solid",
@@ -264,12 +266,12 @@ export default class IndexPage extends React.Component {
               <h3 id="chordpro-directives">ChordPro Directives</h3>
               <p>
                 There are about 50 ChordPro directives (the commands inside the
-                curly brackets). You can see all the ChordPro directives
+                curly brackets). You can see all the ChordPro directives{" "}
                 <a href="http://www.chordpro.org/chordpro/ChordPro-Directives.html">
                   here
                 </a>
-                . This is the list of ChordPro directives supported by
-                ChartComposer.
+                . This is the list of ChordPro directives supported by{" "}
+                {APP_NAME}.
               </p>
 
               <ul>
@@ -338,7 +340,7 @@ export default class IndexPage extends React.Component {
                 </li>
               </ul>
 
-              <p>ChartComposer adds the following custom directives:</p>
+              <p>{APP_NAME} adds the following custom directives:</p>
               <ul>
                 <li>
                   <code>
@@ -374,7 +376,7 @@ export default class IndexPage extends React.Component {
               </div>
 
               <div style={{ fontWeight: "bold" }}>
-                Q: Do I have to have a Dropbox account to use ChartComposer?
+                Q: Do I have to have a Dropbox account to use {APP_NAME}?
               </div>
               <div style={{ marginBottom: "1em" }}>
                 A: No. You can login as "Guest" and open shared folder links

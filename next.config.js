@@ -3,6 +3,9 @@ const path = require("path");
 const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
 const WebpackPwaManifest = require("webpack-pwa-manifest");
 
+// TODO: how to import from utils/constants?
+const APP_NAME = "ChartComposer";
+
 module.exports = {
   publicRuntimeConfig: {
     // Will be available on both server and client
@@ -26,10 +29,9 @@ module.exports = {
     );
     config.plugins.push(
       new WebpackPwaManifest({
-        name: "ChartComposer",
+        name: APP_NAME,
         short_name: "CC",
-        description:
-          "ChartComposer lets you create and share sheet music with your friends.",
+        description: `${APP_NAME} lets you create and share sheet music with your friends.`,
         background_color: "#ffffff",
         theme_color: "#eeeeee",
         display: "standalone",
@@ -38,13 +40,13 @@ module.exports = {
         inject: false,
         start_url: "/",
         ios: {
-          "apple-mobile-web-app-title": "ChartComposer",
+          "apple-mobile-web-app-title": APP_NAME,
           "apple-mobile-web-app-status-bar-style": "#eeeeee",
         },
         icons: [
           {
             src: path.resolve("static/icon.png"),
-            sizes: [96, 128, 192, 256, 384, 512],
+            sizes: [96, 128, 144, 192, 256, 384, 512],
             destination: "static",
           },
         ],
