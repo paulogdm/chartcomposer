@@ -22,7 +22,6 @@ export default class IndexPage extends React.Component {
           style={{
             display: "flex",
             flexDirection: "column",
-            height: "100vh",
           }}
         >
           <Header
@@ -35,8 +34,8 @@ export default class IndexPage extends React.Component {
             <div
               style={{
                 padding: "1em",
-                marginLeft: "4em",
                 maxWidth: "800px",
+                boxSizing: "border-box",
               }}
             >
               <p>
@@ -46,72 +45,58 @@ export default class IndexPage extends React.Component {
               </p>
               <ul>
                 <li>
-                  {" "}
-                  <a href="#getting-started">Getting Started</a>{" "}
+                  <a href="#getting-started">Getting Started</a>
                 </li>
                 <ul>
                   <li>
-                    {" "}
-                    <a href="#guest-mode">Guest mode</a>{" "}
+                    <a href="#guest-mode">Guest mode</a>
                   </li>
                   <li>
-                    {" "}
-                    <a href="#signedin-mode">Signed-in mode</a>{" "}
+                    <a href="#signedin-mode">Signed-in mode</a>
                   </li>
                 </ul>
                 <li>
-                  {" "}
-                  <a href="#sharing">Sharing</a>{" "}
+                  <a href="#sharing">Sharing</a>
                 </li>
                 <ul>
                   <li>
-                    {" "}
-                    <a href="#view-only-access">View-only access</a>{" "}
+                    <a href="#view-only-access">View-only access</a>
                   </li>
                   <li>
-                    {" "}
-                    <a href="#edit-access">Edit access</a>{" "}
+                    <a href="#edit-access">Edit access</a>
                   </li>
                   <li>
-                    {" "}
                     <a href="#restricted-view-only-access">
                       Restriected view-only access
-                    </a>{" "}
+                    </a>
                   </li>
                 </ul>
                 <li>
-                  {" "}
-                  <a href="#editing-songs">Editing Songs</a>{" "}
+                  <a href="#editing-songs">Editing Songs</a>
                 </li>
                 <ul>
                   <li>
-                    {" "}
-                    <a href="#chordpro-example">ChordPro Example</a>{" "}
+                    <a href="#chordpro-example">ChordPro Example</a>
                   </li>
                   <li>
-                    {" "}
-                    <a href="#chordpro-directives">ChordPro Directives</a>{" "}
+                    <a href="#chordpro-directives">ChordPro Directives</a>
                   </li>
                 </ul>
                 <li>
-                  {" "}
-                  <a href="#faq">FAQ</a>{" "}
+                  <a href="#faq">FAQ</a>
                 </li>
               </ul>
 
               <iframe
-                width="560"
                 height="315"
                 src="https://www.youtube.com/embed/P50ialcr7TQ"
                 frameborder="0"
                 allow="autoplay; encrypted-media"
                 allowFullScreen
+                style={{ minWidth: 380, maxWidth: 560 }}
               />
 
-              <h2
-                style={{ marginTop: "2.5em", marginLeft: "-2em" }}
-                id="getting-started"
-              >
+              <h2 style={{ marginTop: "2.5em" }} id="getting-started">
                 Getting Started
               </h2>
 
@@ -123,14 +108,14 @@ export default class IndexPage extends React.Component {
                 </a>{" "}
                 and clicking "Guest". Click on one of the sample songs to see
                 what it looks like. As "guest" you're in View-only mode - you
-                can <em>see</em> songs but you can't <em>edit</em> or{" "}
+                can <em>see</em> songs but you can't <em>edit</em> or
                 <em>create</em> songs. Here are things you can do as "guest":
               </p>
               <ul>
-                <li> print songs </li>
-                <li> play songs with autoscroll </li>
-                <li> view other people's song folders </li>
-                <li> share song folders with other people </li>
+                <li>print songs</li>
+                <li>play songs with autoscroll</li>
+                <li>view other people's song folders</li>
+                <li>share song folders with other people</li>
               </ul>
 
               <p>
@@ -155,10 +140,7 @@ export default class IndexPage extends React.Component {
                 <a href="https://www.dropbox.com/">create one for free</a>.
               </p>
 
-              <h2
-                style={{ marginTop: "2.5em", marginLeft: "-2em" }}
-                id="sharing"
-              >
+              <h2 style={{ marginTop: "2.5em" }} id="sharing">
                 Sharing
               </h2>
               <p>
@@ -199,14 +181,11 @@ export default class IndexPage extends React.Component {
                 (Dropbox accounts can be created for free.)
               </p>
 
-              <h2
-                style={{ marginTop: "2.5em", marginLeft: "-2em" }}
-                id="editing-songs"
-              >
+              <h2 style={{ marginTop: "2.5em" }} id="editing-songs">
                 Editing Songs
               </h2>
               <p>
-                ChartComposer requires that songs be written in ChordPro format.{" "}
+                ChartComposer requires that songs be written in ChordPro format.
                 <a href="http://www.chordpro.org/">ChordPro</a> is the closest
                 thing the sheet music industry has for a "standard". There are
                 other popular formats, but they're generally proprietary.
@@ -242,46 +221,50 @@ export default class IndexPage extends React.Component {
                 brackets. You add other song parts by using ChordPro directives
                 within curly brackets. Here's an example:
               </p>
-
-              <pre
+              <div
                 style={{
-                  border: "1px solid",
-                  padding: "1em",
-                  marginLeft: "4em",
+                  paddingLeft: "1em",
+                  boxSizing: "border-box",
                 }}
               >
-                &#123;title: Amazing Grace&#125;
-                <br />
-                &#123;composer: John Newton&#125;
-                <br />
-                &#123;key: D&#125;
-                <br />
-                &nbsp;
-                <br />
-                [D]Amazing grace! (how [G]sweet the [D]sound)
-                <br />
-                That [D]saved a wretch like [A7]me!
-                <br />I [D]once was lost, but [G]now am [D]found,
-                <br />
-                Was [D]blind, but [A7]now I [D]see.
-                <br />
-              </pre>
+                <pre
+                  style={{
+                    border: "1px solid",
+                  }}
+                >
+                  &#123;title: Amazing Grace&#125;
+                  <br />
+                  &#123;composer: John Newton&#125;
+                  <br />
+                  &#123;key: D&#125;
+                  <br />
+                  &nbsp;
+                  <br />
+                  [D]Amazing grace! (how [G]sweet the [D]sound)
+                  <br />
+                  That [D]saved a wretch like [A7]me!
+                  <br />I [D]once was lost, but [G]now am [D]found,
+                  <br />
+                  Was [D]blind, but [A7]now I [D]see.
+                  <br />
+                </pre>
+              </div>
 
               <p>Here's what that ChordPro text looks like in ChartComposer:</p>
               <div
                 style={{
                   border: "1px solid",
                   padding: "1em",
-                  marginLeft: "4em",
+                  marginLeft: "1em",
                 }}
               >
-                <img src={"/static/amazing-grace.png"} />
+                <img src={"/static/amazing-grace.png"} alt="Amazing Grace" />
               </div>
 
               <h3 id="chordpro-directives">ChordPro Directives</h3>
               <p>
                 There are about 50 ChordPro directives (the commands inside the
-                curly brackets). You can see all the ChordPro directives{" "}
+                curly brackets). You can see all the ChordPro directives
                 <a href="http://www.chordpro.org/chordpro/ChordPro-Directives.html">
                   here
                 </a>
@@ -361,8 +344,8 @@ export default class IndexPage extends React.Component {
                   <code>
                     &#123;x_audio: url="https://example.com/foo.m4a" title="my
                     band"&#125;
-                  </code>{" "}
-                  - Add a link to an audio file. See{" "}
+                  </code>
+                  - Add a link to an audio file. See
                   <a href="#audiohowto">
                     how to embed audio files from Dropbox
                   </a>
@@ -376,12 +359,12 @@ export default class IndexPage extends React.Component {
                   <code>
                     &#123;x_video:
                     url="https://www.youtube.com/watch?v=R0fQm9OsMcw"&#125;
-                  </code>{" "}
+                  </code>
                   - Add a link to a video file.
                 </li>
               </ul>
 
-              <h2 style={{ marginTop: "2.5em", marginLeft: "-2em" }} id="faq">
+              <h2 style={{ marginTop: "2.5em" }} id="faq">
                 FAQ
               </h2>
 
@@ -405,7 +388,7 @@ export default class IndexPage extends React.Component {
               <div style={{ marginBottom: "1em" }}>
                 A: Go into your Dropbox preferences and uncheck "Edits to
                 files".
-                <img src={"/static/dropbox-prefs.png"} />
+                <img src={"/static/dropbox-prefs.png"} style={{ width: 300 }} />
               </div>
 
               <div style={{ fontWeight: "bold" }}>Q: What's "ChordPro"?</div>

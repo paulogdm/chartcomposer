@@ -15,7 +15,6 @@ import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
 import Page from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
-import ServiceWorker from "../components/ServiceWorker";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
 import SongView from "../components/SongView";
@@ -734,7 +733,6 @@ export default class IndexPage extends React.Component {
     }
     return (
       <Page>
-        <ServiceWorker />
         <style jsx global>{`
           html,
           body {

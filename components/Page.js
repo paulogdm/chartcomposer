@@ -5,6 +5,7 @@ import localforage from "localforage";
 import withSentry from "./withSentry";
 import Meta from "./Meta";
 import Footer from "./Footer";
+import ServiceWorker from "./ServiceWorker";
 
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
 const {
@@ -17,6 +18,7 @@ const {
 export default withSentry(({ children }) => (
   <div>
     <Meta />
+    <ServiceWorker />
     {children}
   </div>
 ));
