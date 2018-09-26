@@ -4,6 +4,7 @@ import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
 import Draggable from "react-draggable";
+import { withRouter } from "next/router";
 import dropbox from "dropbox";
 import localforage from "localforage";
 import "whatwg-fetch";
@@ -42,13 +43,13 @@ const LOCAL_STORAGE_FIELDS = [
   "preferences",
 ];
 
-export default class IndexPage extends React.Component {
+class IndexPage extends React.Component {
   constructor(props) {
+    console.debug("IndexPage", { props });
     super();
     this.state = {
       chordPro: {},
       closedFolders: {},
-      componentDidMount: false,
       dirty: {},
       folders: {},
       loading: false,
@@ -69,17 +70,20 @@ export default class IndexPage extends React.Component {
     this.dbx = null;
     this.debouncedOnWindowResize = _.debounce(this.onWindowResize, 300);
     this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 1000);
+
+    if (props.router.query.error) {
+      throw new Error("This is Lindsey testing Sentry");
+    }
   }
 
-  componentDidMount = async () => {
+  async componentDidMount() {
     if (window) {
       // for console debugging
       window.lodash = _;
       window.localforage = localforage;
     }
-
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const shareLink = urlSearchParams.get("share");
+    const { router } = this.props;
+    const shareLink = router.query.share;
 
     let localState = {};
     LOCAL_STORAGE_FIELDS.forEach(async field => {
@@ -128,7 +132,6 @@ export default class IndexPage extends React.Component {
         this.loadDropboxLink(shareLink, true);
       }
     }
-    this.setState({ componentDidMount: true });
 
     const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();
@@ -144,12 +147,8 @@ export default class IndexPage extends React.Component {
     window.addEventListener("offline", this.updateOnlineStatus);
     window.addEventListener("online", this.updateOnlineStatus);
 
-    if (urlSearchParams.has("error")) {
-      throw new Error("This is Lindsey testing Sentry");
-    }
-
     setUpAutoscroll();
-  };
+  }
 
   componentWillUnmount() {
     this.dbx = null;
@@ -686,7 +685,6 @@ export default class IndexPage extends React.Component {
       folders,
       loading,
       closedFolders,
-      componentDidMount,
       preferences,
       preferencesOpen,
       saving,
@@ -699,7 +697,6 @@ export default class IndexPage extends React.Component {
       songId,
       user,
     } = this.state;
-    //console.debug("render", { componentDidMount, user });
     const [song, _] = this.getSongById(songId);
     const readOnly = song && !song.path_lower;
     const renderSongEditor =
@@ -712,19 +709,6 @@ export default class IndexPage extends React.Component {
       chordPro[songId] &&
       (smallScreenMode === "SongView" || smallScreenMode === null);
 
-    if (!componentDidMount) {
-      return (
-        <LoadingIndicator
-          style={{
-            position: "fixed",
-            left: "50%",
-            top: "50%",
-            transform: "translate3d(-50%, -50%, 0)",
-            zIndex: 2,
-          }}
-        />
-      );
-    }
     return (
       <Page>
         <style jsx global>{`
@@ -998,6 +982,8 @@ export default class IndexPage extends React.Component {
     );
   }
 }
+
+export default withRouter(IndexPage);
 
 const PromoCopy = () => (
   <div

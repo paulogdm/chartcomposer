@@ -34,7 +34,6 @@ class ServiceWorker extends PureComponent {
   };
 
   onClickShowInstallPrompt = e => {
-    console.debug("onClickShowInstallPrompt", this.installPromptEvent);
     if (!this.installPromptEvent) {
       return;
     }
