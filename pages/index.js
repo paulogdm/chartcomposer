@@ -90,6 +90,7 @@ class IndexPage extends React.Component {
       if (router.query.songId) {
         this.setSongId(router.query.songId, router.query.folderId);
       }
+      window.setTimeout(() => this.reSyncDropboxFolders(), 1000);
     });
   }
 
