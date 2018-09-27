@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+import { withRouter } from "next/router";
 import FaClose from "react-icons/lib/fa/close";
 import FaFolder from "react-icons/lib/fa/folder";
 import FaFolderOpen from "react-icons/lib/fa/folder-open";
@@ -6,6 +8,7 @@ import FaPlus from "react-icons/lib/fa/plus";
 import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
+import slugify from "../utils/slugify";
 
 const SongList = ({
   closedFolders,
@@ -14,7 +17,6 @@ const SongList = ({
   loadDropboxLink,
   newSong,
   removeFolder,
-  setSongId,
   songId,
   songs,
   toggleFolderOpen,
@@ -30,14 +32,13 @@ const SongList = ({
               newSong={newSong}
               removeFolder={removeFolder}
               copyShareLink={copyShareLink}
-              setSongId={setSongId}
               songId={songId}
               toggleFolderOpen={toggleFolderOpen}
             />
           ))
         : null}
       {!_.isEmpty(songs) ? (
-        <SongOrderedList setSongId={setSongId} songs={songs} songId={songId} />
+        <SongOrderedList songs={songs} songId={songId} />
       ) : null}
     </div>
   );
@@ -50,7 +51,6 @@ const SongFolder = ({
   newSong,
   removeFolder,
   copyShareLink,
-  setSongId,
   songId,
   toggleFolderOpen,
 }) => {
@@ -118,12 +118,7 @@ const SongFolder = ({
         <ButtonToolbarGroup buttons={toolbarButtons} />
       </div>
       {isOpen ? (
-        <SongOrderedList
-          folder={folder}
-          setSongId={setSongId}
-          songId={songId}
-          songs={folder.songs}
-        />
+        <SongOrderedList folder={folder} songId={songId} songs={folder.songs} />
       ) : (
         <div
           style={{
@@ -141,10 +136,17 @@ const SongFolder = ({
   );
 };
 
-const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
+let SongOrderedList = ({ folder, router, songId, songs }) => {
   const padding = 10;
   const paddingLeft = padding + (folder ? 20 : 0);
   //console.debug({ songs });
+  /*<a
+              onClick={e => {
+                console.debug("ONCLICK LINK", router.query);
+                e.preventDefault();
+              }}
+              style={{ display: "block" }}
+            >*/
   return (
     <ol
       style={{
@@ -156,26 +158,44 @@ const SongOrderedList = ({ folder, setSongId, songId, songs }) => {
       {_.sortBy(_.values(songs), ["name"]).map(song => (
         <li
           key={song.id}
-          data-key={song.id}
-          onClick={() => {
-            setSongId(song.id, folder && folder.id);
-          }}
           tabIndex={0}
           style={{
             background: "#fff",
             borderBottom: "1px solid #ccc",
             cursor: "pointer",
             fontWeight: songId == song.id ? "bold" : null,
-            padding,
-            paddingLeft,
           }}
         >
-          <div>{removeExtension(song.name)}</div>
+          <Link
+            as={
+              songId === song.id
+                ? "/"
+                : `/folder/${folder.id}/song/${song.id}/${slugify(
+                    removeExtension(song.name),
+                  )}`
+            }
+            href={
+              songId === song.id
+                ? "/"
+                : `/?folderId=${folder.id}&songId=${song.id}`
+            }
+          >
+            <a
+              style={{
+                display: "block",
+                padding,
+                paddingLeft,
+              }}
+            >
+              {removeExtension(song.name)}
+            </a>
+          </Link>
         </li>
       ))}
     </ol>
   );
 };
+SongOrderedList = withRouter(SongOrderedList);
 
 function removeExtension(filename) {
   var iDot = filename.lastIndexOf(".");

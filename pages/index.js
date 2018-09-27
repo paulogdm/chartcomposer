@@ -4,7 +4,8 @@ import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
 import Draggable from "react-draggable";
-import { withRouter } from "next/router";
+import Raven from "raven-js";
+import Router, { withRouter } from "next/router";
 import dropbox from "dropbox";
 import localforage from "localforage";
 import "whatwg-fetch";
@@ -76,25 +77,39 @@ class IndexPage extends React.Component {
     }
   }
 
-  async componentDidMount() {
-    if (window) {
-      // for console debugging
-      window.lodash = _;
-      window.localforage = localforage;
-    }
+  async setStateFromLocalStorage() {
     const { router } = this.props;
-    const shareLink = router.query.share;
-
     let localState = {};
-    LOCAL_STORAGE_FIELDS.forEach(async field => {
+    for (const field of LOCAL_STORAGE_FIELDS) {
       const localValue = await localforage.getItem(field);
       if (localValue) {
         localState[field] = JSON.parse(localValue);
       }
+    }
+    this.setState({ ...localState }, () => {
+      if (router.query.songId) {
+        this.setSongId(router.query.songId, router.query.folderId);
+      }
     });
-    console.log("componentDidMount", { localState });
-    this.setState(localState);
+  }
 
+  async reSyncDropboxFolders() {
+    const { folders } = this.state;
+    // Sync the folder contents in the background in case there have
+    // been changes in the user's dropbox that are out of sync with local
+    // storage.
+    if (folders) {
+      Object.keys(folders).forEach(folderId => {
+        const folder = folders[folderId];
+        console.log("reSyncDropboxFolder", { folder });
+        this.loadDropboxLink(folder.url, true);
+      });
+    }
+  }
+
+  async initializeDropbox() {
+    const { router } = this.props;
+    const shareLink = router.query.share;
     let accessToken = await localforage.getItem("db-access-token");
     // Automatically sign a share-link visitor in as a guest
     if (shareLink && !accessToken) {
@@ -113,25 +128,32 @@ class IndexPage extends React.Component {
       this.dbx.usersGetCurrentAccount().then(user => {
         console.log({ user });
         this.setState({ user });
+        if (accessToken !== DROPBOX_PUBLIC_TOKEN) {
+          Raven.setUserContext({
+            name: user.display_name,
+            email: user.email,
+            id: user.account_id,
+            country: user.country,
+          });
+        }
       });
-
       this.loadPreferencesFromDropbox();
-
-      // Sync the folder contents in the background in case there have
-      // been changes in the user's dropbox that are out of sync with local
-      // storage.
-      if (localState.folders) {
-        Object.keys(localState.folders).forEach(folderId => {
-          const folder = localState.folders[folderId];
-          console.log("Re-sync", { folder });
-          this.loadDropboxLink(folder.url, true);
-        });
-      }
 
       if (shareLink) {
         this.loadDropboxLink(shareLink, true);
       }
     }
+  }
+
+  async componentDidMount() {
+    if (window) {
+      // for console debugging
+      window.lodash = _;
+      window.localforage = localforage;
+    }
+
+    await this.initializeDropbox();
+    await this.setStateFromLocalStorage();
 
     const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();
@@ -173,6 +195,21 @@ class IndexPage extends React.Component {
     });
     if (!this.state.onLine && nextState.onLine) {
       this.checkDirty();
+    }
+
+    if (nextProps.router.query.songId !== this.props.router.query.songId) {
+      const nextSongId = nextProps.router.query.songId;
+      const nextFolderId = nextProps.router.query.folderId;
+      console.debug(
+        "-0-0-0-0-0-0-0-0-0-0 nextProps.router",
+        nextProps.router,
+        "nextSongId",
+        nextSongId,
+        "nextFolderId",
+        nextFolderId,
+        this.state.songs,
+      );
+      this.setSongId(nextSongId, nextFolderId);
     }
   }
 
@@ -441,11 +478,18 @@ class IndexPage extends React.Component {
   };
 
   setSongId = (songId, folderId) => {
-    if (this.state.songId === songId) {
+    console.debug("setSongId", { songId, folderId });
+    if (!songId) {
       this.setState({ songId: null });
       return;
     }
     const { folders, smallScreenMode, songs } = this.state;
+
+    if (!folders[folderId] && !songs[songId]) {
+      console.error("no folders and songs in state", { folders, songs });
+      return;
+    }
+
     let nextSmallScreenMode = null;
     if (smallScreenMode === "SongList") {
       nextSmallScreenMode = "SongView";
@@ -458,8 +502,8 @@ class IndexPage extends React.Component {
       songEditorPercentWidth: 50,
     });
     const [song, _] = this.getSongById(songId);
+
     const url = folderId ? folders[folderId].url : songs[songId].url;
-    console.log("setSongId", { songId, song, folderId, url });
     this.dbx
       .sharingGetSharedLinkFile({
         url,
@@ -559,13 +603,14 @@ class IndexPage extends React.Component {
       return [null, null];
     }
     const { folders, songs } = this.state;
+    console.debug("getSongById", { songId, folders, songs });
     const folderIds = Object.keys(folders);
     for (var i = 0, folderId; (folderId = folderIds[i]); i++) {
       if (folders[folderId].songs && folders[folderId].songs[songId]) {
         return [folders[folderId].songs[songId], folderId];
       }
     }
-    console.log("getSongById", songId, "not found in folders, looking in", {
+    console.debug("getSongById", songId, "not found in folders, looking in", {
       songs,
     });
     return [songs[songId], null];
@@ -676,10 +721,12 @@ class IndexPage extends React.Component {
 
   signOut = async () => {
     await localforage.clear();
+    Raven.setUserContext();
     window.location.href = "/";
   };
 
   render() {
+    const { router } = this.props;
     const {
       chordPro,
       folders,
@@ -880,7 +927,6 @@ class IndexPage extends React.Component {
                       folders={folders}
                       newSong={this.newSong}
                       removeFolder={this.removeFolder}
-                      setSongId={this.setSongId}
                       smallScreenMode={smallScreenMode}
                       songId={songId}
                       songs={songs}
@@ -982,7 +1028,6 @@ class IndexPage extends React.Component {
     );
   }
 }
-
 export default withRouter(IndexPage);
 
 const PromoCopy = () => (

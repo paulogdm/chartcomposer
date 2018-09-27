@@ -18,6 +18,7 @@
     "classnames": "^2.2.6",
     "create-next": "^0.1.4",
     "dropbox": "^4.0.9",
+    "express": "^4.16.3",
     "jest": "^23.6.0",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",

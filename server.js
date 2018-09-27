@@ -1,4 +1,5 @@
 const { createServer } = require("http");
+const express = require("express");
 const { join } = require("path");
 const { parse } = require("url");
 const next = require("next");
@@ -15,20 +16,47 @@ const STATIC_FILES = [
   //"/robots.txt",
 ];
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    const parsedUrl = parse(req.url, true);
-    const { pathname } = parsedUrl;
+app
+  .prepare()
+  .then(() => {
+    const server = express();
 
-    if (STATIC_FILES.indexOf(pathname) !== -1) {
-      const filePath = join(__dirname, ".next", pathname);
-      console.log("GO STATIC " + pathname + " :: " + filePath);
-      app.serveStatic(req, res, filePath);
-    } else {
-      handle(req, res, parsedUrl);
-    }
-  }).listen(port, err => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
+    server.get("/folder/:folderId/song/:songId/:songName", (req, res) => {
+      const actualPage = "/";
+      const queryParams = {
+        folderId: req.params.folderId,
+        songId: req.params.songId,
+      };
+      console.log("QUERY PARAMS", queryParams);
+      app.render(req, res, actualPage, queryParams);
+    });
+
+    /*
+    server.get("/song/:songId/:songName", (req, res) => {
+      const actualPage = "/";
+      const queryParams = { songId: req.params.songId };
+      app.render(req, res, actualPage, queryParams);
+    });
+    */
+
+    STATIC_FILES.forEach(pathName => {
+      server.get(pathName, (req, res) => {
+        const filePath = join(__dirname, ".next", pathName);
+        console.log("GO STATIC_FILES " + pathName + " :: " + filePath);
+        app.serveStatic(req, res, filePath);
+      });
+    });
+
+    server.get("*", (req, res) => {
+      return handle(req, res);
+    });
+
+    server.listen(port, err => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+    });
+  })
+  .catch(err => {
+    console.error(err.stack);
+    process.exit(1);
   });
-});
