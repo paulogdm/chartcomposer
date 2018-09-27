@@ -1,17 +1,16 @@
 import React from "react";
+import classNames from "classnames";
 
 import chordProParse, {
   displayPreferenceDefaults,
   parseChordProString,
 } from "../utils/chordProParse.js";
-import classNames from "classnames";
 
 const PreferenceContext = React.createContext({
   preferences: displayPreferenceDefaults,
 });
 
 const RENDER_IN_REACT = false;
-import SongViewCSS from "raw-loader!./SongView.css";
 
 const SongView = ({ preferences = {}, value = "" }) => {
   Object.keys(displayPreferenceDefaults).forEach(name => {
@@ -24,10 +23,6 @@ const SongView = ({ preferences = {}, value = "" }) => {
   console.debug("preferences.textsize", preferences.textsize);
   return (
     <div>
-      <style jsx global>
-        {SongViewCSS}
-      </style>
-
       {RENDER_IN_REACT ? (
         <PreferenceContext.Provider value={preferences}>
           <div

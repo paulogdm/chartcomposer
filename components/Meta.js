@@ -18,6 +18,7 @@ export default () => (
       <link rel="manifest" href="/manifest.json" />
       <meta name="theme-color" content="#eeeeee" />
       <link rel="stylesheet" href="/static/bootstrap.min.css" />
+      <link rel="stylesheet" href="/static/SongView.css" />
     </Head>
     <style jsx global>{`
       body {
