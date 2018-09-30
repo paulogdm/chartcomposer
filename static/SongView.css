@@ -9,36 +9,31 @@
 .x_pdf {
   width: 95%;
 }
-.chordsmall,
-.chordmedium,
-.chordlarge {
-  float: left;
+
+.chorddiagrams {
+  display: flex;
+  margin: 30px 0 10px;
+}
+
+.chorddiagrams .chord {
   margin: 10px;
 }
 
-.chordsmall .name,
-.chordmedium .name,
-.chordlarge .name,
-.fingering,
-.bar {
-  clear: both;
-}
-
-.chordsmall .name {
+.chord-diagramsize-small .chord .name {
   text-align: center;
   font-size: 10px;
   margin-left: 5px;
   margin-bottom: 1px;
 }
 
-.chordmedium .name {
+.chord-diagramsize-medium .chord .name {
   text-align: center;
   font-size: 13px;
   margin-left: 8px;
   margin-bottom: 1px;
 }
 
-.chordlarge .name {
+.chord-diagramsize-large .chord .name {
   text-align: center;
   font-size: 16px;
   margin-left: 10px;
@@ -55,7 +50,7 @@
   position: relative;
 }
 
-.chordsmall .finger {
+.chord-diagramsize-small .finger {
   width: 2px;
   height: 6px;
   margin-left: 4px;
@@ -63,7 +58,7 @@
   text-align: right;
 }
 
-.chordmedium .finger {
+.chord-diagramsize-medium .finger {
   width: 3px;
   height: 9px;
   margin-left: 6px;
@@ -71,7 +66,7 @@
   text-align: right;
 }
 
-.chordlarge .finger {
+.chord-diagramsize-large .finger {
   width: 4px;
   height: 12px;
   margin-left: 8px;
@@ -88,17 +83,17 @@
   border-left: 0px solid transparent;
 }
 
-.chordsmall .fret {
+.chord-diagramsize-small .fret {
   width: 6px;
   height: 6px;
 }
 
-.chordmedium .fret {
+.chord-diagramsize-medium .fret {
   width: 9px;
   height: 9px;
 }
 
-.chordlarge .fret {
+.chord-diagramsize-large .fret {
   width: 12px;
   height: 12px;
 }
@@ -107,15 +102,15 @@
   border-top: 1px solid #555;
 }
 
-.chordsmall .bar:first-child .fret:not(:first-of-type) {
+.chord-diagramsize-small .bar:first-child .fret:not(:first-of-type) {
   height: 7px;
 }
 
-.chordmedium .bar:first-child .fret:not(:first-of-type) {
+.chord-diagramsize-medium .bar:first-child .fret:not(:first-of-type) {
   height: 11px;
 }
 
-.chordlarge .bar:first-child .fret:not(:first-of-type) {
+.chord-diagramsize-large .bar:first-child .fret:not(:first-of-type) {
   height: 14px;
 }
 
@@ -123,15 +118,15 @@
   border-top: 1px solid transparent;
 }
 
-.chordsmall .bar:first-child .fret {
+.chord-diagramsize-small .bar:first-child .fret {
   height: 7px;
 }
 
-.chordmedium .bar:first-child .fret {
+.chord-diagramsize-medium .bar:first-child .fret {
   height: 11px;
 }
 
-.chordlarge .bar:first-child .fret {
+.chord-diagramsize-large .bar:first-child .fret {
   height: 14px;
 }
 
@@ -151,7 +146,7 @@
   border-radius: 50%;
 }
 
-.chordsmall .fret .note {
+.chord-diagramsize-small .fret .note {
   width: 5px;
   height: 5px;
   margin-left: 3px;
@@ -159,7 +154,7 @@
   padding-top: 2px;
 }
 
-.chordmedium .fret .note {
+.chord-diagramsize-medium .fret .note {
   width: 8px;
   height: 8px;
   margin-left: 5px;
@@ -167,7 +162,7 @@
   padding-top: 3px;
 }
 
-.chordlarge .fret .note {
+.chord-diagramsize-large .fret .note {
   width: 10px;
   height: 10px;
   margin-left: 6px;
@@ -175,19 +170,19 @@
   padding-top: 4px;
 }
 
-.chordsmall .bar .basefret {
+.chord-diagramsize-small .bar .basefret {
   font-size: 9px;
   float: left;
   line-height: 1;
 }
 
-.chordmedium .bar .basefret {
+.chord-diagramsize-medium .bar .basefret {
   font-size: 10px;
   float: left;
   line-height: 1;
 }
 
-.chordlarge .bar .basefret {
+.chord-diagramsize-large .bar .basefret {
   font-size: 12px;
   float: left;
   line-height: 1;

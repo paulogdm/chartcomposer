@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import chordProParse, {
   displayPreferenceDefaults,
+  getChordDiagram,
   parseChordProString,
 } from "../utils/chordProParse.js";
 
@@ -17,10 +18,15 @@ const SongView = ({ preferences = {}, value = "" }) => {
     preferences[name] = preferences[name] || displayPreferenceDefaults[name];
   });
   let chordPro;
+  let chordDiagramsHtml = "";
   if (RENDER_IN_REACT) {
+    //console.debug("SongView preferences", preferences);
     chordPro = parseChordProString(value);
+    chordPro.chords.forEach(chord => {
+      const diagram = getChordDiagram(chord, preferences.x_instrument);
+      chordDiagramsHtml += diagram;
+    });
   }
-  console.debug("preferences.textsize", preferences.textsize);
   return (
     <div>
       {RENDER_IN_REACT ? (
@@ -34,7 +40,15 @@ const SongView = ({ preferences = {}, value = "" }) => {
             }}
           >
             <SongProperties chordPro={chordPro} />
-            <div style={{ height: 48 }}>tmp</div>
+            <div>
+              <div
+                className={classNames(
+                  "chorddiagrams",
+                  `chord-diagramsize-${preferences.x_diagramsize}`,
+                )}
+                dangerouslySetInnerHTML={{ __html: chordDiagramsHtml }}
+              />
+            </div>
             {chordPro.parts.map((part, i) => (
               <Section key={i} part={part} />
             ))}
@@ -52,8 +66,33 @@ const SongView = ({ preferences = {}, value = "" }) => {
 export default SongView;
 
 const Section = ({ part }) => {
+  let content;
+  switch (part.type) {
+    case "verse":
+      content = <Verse part={part} />;
+      break;
+    case "comment":
+    case "choruscomment":
+      content = <Comment part={part} />;
+      break;
+    case "x_audio":
+    case "x_pdf":
+    case "x_video":
+    case "image":
+      content = "TODO";
+    default:
+      console.warn("No implementation yet for part.type", part.type, part);
+  }
+  return <div className={`SongView-section-${part.type}`}>{content}</div>;
+};
+
+const Comment = ({ part }) => {
+  return <div className="lyriccomment">{part.lines[0]}</div>;
+};
+
+const Verse = ({ part }) => {
   return (
-    <div className={`SongView-section-${part.type}`}>
+    <div>
       {part.linesParsed.map((parsed, i) => (
         <div key={i} className="SongView-line lyricline">
           {parsed.map(

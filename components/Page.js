@@ -39,6 +39,7 @@ const SignInAsGuest = () => (
   <a
     href="/"
     onClick={async () => {
+      console.debug("login as guest", { DROPBOX_PUBLIC_TOKEN });
       await localforage.setItem("db-access-token", DROPBOX_PUBLIC_TOKEN);
       // href is "/" so letting default event go through here = refresh
     }}
@@ -50,5 +51,23 @@ const SignInAsGuest = () => (
 export function getGuestAccessToken() {
   return DROPBOX_PUBLIC_TOKEN;
 }
+
+export const LOCAL_STORAGE_FIELDS = [
+  "folders",
+  "songs",
+  "user",
+  "dirty",
+  "preferences",
+];
+
+export const getStateFromLocalStorage = async () => {
+  let localState = {};
+  for (const field of LOCAL_STORAGE_FIELDS) {
+    const localValue = await localforage.getItem(field);
+    if (localValue) {
+      localState[field] = JSON.parse(localValue);
+    }
+  }
+};
 
 export { Sender, SignInAsGuest, Receiver };

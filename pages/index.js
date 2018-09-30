@@ -15,7 +15,10 @@ import AddFolder from "../components/AddFolder";
 import ButtonToolbarGroup from "../components/ButtonToolbarGroup";
 import LoadingIndicator from "../components/LoadingIndicator";
 import Header from "../components/Header";
-import Page from "../components/Page";
+import Page, {
+  LOCAL_STORAGE_FIELDS,
+  getStateFromLocalStorage,
+} from "../components/Page";
 import Preferences, { defaultPreferences } from "../components/Preferences";
 import SongEditor from "../components/SongEditor";
 import SongList from "../components/SongList";
@@ -36,21 +39,16 @@ const PREFERENCES_PATH = `${DROPBOX_APP_DIR}/.preferences.json`;
 const NEW_SONG_NAME = "new_song.pro";
 const NEW_SONG_ID_MARKER = "NEW-SONG";
 
-const LOCAL_STORAGE_FIELDS = [
-  "folders",
-  "songs",
-  "user",
-  "dirty",
-  "preferences",
-];
-
 class IndexPage extends React.Component {
   constructor(props) {
     console.debug("IndexPage", { props });
     super();
+    const smallScreenMode = this.getDefaultSmallScreenMode();
+    console.debug({ smallScreenMode });
     this.state = {
       chordPro: {},
       closedFolders: {},
+      componentIsMounted: false,
       dirty: {},
       folders: {},
       loading: false,
@@ -58,7 +56,7 @@ class IndexPage extends React.Component {
       preferences: defaultPreferences,
       preferencesOpen: false,
       saving: false,
-      smallScreenMode: this.getDefaultSmallScreenMode(),
+      smallScreenMode,
       resizerPosition: { x: 0, y: 0 },
       songListClosed: false,
       songEditorClosed: false,
@@ -77,15 +75,9 @@ class IndexPage extends React.Component {
     }
   }
 
-  async setStateFromLocalStorage() {
+  setStateFromLocalStorage() {
     const { router } = this.props;
-    let localState = {};
-    for (const field of LOCAL_STORAGE_FIELDS) {
-      const localValue = await localforage.getItem(field);
-      if (localValue) {
-        localState[field] = JSON.parse(localValue);
-      }
-    }
+    const localState = getStateFromLocalStorage();
     this.setState({ ...localState }, () => {
       if (router.query.songId) {
         this.setSongId(router.query.songId, router.query.folderId);
@@ -154,7 +146,7 @@ class IndexPage extends React.Component {
     }
 
     await this.initializeDropbox();
-    await this.setStateFromLocalStorage();
+    this.setStateFromLocalStorage();
 
     const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();
@@ -171,6 +163,9 @@ class IndexPage extends React.Component {
     window.addEventListener("online", this.updateOnlineStatus);
 
     setUpAutoscroll();
+
+    // Otherwise there's no way for us to set smallScreenMode size correctly.
+    this.setState({ componentIsMounted: true });
   }
 
   componentWillUnmount() {
@@ -201,7 +196,7 @@ class IndexPage extends React.Component {
     if (nextProps.router.query.songId !== this.props.router.query.songId) {
       const nextSongId = nextProps.router.query.songId;
       const nextFolderId = nextProps.router.query.folderId;
-      console.debug(
+      /*console.debug(
         "-0-0-0-0-0-0-0-0-0-0 nextProps.router",
         nextProps.router,
         "nextSongId",
@@ -210,6 +205,7 @@ class IndexPage extends React.Component {
         nextFolderId,
         this.state.songs,
       );
+      */
       this.setSongId(nextSongId, nextFolderId);
     }
   }
@@ -278,7 +274,7 @@ class IndexPage extends React.Component {
   setSmallScreenMode = smallScreenMode => {
     this.setState({
       smallScreenMode,
-      songId: smallScreenMode === "SongList" ? null : this.state.songId,
+      //songId: smallScreenMode === "SongList" ? null : this.state.songId,
     });
   };
 
@@ -481,7 +477,15 @@ class IndexPage extends React.Component {
   setSongId = (songId, folderId) => {
     console.debug("setSongId", { songId, folderId });
     if (!songId) {
-      this.setState({ songId: null });
+      this.setState({
+        songId: null,
+        smallScreenMode:
+          smallScreenMode !== null &&
+          smallScreenMode !== "SongList" &&
+          smallScreenMode !== "PromoCopy"
+            ? "SongList"
+            : this.state.smallScreenMode,
+      });
       return;
     }
     const { folders, smallScreenMode, songs } = this.state;
@@ -604,7 +608,7 @@ class IndexPage extends React.Component {
       return [null, null];
     }
     const { folders, songs } = this.state;
-    console.debug("getSongById", { songId, folders, songs });
+    //console.debug("getSongById", { songId, folders, songs });
     const folderIds = Object.keys(folders);
     for (var i = 0, folderId; (folderId = folderIds[i]); i++) {
       if (folders[folderId].songs && folders[folderId].songs[songId]) {
@@ -730,6 +734,7 @@ class IndexPage extends React.Component {
     const { router } = this.props;
     const {
       chordPro,
+      componentIsMounted,
       folders,
       loading,
       closedFolders,
@@ -757,6 +762,19 @@ class IndexPage extends React.Component {
       chordPro[songId] &&
       (smallScreenMode === "SongView" || smallScreenMode === null);
 
+    if (!componentIsMounted) {
+      return (
+        <LoadingIndicator
+          style={{
+            position: "fixed",
+            left: "50%",
+            top: "50%",
+            transform: "translate3d(-50%, -50%, 0)",
+            zIndex: 2,
+          }}
+        />
+      );
+    }
     return (
       <Page>
         <style jsx global>{`

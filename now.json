@@ -10,6 +10,6 @@
   "env": {
     "DROPBOX_APP_KEY": "@dropbox_app_key",
     "DROPBOX_APP_SECRET": "@dropbox_app_secret",
-    "ROPBOX_PUBLIC_TOKEN": "@dropbox_public_token"
+    "DROPBOX_PUBLIC_TOKEN": "@dropbox_public_token"
   }
 }

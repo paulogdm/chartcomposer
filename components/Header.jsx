@@ -1,5 +1,8 @@
 import { Button } from "react-bootstrap";
 
+import Link from "next/link";
+import Router from "next/router";
+
 import { Sender, SignInAsGuest } from "../components/Page";
 import UserMenu from "../components/UserMenu";
 import { APP_NAME } from "../utils/constants";
@@ -58,14 +61,9 @@ const Header = ({
       {smallScreenMode !== null &&
       smallScreenMode !== "SongList" &&
       smallScreenMode !== "PromoCopy" ? (
-        <div
-          onClick={() => {
-            setSmallScreenMode("SongList");
-          }}
-          style={{ cursor: "pointer", padding: 10 }}
-        >
-          ◀
-        </div>
+        <Link as="/" href="/" style={{ cursor: "pointer", padding: 10 }}>
+          <a>◀</a>
+        </Link>
       ) : null}
       <h1
         style={{
@@ -115,7 +113,9 @@ const Header = ({
           togglePreferencesOpen={togglePreferencesOpen}
         />
       ) : nologin ? (
-        <a href="/">Home</a>
+        <Link href="/">
+          <a>Home</a>
+        </Link>
       ) : (
         <Sender
           state={{ to: "/" }}

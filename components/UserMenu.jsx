@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export default class UserMenu extends React.Component {
   constructor(props) {
@@ -54,7 +55,7 @@ export default class UserMenu extends React.Component {
           <img
             alt=""
             src={user.profile_photo_url || "/static/notes.png"}
-            style={{ height: 30, width: 30 }}
+            style={{ height: 25 }}
           />
         </div>
         {isOpen ? (
@@ -77,10 +78,14 @@ export default class UserMenu extends React.Component {
               }}
             >
               <li>
-                <a href="/about">About</a>
+                <Link href="/about">
+                  <a>About</a>
+                </Link>
               </li>
               <li>
-                <a href="/help">Help</a>
+                <Link href="/help">
+                  <a>Help</a>
+                </Link>
               </li>
               <li onClick={this.togglePreferences}>
                 <div>Preferences</div>

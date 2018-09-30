@@ -16,7 +16,7 @@ export default class IndexPage extends React.Component {
   }
 
   render() {
-    const {} = this.state;
+    const { user } = this.state;
     return (
       <Page>
         <div
@@ -31,6 +31,7 @@ export default class IndexPage extends React.Component {
             smallScreenMode={null} // need this to hide "View" button
             nologin={true}
             title={`${APP_NAME} > Help`}
+            user={user}
           />
           <div style={{ display: "flex", flex: 1 }}>
             <div
