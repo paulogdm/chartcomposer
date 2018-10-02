@@ -75,9 +75,9 @@ class IndexPage extends React.Component {
     }
   }
 
-  setStateFromLocalStorage() {
+  async setStateFromLocalStorage() {
     const { router } = this.props;
-    const localState = getStateFromLocalStorage();
+    const localState = await getStateFromLocalStorage();
     this.setState({ ...localState }, () => {
       if (router.query.songId) {
         this.setSongId(router.query.songId, router.query.folderId);
@@ -146,7 +146,7 @@ class IndexPage extends React.Component {
     }
 
     await this.initializeDropbox();
-    this.setStateFromLocalStorage();
+    await this.setStateFromLocalStorage();
 
     const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();
@@ -164,7 +164,9 @@ class IndexPage extends React.Component {
 
     setUpAutoscroll();
 
-    // Otherwise there's no way for us to set smallScreenMode size correctly.
+    // Otherwise there's no way for us to set smallScreenMode size correctly,
+    // and when it's wrong initially, we see a flash of the left column + home
+    // page UI before it re-renders as a mobile app looking page.
     this.setState({ componentIsMounted: true });
   }
 

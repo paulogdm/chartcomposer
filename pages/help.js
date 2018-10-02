@@ -348,7 +348,7 @@ export default class IndexPage extends React.Component {
                     &#123;x_audio: url="https://example.com/foo.m4a" title="my
                     band"&#125;
                   </code>
-                  - Add a link to an audio file. See
+                  - Add a link to an audio file. See{" "}
                   <a href="#audiohowto">
                     how to embed audio files from Dropbox
                   </a>

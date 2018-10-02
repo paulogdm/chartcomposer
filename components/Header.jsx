@@ -61,8 +61,8 @@ const Header = ({
       {smallScreenMode !== null &&
       smallScreenMode !== "SongList" &&
       smallScreenMode !== "PromoCopy" ? (
-        <Link as="/" href="/" style={{ cursor: "pointer", padding: 10 }}>
-          <a>◀</a>
+        <Link as="/" href="/">
+          <a style={{ display: "inline-block", padding: 10 }}>◀</a>
         </Link>
       ) : null}
       <h1

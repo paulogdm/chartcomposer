@@ -68,6 +68,7 @@ export const getStateFromLocalStorage = async () => {
       localState[field] = JSON.parse(localValue);
     }
   }
+  return localState;
 };
 
 export { Sender, SignInAsGuest, Receiver };

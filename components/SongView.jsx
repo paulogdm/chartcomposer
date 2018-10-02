@@ -69,7 +69,8 @@ const Section = ({ part }) => {
   let content;
   switch (part.type) {
     case "verse":
-      content = <Verse part={part} />;
+    case "chorus":
+      content = <ChordsAndLyrics part={part} />;
       break;
     case "comment":
     case "choruscomment":
@@ -86,11 +87,15 @@ const Section = ({ part }) => {
   return <div className={`SongView-section-${part.type}`}>{content}</div>;
 };
 
+const Image = ({ part }) => {
+  return <img src={part.src} />;
+};
+
 const Comment = ({ part }) => {
   return <div className="lyriccomment">{part.lines[0]}</div>;
 };
 
-const Verse = ({ part }) => {
+const ChordsAndLyrics = ({ part }) => {
   return (
     <div>
       {part.linesParsed.map((parsed, i) => (
@@ -184,4 +189,17 @@ const SongProperties = ({ chordPro }) => {
       )}
     </div>
   );
+};
+
+// The Dropbox Share URL for images and audio files end with "?dl=0" which takes you to an HTML
+// page containing the object. You have to replace that with "?raw=1" to get the actual file.
+const fixDropboxUrl = url => {
+  if (
+    -1 !== url.indexOf("https://www.dropbox.com/") &&
+    -1 !== url.indexOf("?dl=0")
+  ) {
+    url = url.replace("?dl=0", "?raw=1");
+  }
+
+  return url;
 };
