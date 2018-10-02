@@ -950,7 +950,7 @@ function exportHtmlPart(aParts, i) {
             "' controls style='width: 80%'></audio>";
         }
       } else if ("x_pdf" === part.type) {
-        // syntax: {x_pdf: url="url"}
+        // syntax: {x_pdf: url="url" [pages="2"]}
         var hParams = parseParameters(line);
         if (!hParams["url"]) {
           continue; // must have URL
@@ -1068,7 +1068,7 @@ function fixDropboxUrl(url) {
 }
 
 // Return a hash based on name=value tuples.
-// example: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'
+// example: src="https://example.com/score.png" width="100" height="80" title="Bob and Mary"
 function parseParameters(sParams) {
   var hParams = {};
 

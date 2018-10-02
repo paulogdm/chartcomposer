@@ -118,18 +118,21 @@ class IndexPage extends React.Component {
         // for console debugging
         window.dbx = this.dbx;
       }
-      this.dbx.usersGetCurrentAccount().then(user => {
-        console.log({ user });
-        this.setState({ user });
-        if (accessToken !== DROPBOX_PUBLIC_TOKEN) {
-          Raven.setUserContext({
-            name: user.display_name,
-            email: user.email,
-            id: user.account_id,
-            country: user.country,
-          });
-        }
-      });
+      this.dbx
+        .usersGetCurrentAccount()
+        .then(user => {
+          console.log({ user });
+          this.setState({ user });
+          if (accessToken !== DROPBOX_PUBLIC_TOKEN) {
+            Raven.setUserContext({
+              name: user.display_name,
+              email: user.email,
+              id: user.account_id,
+              country: user.country,
+            });
+          }
+        })
+        .catch(error => console.error({ error }));
       this.loadPreferencesFromDropbox();
 
       if (shareLink) {
@@ -352,7 +355,7 @@ class IndexPage extends React.Component {
       })
       .catch(error => {
         this.setState({ loading: false });
-        throw error;
+        console.error({ error });
       });
   };
 
@@ -402,7 +405,7 @@ class IndexPage extends React.Component {
             }
           }
         });
-        console.log({ songs });
+        //console.log({ songs });
         const folders = {
           ...this.state.folders,
           [folderId]: {
@@ -414,7 +417,7 @@ class IndexPage extends React.Component {
       })
       .catch(error => {
         this.setState({ loading: false });
-        throw error;
+        console.error({ error });
       });
   };
 
@@ -509,6 +512,7 @@ class IndexPage extends React.Component {
       songEditorPercentWidth: 50,
     });
     const [song, _] = this.getSongById(songId);
+    console.debug("got song", song);
 
     const url = folderId ? folders[folderId].url : songs[songId].url;
     this.dbx
@@ -528,7 +532,7 @@ class IndexPage extends React.Component {
       })
       .catch(error => {
         this.setState({ loading: false });
-        throw error;
+        console.error({ error });
       });
   };
 
@@ -601,7 +605,7 @@ class IndexPage extends React.Component {
       })
       .catch(error => {
         this.setState({ saving: false });
-        throw error;
+        console.error({ error });
       });
   };
 
@@ -722,7 +726,7 @@ class IndexPage extends React.Component {
       })
       .catch(error => {
         this.setState({ loading: false });
-        throw error;
+        console.error({ error });
       });
   };
 

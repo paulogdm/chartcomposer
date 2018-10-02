@@ -231,7 +231,7 @@
 }
 
 .SongView .lyriccomment {
-  float: left;
+  display: inline-block;
   padding: 4px 8px;
   padding-bottom: 0.2em;
   background: #ddd;

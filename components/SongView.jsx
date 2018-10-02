@@ -66,33 +66,109 @@ const SongView = ({ preferences = {}, value = "" }) => {
 export default SongView;
 
 const Section = ({ part }) => {
+  console.debug("Section type", part.type, { part });
   let content;
   switch (part.type) {
     case "verse":
     case "chorus":
       content = <ChordsAndLyrics part={part} />;
       break;
+    case "image":
+      content = <Image part={part} />;
+      break;
     case "comment":
     case "choruscomment":
-      content = <Comment part={part} />;
+      content = <div className="lyriccomment">{part.lines[0]}</div>;
+      break;
+    case "x_url":
+      content = (
+        <a href={part.href} target="_blank">
+          {part.title}
+        </a>
+      );
+      break;
+    case "x_video":
+      content = <Video part={part} />;
       break;
     case "x_audio":
+      content = <Audio part={part} />;
+      break;
     case "x_pdf":
-    case "x_video":
-    case "image":
-      content = "TODO";
+      content = <PDF part={part} />;
+      break;
     default:
       console.warn("No implementation yet for part.type", part.type, part);
   }
   return <div className={`SongView-section-${part.type}`}>{content}</div>;
 };
 
-const Image = ({ part }) => {
-  return <img src={part.src} />;
+const Audio = ({ part }) => {
+  if (!part.url) {
+    return null;
+  }
+  return <audio src={part.url} controls style={{ width: "80%" }} />;
 };
 
-const Comment = ({ part }) => {
-  return <div className="lyriccomment">{part.lines[0]}</div>;
+const Video = ({ part }) => {
+  if (!part.url) {
+    return null;
+  }
+  if (part.url.indexOf("youtube") !== -1) {
+    return (
+      <iframe
+        width="560"
+        height="315"
+        src={part.url}
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+        style={{ paddingLeft: "5%" }}
+      />
+    );
+  }
+  return <video src={part.url} controls style="width: 80%" />;
+};
+
+const PDF = ({ part }) => {
+  if (!part.url) {
+    return null;
+  }
+  /*
+  var width = Math.min(
+    800,
+    songView && 0 < songView.clientWidth ? songView.clientWidth : 800,
+  );
+  var height =
+    Math.round((1100 * width) / 800) *
+    (hParams["pages"] ? hParams["pages"] : 1);
+    */
+  return (
+    <object data={part.url} type="application/pdf" width="95%">
+      <p>
+        You don't have a PDF plugin, but you can{" "}
+        <a href={part.url} target="_blank">
+          download the PDF file.
+        </a>
+      </p>
+    </object>
+  );
+};
+
+const Image = ({ part }) => {
+  if (!part.src) {
+    return null;
+  }
+  const { height, src, title, width } = part;
+  return (
+    <img
+      src={src}
+      alt={title}
+      style={{
+        width: width ? width + "px" : "100%",
+        height: height ? height + "px" : null,
+      }}
+    />
+  );
 };
 
 const ChordsAndLyrics = ({ part }) => {
@@ -189,17 +265,4 @@ const SongProperties = ({ chordPro }) => {
       )}
     </div>
   );
-};
-
-// The Dropbox Share URL for images and audio files end with "?dl=0" which takes you to an HTML
-// page containing the object. You have to replace that with "?raw=1" to get the actual file.
-const fixDropboxUrl = url => {
-  if (
-    -1 !== url.indexOf("https://www.dropbox.com/") &&
-    -1 !== url.indexOf("?dl=0")
-  ) {
-    url = url.replace("?dl=0", "?raw=1");
-  }
-
-  return url;
 };
