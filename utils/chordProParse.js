@@ -573,6 +573,25 @@ function doDirective(line) {
     case "x_url":
       // Extract each parameter and set it as a property on the "part".
       var hPart = parseParameters(parameters);
+      if (hPart.url) {
+        // Dropbox fixes
+        hPart.url = fixDropboxUrl(hPart.url);
+        // Spotify fixes
+        if (hPart.url.indexOf("https://open.spotify.com/") !== -1) {
+          // Extract the URI and convert "/" to ":".
+          var uri = hPart.url
+            .substring("https://open.spotify.com/".length)
+            .replace(/\//g, ":");
+          if (uri) {
+            hPart.url = `https://embed.spotify.com/?uri=spotify:${uri}`;
+          }
+        }
+        // Youtube
+        const youTubeUrl = getYoutubeUrl(hPart.url);
+        if (youTubeUrl) {
+          hPart.url = youTubeUrl;
+        }
+      }
       hPart.type = directive;
       hPart.lines = [parameters];
       gSong.parts.push(hPart);

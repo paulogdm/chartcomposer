@@ -50,7 +50,7 @@ const SongView = ({ preferences = {}, value = "" }) => {
               />
             </div>
             {chordPro.parts.map((part, i) => (
-              <Section key={i} part={part} />
+              <Section key={JSON.stringify(part)} part={part} />
             ))}
           </div>
         </PreferenceContext.Provider>
@@ -126,7 +126,7 @@ const Video = ({ part }) => {
       />
     );
   }
-  return <video src={part.url} controls style="width: 80%" />;
+  return <video src={part.url} controls style={{ width: "80%" }} />;
 };
 
 const PDF = ({ part }) => {
