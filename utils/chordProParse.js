@@ -1,3 +1,5 @@
+import { initAutoscroll, toggleAutoScroll } from "../components/AutoScroll.jsx";
+
 var gSong; // the song object is a global
 
 export default function chordProParse(chordprotext, preferences) {
@@ -13,14 +15,8 @@ export default function chordProParse(chordprotext, preferences) {
     outersongClassNames.push("chord-position-above");
   }
 
-  // Initialize the Autoscroll globals.
-  initAutoscroll();
-
   return {
     __html:
-      (gSong.duration
-        ? "<button id=autoscrollbtn onclick='toggleAutoScroll()' style='position: fixed; right: 80px; padding: 10px'>Autoscroll</button>"
-        : "") +
       "<div class='" +
       outersongClassNames.join(" ") +
       "' style='font-family: Verdana, Arial, Helvetica, sans-serif; color: " +
@@ -78,118 +74,6 @@ export function parseChordProString(text, preferences = {}) {
   }
 
   return gSong;
-}
-
-export function initAutoscroll() {
-  window.bAutoScroll = false;
-  window.tAutoscrollStart = 0;
-  window.nSongTop = 0;
-  window.below = 0;
-}
-
-export function setUpAutoscroll() {
-  window.toggleAutoScroll = function() {
-    bAutoScroll = !bAutoScroll;
-    if (bAutoScroll) {
-      // start autoscroll
-      if (window.tAutoscrollStart) {
-        // Resume autoscroll.
-        console.log("toggleAutoScroll: resume");
-        window.tAutoscrollStart += Number(new Date()) - window.tAutoscrollStop; // add paused time
-        autoScroll();
-      } else {
-        // Start autoscroll for the very first time.
-        console.log("toggleAutoScroll: start");
-        var songView = document.getElementsByClassName("panel-song-view")[0];
-        var startElement = document.getElementsByClassName("verse")[0];
-        var startImage =
-          document.getElementsByClassName("image")[0] ||
-          document.getElementsByClassName("x_pdf")[0];
-        if (
-          startImage &&
-          (!startElement ||
-            startImage.getBoundingClientRect().y <
-              startElement.getBoundingClientRect().y)
-        ) {
-          // If there is both a "verse" and an "image", choose the one closest to the top.
-          startElement = startImage;
-        }
-
-        if (startElement) {
-          // scrollTo parameters are relative to the SongView, but
-          // getBoundingClientRect is relative to the viewport.
-          // So we have to offset by the top of the SongView relative to viewport.
-          songView.scrollTo(0, 0); // Reset SongView so all coordinates are relative to 0
-          var songViewTop = songView.getBoundingClientRect().y;
-          window.nSongTop =
-            startElement.getBoundingClientRect().y - songViewTop; // "top" is the first verse so we skip over YouTube videos etc.
-          var nSongHeight = songView.scrollHeight - window.nSongTop;
-          window.below = nSongHeight - songView.clientHeight;
-          songView.scrollTo(0, window.nSongTop);
-          if (window.below <= 0) {
-            // it fits in the viewport - no need to autoscroll
-            console.log("no need to autoscroll - it all fits");
-            window.bAutoScroll = false;
-            return;
-          }
-          // Start after 10 seconds so the first line is visible for a while
-          window.tAutoscrollStart = Number(new Date()) + 10 * 1000;
-          setTimeout(autoScroll, 10 * 1000);
-        } else {
-          console.log("WARNING: Could not find first song element.");
-        }
-      }
-    } else {
-      window.tAutoscrollStop = Number(new Date());
-      console.log("toggleAutoScroll: stop");
-    }
-  };
-
-  window.autoScroll = function() {
-    if (!bAutoScroll) {
-      // stop autoscrolling
-      return;
-    }
-
-    // By 30 seconds before the end of the song we want the last line to be at the bottom of the viewport.
-    // So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
-    var delta = Number(new Date()) - tAutoscrollStart;
-    var duration = (durationSeconds(gSong.duration) - 40) * 1000;
-    if (!duration || delta >= duration) {
-      // done scrolling
-      console.log("done autoscrolling");
-      bAutoScroll = false;
-      return;
-    }
-
-    var scrollTo = Math.round(
-      window.nSongTop + (delta / duration) * window.below,
-    );
-    if (0 > scrollTo) {
-      return;
-    }
-    var songView = document.getElementsByClassName("panel-song-view")[0];
-    if (songView) {
-      songView.scrollTo(0, scrollTo);
-    } else {
-      window.bAutoScroll = false;
-      return;
-    }
-
-    setTimeout(autoScroll, 20);
-  };
-}
-
-// Convert the duration parameter to a number of seconds.
-function durationSeconds(dur) {
-  var matches = dur.match(/([0-9]*):([0-9]*)/);
-  if (matches) {
-    var mins = parseInt(matches[1]);
-    var secs = parseInt(matches[2]);
-    dur = 60 * mins + secs;
-  }
-
-  return dur;
 }
 
 //   closingdirective - a single string or an array of strings
@@ -580,7 +464,6 @@ function doDirective(line) {
         hPart.url &&
         hPart.url.indexOf("spotify.com") !== -1
       ) {
-        console.debug("setting iframe for spotify");
         hPart.tagName = "iframe";
       }
 

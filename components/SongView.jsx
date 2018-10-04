@@ -7,66 +7,67 @@ import chordProParse, {
   parseChordProString,
 } from "../utils/chordProParse.js";
 
+import AutoScroll from "./AutoScroll.jsx";
+
 const PreferenceContext = React.createContext({
   preferences: displayPreferenceDefaults,
 });
 
-const RENDER_IN_REACT = false;
+const RENDER_IN_REACT = true;
 
-const SongView = ({ preferences = {}, value = "" }) => {
-  Object.keys(displayPreferenceDefaults).forEach(name => {
-    preferences[name] = preferences[name] || displayPreferenceDefaults[name];
-  });
-  let chordPro;
-  let chordDiagramsHtml = "";
-  if (RENDER_IN_REACT) {
-    //console.debug("SongView preferences", preferences);
-    chordPro = parseChordProString(value);
+export default class SongView extends React.Component {
+  render() {
+    const { preferences = {}, value = "" } = this.props;
+    Object.keys(displayPreferenceDefaults).forEach(name => {
+      preferences[name] = preferences[name] || displayPreferenceDefaults[name];
+    });
+    const chordPro = parseChordProString(value);
+    let chordDiagramsHtml = "";
     chordPro.chords.forEach(chord => {
       const diagram = getChordDiagram(chord, preferences.x_instrument);
       chordDiagramsHtml += diagram;
     });
-  }
-  return (
-    <div>
-      {RENDER_IN_REACT ? (
-        <PreferenceContext.Provider value={preferences}>
+    return (
+      <div>
+        {chordPro.duration ? <AutoScroll duration={chordPro.duration} /> : null}
+        {RENDER_IN_REACT ? (
+          <PreferenceContext.Provider value={preferences}>
+            <div
+              className="SongView"
+              style={{
+                color: preferences.textcolour,
+                fontFamily: preferences.textfont,
+                fontSize: window.parseInt(preferences.textsize, 10),
+              }}
+            >
+              <SongProperties chordPro={chordPro} />
+              <div>
+                <div
+                  className={classNames(
+                    "chorddiagrams",
+                    `chord-diagramsize-${preferences.x_diagramsize}`,
+                  )}
+                  dangerouslySetInnerHTML={{ __html: chordDiagramsHtml }}
+                />
+              </div>
+              {chordPro.parts.map((part, i) => (
+                <Section key={JSON.stringify(part)} part={part} />
+              ))}
+            </div>
+          </PreferenceContext.Provider>
+        ) : (
           <div
             className="SongView"
-            style={{
-              color: preferences.textcolour,
-              fontFamily: preferences.textfont,
-              fontSize: window.parseInt(preferences.textsize, 10),
-            }}
-          >
-            <SongProperties chordPro={chordPro} />
-            <div>
-              <div
-                className={classNames(
-                  "chorddiagrams",
-                  `chord-diagramsize-${preferences.x_diagramsize}`,
-                )}
-                dangerouslySetInnerHTML={{ __html: chordDiagramsHtml }}
-              />
-            </div>
-            {chordPro.parts.map((part, i) => (
-              <Section key={JSON.stringify(part)} part={part} />
-            ))}
-          </div>
-        </PreferenceContext.Provider>
-      ) : (
-        <div
-          className="SongView"
-          dangerouslySetInnerHTML={chordProParse(value, preferences)}
-        />
-      )}
-    </div>
-  );
-};
-export default SongView;
+            dangerouslySetInnerHTML={chordProParse(value, preferences)}
+          />
+        )}
+      </div>
+    );
+  }
+}
 
 const Section = ({ part }) => {
-  console.debug("Section type", part.type, { part });
+  //console.debug("Section type", part.type, { part });
   let content;
   switch (part.type) {
     case "verse":
@@ -81,9 +82,10 @@ const Section = ({ part }) => {
       content = <div className="lyriccomment">{part.lines[0]}</div>;
       break;
     case "x_url":
+      console.debug("X_URL", part.url, part.title);
       content = (
-        <a href={part.href} target="_blank">
-          {part.title}
+        <a href={part.url} target="_blank">
+          {part.title || part.url}
         </a>
       );
       break;
@@ -99,7 +101,11 @@ const Section = ({ part }) => {
     default:
       console.warn("No implementation yet for part.type", part.type, part);
   }
-  return <div className={`SongView-section-${part.type}`}>{content}</div>;
+  return (
+    <div className={`SongView-section SongView-section-${part.type}`}>
+      {content}
+    </div>
+  );
 };
 
 const Audio = ({ part }) => {

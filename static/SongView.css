@@ -1,5 +1,5 @@
 @media print {
-  #autoscrollbtn,
+  .AutoScroll,
   .x_audio,
   .x_video {
     display: none !important;
@@ -215,6 +215,7 @@
   margin-bottom: 0.5em;
   font-family: monospace;
 }
+.SongView-section-comment,
 .SongView .comment {
   padding-top: 0.5em;
   padding-bottom: 0.5em;

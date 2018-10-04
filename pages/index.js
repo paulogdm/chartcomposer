@@ -26,7 +26,6 @@ import SongView from "../components/SongView";
 import blobToText from "../utils/blobToText";
 import isChordProFileName from "../utils/isChordProFileName";
 import getPathForSong from "../utils/getPathForSong";
-import { setUpAutoscroll } from "../utils/chordProParse";
 import { APP_NAME } from "../utils/constants";
 
 import publicRuntimeConfig from "../utils/publicRuntimeConfig";
@@ -112,7 +111,6 @@ class IndexPage extends React.Component {
       this.dbx = new Dropbox({ accessToken });
       this.setState({
         signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
-        smallScreenMode: this.getDefaultSmallScreenMode(),
       });
       if (window) {
         // for console debugging
@@ -164,8 +162,6 @@ class IndexPage extends React.Component {
     window.addEventListener("resize", this.debouncedOnWindowResize);
     window.addEventListener("offline", this.updateOnlineStatus);
     window.addEventListener("online", this.updateOnlineStatus);
-
-    setUpAutoscroll();
 
     // Otherwise there's no way for us to set smallScreenMode size correctly,
     // and when it's wrong initially, we see a flash of the left column + home
@@ -481,6 +477,8 @@ class IndexPage extends React.Component {
 
   setSongId = (songId, folderId) => {
     console.debug("setSongId", { songId, folderId });
+    const { folders, smallScreenMode, songs } = this.state;
+
     if (!songId) {
       this.setState({
         songId: null,
@@ -489,11 +487,10 @@ class IndexPage extends React.Component {
           smallScreenMode !== "SongList" &&
           smallScreenMode !== "PromoCopy"
             ? "SongList"
-            : this.state.smallScreenMode,
+            : smallScreenMode,
       });
       return;
     }
-    const { folders, smallScreenMode, songs } = this.state;
 
     if (!folders[folderId] && !songs[songId]) {
       console.error("no folders and songs in state", { folders, songs });
@@ -935,7 +932,10 @@ class IndexPage extends React.Component {
                     <FaMusic size={14} />
                     <div style={{ paddingLeft: 6 }}>Songs</div>
                   </div>
-                  <AddFolder loadDropboxLink={this.loadDropboxLink} />
+                  <AddFolder
+                    dbx={this.dbx}
+                    loadDropboxLink={this.loadDropboxLink}
+                  />
                 </div>
                 {songListClosed ? null : (
                   <div

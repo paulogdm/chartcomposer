@@ -8,55 +8,59 @@ import publicRuntimeConfig from "../utils/publicRuntimeConfig";
 
 const { DROPBOX_APP_KEY } = publicRuntimeConfig;
 
-const AddFolder = ({ loadDropboxLink }) => (
-  <div
-    style={{
-      alignItems: "center",
-      display: "flex",
-    }}
-  >
-    <ButtonToolbarGroup
-      buttons={[
-        {
-          title: "Choose a folder on Dropbox",
-          content: (
-            <DropboxChooser
-              appKey={DROPBOX_APP_KEY}
-              success={choices => {
-                console.debug("DropboxChooser success", { choices });
-                const folder = choices[0];
-                if (!folder.isDir) {
-                  alert("Please choose a folder, not a file");
-                  return;
-                }
-                loadDropboxLink(folder.link);
-              }}
-              multiselect={false}
-              extensions={[]}
-              folderselect
-            >
-              + <FaFolderOpen />
-            </DropboxChooser>
-          ),
-        },
-        {
-          onClick: e => {
-            const url = window.prompt("Dropbox shared folder URL");
-            if (!url) {
+const AddFolder = ({ dbx, loadDropboxLink }) => {
+  let buttons = [];
+  if (dbx) {
+    buttons.push({
+      title: "Choose a folder on Dropbox",
+      content: (
+        <DropboxChooser
+          appKey={DROPBOX_APP_KEY}
+          success={choices => {
+            console.debug("DropboxChooser success", { choices });
+            const folder = choices[0];
+            if (!folder.isDir) {
+              alert("Please choose a folder, not a file");
               return;
             }
-            loadDropboxLink(url);
-          },
-          title: "Paste a Dropbox folder link",
-          content: (
-            <div>
-              + <FaChain />
-            </div>
-          ),
-        },
-      ]}
-    />
-  </div>
-);
+            loadDropboxLink(folder.link);
+          }}
+          multiselect={false}
+          extensions={[]}
+          folderselect
+        >
+          + <FaFolderOpen />
+        </DropboxChooser>
+      ),
+    });
+  }
+
+  buttons.push({
+    title: "Paste a Dropbox folder link",
+    onClick: e => {
+      const url = window.prompt("Dropbox shared folder URL");
+      if (!url) {
+        return;
+      }
+      loadDropboxLink(url);
+    },
+    content: (
+      <div>
+        + <FaChain />
+      </div>
+    ),
+  });
+
+  return (
+    <div
+      style={{
+        alignItems: "center",
+        display: "flex",
+      }}
+    >
+      <ButtonToolbarGroup buttons={buttons} />
+    </div>
+  );
+};
 
 export default AddFolder;
