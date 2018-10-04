@@ -573,11 +573,23 @@ function doDirective(line) {
     case "x_url":
       // Extract each parameter and set it as a property on the "part".
       var hPart = parseParameters(parameters);
+
+      // Set a tagName param so we know which implementation to use in SongView
+      if (
+        directive === "x_audio" &&
+        hPart.url &&
+        hPart.url.indexOf("spotify.com") !== -1
+      ) {
+        console.debug("setting iframe for spotify");
+        hPart.tagName = "iframe";
+      }
+
       if (hPart.url) {
         // Dropbox fixes
         hPart.url = fixDropboxUrl(hPart.url);
-        // Spotify fixes
-        if (hPart.url.indexOf("https://open.spotify.com/") !== -1) {
+
+        // Spotify open -> embed link fixes
+        if (hPart.url.indexOf("https://open.spotify.com/") === 0) {
           // Extract the URI and convert "/" to ":".
           var uri = hPart.url
             .substring("https://open.spotify.com/".length)
@@ -586,6 +598,7 @@ function doDirective(line) {
             hPart.url = `https://embed.spotify.com/?uri=spotify:${uri}`;
           }
         }
+
         // Youtube
         const youTubeUrl = getYoutubeUrl(hPart.url);
         if (youTubeUrl) {

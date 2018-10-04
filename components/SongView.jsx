@@ -106,6 +106,17 @@ const Audio = ({ part }) => {
   if (!part.url) {
     return null;
   }
+  if (part.tagName === "iframe") {
+    return (
+      <iframe
+        src={part.url}
+        width="300"
+        height="380"
+        frameBorder="0"
+        allowtransparency="true"
+      />
+    );
+  }
   return <audio src={part.url} controls style={{ width: "80%" }} />;
 };
 
@@ -121,7 +132,7 @@ const Video = ({ part }) => {
         src={part.url}
         frameborder="0"
         allow="autoplay; encrypted-media"
-        allowfullscreen
+        allowFullScreen
         style={{ paddingLeft: "5%" }}
       />
     );
@@ -129,30 +140,50 @@ const Video = ({ part }) => {
   return <video src={part.url} controls style={{ width: "80%" }} />;
 };
 
-const PDF = ({ part }) => {
-  if (!part.url) {
-    return null;
+class PDF extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      height: 500,
+    };
   }
-  /*
-  var width = Math.min(
-    800,
-    songView && 0 < songView.clientWidth ? songView.clientWidth : 800,
-  );
-  var height =
-    Math.round((1100 * width) / 800) *
-    (hParams["pages"] ? hParams["pages"] : 1);
-    */
-  return (
-    <object data={part.url} type="application/pdf" width="95%">
-      <p>
-        You don't have a PDF plugin, but you can{" "}
-        <a href={part.url} target="_blank">
-          download the PDF file.
-        </a>
-      </p>
-    </object>
-  );
-};
+
+  componentDidMount() {
+    const { part } = this.props;
+    const width = Math.min(
+      800,
+      this.el && 0 < this.el.clientWidth ? this.el.clientWidth : 800,
+    );
+    const height =
+      Math.round((1100 * width) / 800) * (part.pages ? part.pages : 1);
+    this.setState({ height });
+  }
+
+  render() {
+    const { part } = this.props;
+    const { height } = this.state;
+    if (!part.url) {
+      return null;
+    }
+    return (
+      <div ref={el => (this.el = el)}>
+        <object
+          data={part.url}
+          type="application/pdf"
+          height={`${height}px`}
+          width="95%"
+        >
+          <p>
+            You don't have a PDF plugin, but you can{" "}
+            <a href={part.url} target="_blank">
+              download the PDF file.
+            </a>
+          </p>
+        </object>
+      </div>
+    );
+  }
+}
 
 const Image = ({ part }) => {
   if (!part.src) {
