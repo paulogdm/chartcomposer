@@ -6,9 +6,88 @@
   }
 }
 
-.x_pdf {
-  width: 95%;
+.SongView .lyricline {
+  line-height: 2.3;
 }
+
+.SongView .directives {
+  margin-bottom: 1em;
+}
+
+.SongView .directive-title {
+  font-size: 2em;
+}
+
+.SongView .title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.SongView .artist {
+  font-size: 1.1em;
+}
+
+.SongView .composer {
+  font-size: 1.1em;
+}
+
+.SongView-section-verse,
+.SongView-section-chorus {
+  padding-top: 0.5em;
+  margin-bottom: 0.5em;
+  clear: both;
+}
+
+.SongView .tab {
+  padding-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-family: monospace;
+}
+
+.SongView-section-comment,
+.SongView .comment {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.SongView .chord {
+  background: none;
+  top: -0.7em;
+  position: relative;
+}
+
+.SongView.chord-position-above .chord {
+  padding: 0;
+}
+
+.SongView.chord-position-above .chord > .visible {
+  position: absolute;
+  top: -1em;
+}
+
+.SongView.chord-position-above .chord > .invisible {
+  visibility: hidden;
+}
+
+.SongView .lyriccomment {
+  display: inline-block;
+  padding: 4px 8px;
+  padding-bottom: 0.2em;
+  background: #ddd;
+  line-height: 1;
+}
+
+.SongView.chord-position-above .space {
+  display: inline-block;
+  min-width: 0.5em;
+}
+
+.SongView.chord-position-above .lyricline,
+.SongView.chord-position-above .lyriccomment {
+  margin-bottom: 0.4em;
+}
+
+/** ChordDiagrams **/
 
 .chorddiagrams {
   display: flex;
@@ -186,70 +265,4 @@
   font-size: 12px;
   float: left;
   line-height: 1;
-}
-
-.SongView .songtitle {
-  font-size: 2em;
-}
-.SongView .songproperties {
-  margin-bottom: 1em;
-}
-.SongView .title {
-  font-size: 1.5em;
-  font-weight: bold;
-}
-.SongView .artist {
-  font-size: 1.1em;
-}
-.SongView .composer {
-  font-size: 1.1em;
-}
-.SongView-section-verse,
-.SongView-section-chorus {
-  padding-top: 0.5em;
-  margin-bottom: 0.5em;
-  clear: both;
-}
-.SongView .tab {
-  padding-top: 0.5em;
-  margin-bottom: 0.5em;
-  font-family: monospace;
-}
-.SongView-section-comment,
-.SongView .comment {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-}
-.SongView .chord {
-  background: none;
-  top: -0.5em;
-  line-height: 1;
-  position: relative;
-  margin: 0 2px 0 4px;
-}
-.SongView .chord-position-above .chord > span {
-  position: absolute;
-}
-
-.SongView .lyriccomment {
-  display: inline-block;
-  padding: 4px 8px;
-  padding-bottom: 0.2em;
-  background: #ddd;
-  line-height: 1;
-}
-
-.SongView .lyricline {
-  line-height: 1.8;
-}
-
-.SongView .chord-position-above .chord {
-  margin: 0;
-  padding: 0;
-}
-.SongView .chord-position-above .lyricline {
-  line-height: 2.3;
-}
-.SongView .chord-position-above .lyriccomment {
-  margin-bottom: 0.6em;
 }

@@ -1,25 +1,53 @@
 import chordProParse, { parseLine } from "./chordProParse";
 
-test("parseLine without capo", () => {
-  expect(parseLine("[C]")).toEqual([
-    { type: "chord", originalChord: "C", text: "C" },
-  ]);
+const SPACE = { type: "space", text: " " };
+
+const chord = originalChord => {
+  return {
+    type: "chord",
+    originalChord: originalChord,
+    text: originalChord,
+  };
+};
+const text = text => {
+  return { type: "text", text: text };
+};
+
+test("parseLine word and chord splitting", () => {
+  expect(parseLine("[C]")).toEqual([chord("C")]);
+  expect(parseLine("[C] [C]")).toEqual([chord("C"), SPACE, chord("C")]);
+
   expect(parseLine("[C]Make[A#]")).toEqual([
-    { type: "chord", originalChord: "C", text: "C" },
-    { type: "word", text: "Make" },
-    { type: "chord", originalChord: "A#", text: "A#" },
+    chord("C"),
+    text("Make"),
+    chord("A#"),
   ]);
 
-  expect(parseLine("[C]Make[A#] a little birdhouse")).toEqual([
-    { type: "chord", originalChord: "C", text: "C" },
-    { type: "word", text: "Make" },
-    { type: "chord", originalChord: "A#", text: "A#" },
-    { type: "word", text: "a" },
-    { type: "word", text: "little" },
-    { type: "word", text: "birdhouse" },
+  expect(
+    parseLine("[C]A delicate [Em]dose of your [G]own medic[C]ine"),
+  ).toEqual([
+    chord("C"),
+    text("A"),
+    SPACE,
+    text("delicate"),
+    SPACE,
+    chord("Em"),
+    text("dose"),
+    SPACE,
+    text("of"),
+    SPACE,
+    text("your"),
+    SPACE,
+    chord("G"),
+    text("own"),
+    SPACE,
+    text("medic"),
+    chord("C"),
+    text("ine"),
   ]);
 });
 
+/*
 test("parseLine with capo", () => {
   expect(parseLine("[C]Make[A#]", 2)).toEqual([
     { type: "chord", originalChord: "C", text: "D" },
@@ -37,3 +65,4 @@ test("parseLine with punctuation", () => {
     { type: "word", text: '"sweat!"' },
   ]);
 });
+*/

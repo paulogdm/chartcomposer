@@ -126,31 +126,42 @@ function doBlock(type, closingdirectives) {
 }
 
 const CHORD_RE = /\[(.*?)\]/;
-const CHORD_OR_WORD_RE = /(\[(.*?)\])|([\w\.\,\!\"\']+)/g;
+
+const CHORD_OR_TEXT_RE = /(\[(.*?)\])|([\w\.\,\!\"\']+)/g;
 
 // Break a line into its atomic, most granular parts.
+// We split on spaces so that we can preserve distance between words, inline
+// chords, and chords one after another, regardless of chordposition.
 export function parseLine(line, capo = undefined) {
   let parsedLine = [];
-  const matches = line.match(CHORD_OR_WORD_RE) || [];
-  matches.forEach(chordOrWord => {
-    const matchesIfChord = chordOrWord.match(CHORD_RE);
-    if (matchesIfChord) {
-      const originalChord = matchesIfChord[1];
-      let text = originalChord;
-      if (capo) {
-        var baseChord = originalChord.substr(0, 1);
-        var baseChordTransposed = transpose(baseChord, capo);
-        text = originalChord.replace(baseChord, baseChordTransposed);
+  line.split(" ").forEach((chunk, i, chunks) => {
+    const matches = chunk.match(CHORD_OR_TEXT_RE) || [];
+    matches.forEach(chordOrText => {
+      const matchesIfChord = chordOrText.match(CHORD_RE);
+      if (matchesIfChord) {
+        const originalChord = matchesIfChord[1];
+        let text = originalChord;
+        if (capo) {
+          var baseChord = originalChord.substr(0, 1);
+          var baseChordTransposed = transpose(baseChord, capo);
+          text = originalChord.replace(baseChord, baseChordTransposed);
+        }
+        parsedLine.push({
+          type: "chord",
+          originalChord,
+          text,
+        });
+      } else {
+        parsedLine.push({
+          type: "text",
+          text: chordOrText,
+        });
       }
+    });
+    if (i < chunks.length - 1) {
       parsedLine.push({
-        type: "chord",
-        originalChord,
-        text,
-      });
-    } else {
-      parsedLine.push({
-        type: "word",
-        text: chordOrWord,
+        type: "space",
+        text: " ",
       });
     }
   });

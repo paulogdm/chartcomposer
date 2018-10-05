@@ -33,7 +33,9 @@ export default class SongView extends React.Component {
         {RENDER_IN_REACT ? (
           <PreferenceContext.Provider value={preferences}>
             <div
-              className="SongView"
+              className={classNames("SongView", {
+                "chord-position-above": preferences.x_chordposition === "above",
+              })}
               style={{
                 color: preferences.textcolour,
                 fontFamily: preferences.textfont,
@@ -51,7 +53,7 @@ export default class SongView extends React.Component {
                 />
               </div>
               {chordPro.parts.map((part, i) => (
-                <Section key={JSON.stringify(part)} part={part} />
+                <Section key={part.url ? part.url : i} part={part} />
               ))}
             </div>
           </PreferenceContext.Provider>
@@ -82,7 +84,6 @@ const Section = ({ part }) => {
       content = <div className="lyriccomment">{part.lines[0]}</div>;
       break;
     case "x_url":
-      console.debug("X_URL", part.url, part.title);
       content = (
         <a href={part.url} target="_blank">
           {part.title || part.url}
@@ -213,41 +214,48 @@ const ChordsAndLyrics = ({ part }) => {
     <div>
       {part.linesParsed.map((parsed, i) => (
         <div key={i} className="SongView-line lyricline">
-          {parsed.map(
-            (chordOrWord, j) =>
-              chordOrWord.type === "word" ? (
-                <Word
+          {parsed.map((chunk, j, chunks) => {
+            if (chunk.type === "text") {
+              return <Word key={j} word={chunk} />;
+            } else if (chunk.type === "space") {
+              return <span className="space"> </span>;
+            } else if (chunk.type === "chord") {
+              return (
+                <Chord
                   key={j}
-                  word={chordOrWord}
-                  isLastWord={j === parsed.length - 1}
+                  chord={chunk}
+                  nextIsChord={
+                    chunks[j + 1] &&
+                    chunks[j + 1].type === "space" &&
+                    chunks[j + 2] &&
+                    chunks[j + 2].type === "chord"
+                  }
                 />
-              ) : (
-                <Chord key={j} chord={chordOrWord} />
-              ),
-          )}
+              );
+            } else {
+              throw new Error("Found chunk with unknown type: " + chunk.type);
+            }
+          })}
         </div>
       ))}
     </div>
   );
 };
 
-const Word = ({ isLastWord, word }) => {
+const Word = ({ word }) => {
   return (
     <PreferenceContext.Consumer>
       {({ textcolour, textfont, textsize }) => (
-        <span className="SongView-word">
-          {word.text}
-          {!isLastWord && <span> </span>}
-        </span>
+        <span className="SongView-word">{word.text}</span>
       )}
     </PreferenceContext.Consumer>
   );
 };
 
-const Chord = ({ chord }) => {
+const Chord = ({ chord, nextIsChord }) => {
   return (
     <PreferenceContext.Consumer>
-      {({ chordcolour, chordfont, chordsize }) => (
+      {({ chordcolour, chordfont, chordsize, x_chordposition }) => (
         <code
           className="chord"
           style={{
@@ -256,7 +264,11 @@ const Chord = ({ chord }) => {
             fontSize: chordsize,
           }}
         >
-          <span>{chord.text}</span>
+          <span className="visible">{chord.text}</span>
+          {nextIsChord &&
+            x_chordposition === "above" && (
+              <span className="invisible">{chord.text}</span>
+            )}
         </code>
       )}
     </PreferenceContext.Consumer>
@@ -288,11 +300,11 @@ const SongProperties = ({ chordPro }) => {
     //"x_chordposition",
   ];
   return (
-    <div className="songproperties">
+    <div className="directives">
       {songProperties.map(
         property =>
           chordPro[property] && (
-            <div key={property} className={`song${property}`}>
+            <div key={property} className={`directive-${property}`}>
               {["title", "subtitle"].indexOf(property) === -1 && (
                 <span>{`${titleCase(property)}: `}</span>
               )}
