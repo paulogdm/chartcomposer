@@ -54,6 +54,7 @@ export function getGuestAccessToken() {
 
 export const LOCAL_STORAGE_FIELDS = [
   "chordPro", // the raw text of songs
+  "closedFolders",
   "folders",
   "songs",
   "user",
