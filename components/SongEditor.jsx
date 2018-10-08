@@ -1,4 +1,6 @@
 import moment from "moment";
+import { Button } from "react-bootstrap";
+
 import LoadingIndicator from "./LoadingIndicator";
 import textToChordPro, { isChordProFormat } from "../utils/textToChordPro";
 
@@ -32,33 +34,31 @@ class SongEditor extends React.Component {
         }}
       >
         {isChordProFormat(value) ? null : (
-          <button
+          <Button
             onClick={this.convertValueToChordPro}
             style={{
               position: "fixed",
               right: "80px",
-              padding: "10px",
             }}
           >
             Convert to ChordPro
-          </button>
+          </Button>
         )}
         <div
           style={{
             display: "flex",
             fontSize: 10,
             justifyContent: "space-between",
+            minHeight: 20,
           }}
         >
-          {readOnly ? (
-            <div style={{ color: "red", marginBottom: 10 }}>READ ONLY</div>
-          ) : saving ? (
-            <div>Saving ...</div>
-          ) : (
-            <div />
-          )}
+          <div>
+            {readOnly && (
+              <div style={{ color: "red", marginBottom: 10 }}>READ ONLY</div>
+            )}
+          </div>
 
-          <LastSaved timestamp={serverModified} />
+          {saving ? <Saving /> : <LastSaved timestamp={serverModified} />}
         </div>
         <div style={{ flex: 1, position: "relative" }}>
           <textarea
@@ -81,6 +81,29 @@ class SongEditor extends React.Component {
 }
 
 export default SongEditor;
+
+const Saving = () => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      padding: 5,
+    }}
+  >
+    <div>Saving ...</div>
+    <div
+      style={{
+        color: "gold",
+        padding: "0px 3px",
+        marginLeft: 5,
+        borderRadius: "50%",
+        border: "1px solid gold",
+      }}
+    >
+      ✔
+    </div>
+  </div>
+);
 
 const LastSaved = ({ timestamp }) => (
   <div style={{ display: "flex", alignItems: "center", padding: 5 }}>

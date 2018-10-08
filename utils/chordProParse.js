@@ -202,6 +202,7 @@ export { gaDefaultSettings as displayPreferenceDefaults };
 const fontOptions = [
   { label: "Default", value: "Verdana, Arial, Helvetica, sans-serif" },
   { label: "Lucida Grande", value: "Lucida Grande, sans-serif" },
+  //{ label: "Plex", value: "'IBM Plex Mono', monospace" },
 ];
 const sizeOptions = [
   { label: "12", value: 12 },

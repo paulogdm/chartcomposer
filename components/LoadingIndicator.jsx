@@ -4,7 +4,12 @@ import Background from "./Background";
 
 const notes = ["♪", "♫", "♬", "♩", "♪", "♫", "♬"];
 
-const LoadingIndicator = ({ hasBackground, style }) => {
+const LoadingIndicator = ({
+  bounceHeight = 10,
+  fontSize = "2em",
+  hasBackground,
+  style,
+}) => {
   hasBackground = hasBackground !== false;
   style = style || {};
   return (
@@ -12,7 +17,7 @@ const LoadingIndicator = ({ hasBackground, style }) => {
       <style jsx>{`
         ul li {
           display: inline-block;
-          font-size: 2em;
+          font-size: ${fontSize};
           margin: 0 4px;
           color: #000;
           text-shadow: 0 -1px 0 white, 0 1px 0 black;
@@ -42,17 +47,17 @@ const LoadingIndicator = ({ hasBackground, style }) => {
         @keyframes music {
           0%,
           100% {
-            transform: translate3d(0, -10px, 0);
+            transform: translate3d(0, -${bounceHeight}px, 0);
           }
           50% {
-            transform: translate3d(0, 10px, 0);
+            transform: translate3d(0, ${bounceHeight}px, 0);
           }
         }
       `}</style>
       {hasBackground && <Background />}
       <div
         style={{
-          background: "#fff",
+          background: "transparent",
           borderRadius: 7,
           padding: "10px 30px 20px 30px",
           color: "#000",

@@ -810,20 +810,6 @@ class IndexPage extends React.Component {
           }
         `}</style>
 
-        {saving && (
-          <LoadingIndicator
-            hasBackground={false}
-            style={{
-              padding: "5px 10px 10px 10px",
-              position: "fixed",
-              fontSize: 10,
-              right: 42,
-              top: 0,
-              zIndex: 2,
-            }}
-          />
-        )}
-
         {loading ? (
           <LoadingIndicator
             style={{
@@ -1008,8 +994,7 @@ class IndexPage extends React.Component {
                   className="panel-song-editor"
                   style={{
                     height: "100%",
-                    overflow: "auto",
-                    padding: "8px 0",
+                    padding: "0",
                     display: songEditorClosed ? "none" : "block",
                     width:
                       renderSongEditor && renderSongView
