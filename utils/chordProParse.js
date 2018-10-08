@@ -127,7 +127,7 @@ function doBlock(type, closingdirectives) {
 
 const CHORD_RE = /\[(.*?)\]/;
 
-const CHORD_OR_TEXT_RE = /(\[(.*?)\])|([\w\.\,\!\"\']+)/g;
+const CHORD_OR_TEXT_RE = /(\[(.*?)\])|([\w\.\,\!\"\'\’\“\”]+)/g;
 
 // Break a line into its atomic, most granular parts.
 // We split on spaces so that we can preserve distance between words, inline

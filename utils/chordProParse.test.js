@@ -47,11 +47,10 @@ test("parseLine word and chord splitting", () => {
   ]);
 });
 
-/*
 test("parseLine with capo", () => {
   expect(parseLine("[C]Make[A#]", 2)).toEqual([
     { type: "chord", originalChord: "C", text: "D" },
-    { type: "word", text: "Make" },
+    text("Make"),
     { type: "chord", originalChord: "A#", text: "B#" },
   ]);
 });
@@ -59,10 +58,24 @@ test("parseLine with capo", () => {
 test("parseLine with punctuation", () => {
   expect(parseLine(`[C]Make's[A#] me "sweat!"`, 2)).toEqual([
     { type: "chord", originalChord: "C", text: "D" },
-    { type: "word", text: "Make's" },
+    text("Make's"),
     { type: "chord", originalChord: "A#", text: "B#" },
-    { type: "word", text: "me" },
-    { type: "word", text: '"sweat!"' },
+    SPACE,
+    text("me"),
+    SPACE,
+    text('"sweat!"'),
+  ]);
+  expect(parseLine(`[Am]You’re brighter than you [E]think`)).toEqual([
+    chord("Am"),
+    text("You’re"),
+    SPACE,
+    text("brighter"),
+    SPACE,
+    text("than"),
+    SPACE,
+    text("you"),
+    SPACE,
+    chord("E"),
+    text("think"),
   ]);
 });
-*/
