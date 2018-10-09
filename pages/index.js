@@ -81,7 +81,10 @@ class IndexPage extends React.Component {
       if (router.query.songId) {
         this.setSongId(router.query.songId, router.query.folderId);
       }
-      window.setTimeout(() => this.reSyncDropboxFolders(), 1000);
+      this.reSyncDropboxTimeout = window.setTimeout(
+        () => this.reSyncDropboxFolders(),
+        1000,
+      );
     });
   }
 
@@ -170,6 +173,9 @@ class IndexPage extends React.Component {
   }
 
   componentWillUnmount() {
+    if (this.reSyncDropboxTimeout) {
+      window.clearTimeout(this.reSyncDropboxTimeout);
+    }
     this.dbx = null;
     window.removeEventListener("resize", this.debouncedOnWindowResize);
     window.removeEventListener("offline", this.updateOnlineStatus);

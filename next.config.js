@@ -3,6 +3,7 @@ const withCSS = require("@zeit/next-css");
 
 const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
 const WebpackPwaManifest = require("webpack-pwa-manifest");
+const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 // TODO: how to import from utils/constants?
 const APP_NAME = "ChartComposer";
@@ -53,6 +54,55 @@ module.exports = withCSS({
         ],
         //includeDirectory: true,
         publicPath: "/_next",
+      }),
+    );
+
+    config.plugins.push(
+      new MonacoWebpackPlugin({
+        languages: ["markdown"],
+        features: [
+          //"accessibilityHelp",
+          "bracketMatching",
+          //"caretOperations",
+          "clipboard",
+          "codeAction",
+          //"codelens",
+          "colorDetector",
+          "comment",
+          //"contextmenu",
+          "coreCommands",
+          "cursorUndo",
+          //"dnd",
+          //"find",
+          "folding",
+          //"fontZoom",
+          "format",
+          //"goToDefinitionCommands",
+          //"goToDefinitionMouse",
+          //"gotoError",
+          //"gotoLine",
+          //"hover",
+          //"inPlaceReplace",
+          //"inspectTokens",
+          "iPadShowKeyboard",
+          //"linesOperations",
+          //"links",
+          //"multicursor",
+          //"parameterHints",
+          //"quickCommand",
+          //"quickOutline",
+          //"referenceSearch",
+          //"rename",
+          //"smartSelect",
+          //"snippets",
+          //"suggest",
+          //"toggleHighContrast",
+          //"toggleTabFocusMode",
+          //"transpose",
+          //"wordHighlighter",
+          //"wordOperations",
+          //"wordPartOperations",
+        ],
       }),
     );
 

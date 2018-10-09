@@ -24,6 +24,7 @@
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
+    "monaco-editor-webpack-plugin": "^1.5.4",
     "next": "^7.0.1",
     "prop-types": "^15.6.2",
     "raven-js": "^3.27.0",

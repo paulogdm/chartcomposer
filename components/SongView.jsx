@@ -220,18 +220,18 @@ const ChordsAndLyrics = ({ part }) => {
             } else if (chunk.type === "space") {
               return <span className="space"> </span>;
             } else if (chunk.type === "chord") {
-              return (
-                <Chord
-                  key={j}
-                  chord={chunk}
-                  nextIsChord={
-                    chunks[j + 1] &&
-                    chunks[j + 1].type === "space" &&
-                    chunks[j + 2] &&
-                    chunks[j + 2].type === "chord"
-                  }
-                />
-              );
+              let nextIsChord = false;
+              if (chunks[j + 1] && chunks[j + 1].type === "chord") {
+                nextIsChord = true;
+              } else if (
+                chunks[j + 1] &&
+                chunks[j + 1].type === "space" &&
+                chunks[j + 2] &&
+                chunks[j + 2].type === "chord"
+              ) {
+                nextIsChord = true;
+              }
+              return <Chord key={j} chord={chunk} nextIsChord={nextIsChord} />;
             } else {
               throw new Error("Found chunk with unknown type: " + chunk.type);
             }
