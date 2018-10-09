@@ -18,7 +18,6 @@ class SongEditor extends React.Component {
   onChangeMonaco = value => {
     const { onChange } = this.props;
     this.setState({ value }, () => onChange(value));
-    console.debug("onChangeMonaco", value);
   };
 
   onChange = e => {
