@@ -15,6 +15,14 @@ class SongEditor extends React.Component {
     this.state = { value: props.value };
   }
 
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  }
+
   onChangeMonaco = value => {
     const { onChange } = this.props;
     this.setState({ value }, () => onChange(value));
@@ -31,6 +39,8 @@ class SongEditor extends React.Component {
     const value = textToChordPro(this.state.value);
     this.setState({ value }, () => onChange(value));
   };
+
+  handleResize = () => this.editor.layout();
 
   render() {
     const { readOnly, saving, serverModified } = this.props;
@@ -79,20 +89,19 @@ class SongEditor extends React.Component {
             value={value}
             options={{
               fontSize: 14,
+              glyphMargin: false,
               lineNumbers: "off",
-              minimap: {
-                enabled: false,
-              },
-              roundedSelection: false,
-              scrollBeyondLastLine: false,
+              minimap: { enabled: false },
               readOnly,
               renderLineHighlight: "none",
+              roundedSelection: false,
+              scrollBeyondLastLine: false,
               selectionHighlight: false,
               wordBasedSuggestions: false,
               wordWrap: "on",
             }}
             onChange={this.onChangeMonaco}
-            editorDidMount={() => console.debug("editor mounted")}
+            editorDidMount={editor => (this.editor = editor)}
           />
           {/*
           <textarea
