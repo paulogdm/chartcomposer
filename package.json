@@ -15,6 +15,7 @@
   "author": "Lindsey Simon <elsigh@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@zeit/next-css": "^1.0.1",
     "classnames": "^2.2.6",
     "create-next": "^0.1.4",
     "dropbox": "^4.0.9",
@@ -33,6 +34,7 @@
     "react-draggable": "^3.0.5",
     "react-dropbox-chooser": "^0.0.5",
     "react-icons": "^2.2.7",
+    "react-monaco-editor": "^0.19.0",
     "react-oauth-flow": "1.1.1",
     "whatwg-fetch": "^2.0.3"
   },

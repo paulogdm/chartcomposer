@@ -1,3 +1,8 @@
+import React from "react";
+import dynamic from "next/dynamic";
+const MonacoEditorWithNoSSR = dynamic(() => import("react-monaco-editor"), {
+  ssr: false,
+});
 import moment from "moment";
 import { Button } from "react-bootstrap";
 
@@ -9,6 +14,12 @@ class SongEditor extends React.Component {
     super();
     this.state = { value: props.value };
   }
+
+  onChangeMonaco = value => {
+    const { onChange } = this.props;
+    this.setState({ value }, () => onChange(value));
+    console.debug("onChangeMonaco", value);
+  };
 
   onChange = e => {
     const { onChange } = this.props;
@@ -61,6 +72,30 @@ class SongEditor extends React.Component {
           {saving ? <Saving /> : <LastSaved timestamp={serverModified} />}
         </div>
         <div style={{ flex: 1, position: "relative" }}>
+          <MonacoEditorWithNoSSR
+            width="100%"
+            height="100%"
+            language="markdown"
+            theme="vs-light"
+            value={value}
+            options={{
+              fontSize: 14,
+              lineNumbers: "off",
+              minimap: {
+                enabled: false,
+              },
+              roundedSelection: false,
+              scrollBeyondLastLine: false,
+              readOnly,
+              renderLineHighlight: "none",
+              selectionHighlight: false,
+              wordBasedSuggestions: false,
+              wordWrap: "on",
+            }}
+            onChange={this.onChangeMonaco}
+            editorDidMount={() => console.debug("editor mounted")}
+          />
+          {/*
           <textarea
             value={value}
             onChange={this.onChange}
@@ -73,7 +108,7 @@ class SongEditor extends React.Component {
               padding: "3px",
               width: "100%",
             }}
-          />
+          />*/}
         </div>
       </div>
     );

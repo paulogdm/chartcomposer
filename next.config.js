@@ -1,4 +1,5 @@
 const path = require("path");
+const withCSS = require("@zeit/next-css");
 
 const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
 const WebpackPwaManifest = require("webpack-pwa-manifest");
@@ -6,7 +7,7 @@ const WebpackPwaManifest = require("webpack-pwa-manifest");
 // TODO: how to import from utils/constants?
 const APP_NAME = "ChartComposer";
 
-module.exports = {
+module.exports = withCSS({
   publicRuntimeConfig: {
     // Will be available on both server and client
     DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
@@ -57,4 +58,4 @@ module.exports = {
 
     return config;
   },
-};
+});
