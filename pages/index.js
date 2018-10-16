@@ -1030,6 +1030,7 @@ class IndexPage extends React.Component {
                   }}
                 >
                   <SongView
+                    key={songId}
                     preferences={preferences.display}
                     value={chordPro[songId]}
                   />

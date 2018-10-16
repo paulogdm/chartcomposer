@@ -21,19 +21,30 @@ export default class AutoScroll extends React.Component {
     this.below = 0;
   }
 
+  componentWillUnmount() {
+    console.debug("AUTOSCROLL CWU");
+    const songView = document.querySelector(".panel-song-view");
+    songView.scrollTo(0, 0);
+    if (this.autoScrollTimeout) {
+      console.debug("unsetting autoScrollTimeout", this.autoScrollTimeout);
+      window.clearTimeout(this.autoScrollTimeout);
+      this.autoScrollTimeout = null;
+    }
+  }
+
   autoScroll = () => {
     if (!this.bAutoScroll) {
       // stop autoscrolling
       return;
     }
 
-    var songView = document.querySelector(".panel-song-view");
+    const songView = document.querySelector(".panel-song-view");
 
     // By 30 seconds before the end of the song we want the last line to be at the bottom of the viewport.
     // So we find the amount of song that is below the fold, and the time to scroll it, and prorate that.
     // TODO(elsigh): This seems to fail if the song is less than 40 seconds long.
-    var delta = Number(new Date()) - this.tAutoscrollStart;
-    var duration = (durationSeconds(this.props.duration) - 40) * 1000;
+    const delta = Number(new Date()) - this.tAutoscrollStart;
+    const duration = (durationSeconds(this.props.duration) - 40) * 1000;
     if (!duration || delta >= duration) {
       // done scrolling
       console.log("done autoscrolling");
@@ -42,7 +53,9 @@ export default class AutoScroll extends React.Component {
       return;
     }
 
-    var scrollTo = Math.round(this.nSongTop + (delta / duration) * this.below);
+    const scrollTo = Math.round(
+      this.nSongTop + (delta / duration) * this.below,
+    );
     if (0 > scrollTo) {
       return;
     }
@@ -54,7 +67,7 @@ export default class AutoScroll extends React.Component {
       return;
     }
 
-    window.setTimeout(this.autoScroll, 20);
+    this.autoScrollTimeout = window.setTimeout(this.autoScroll, 20);
   };
 
   toggleAutoScroll = () => {
@@ -104,13 +117,17 @@ export default class AutoScroll extends React.Component {
           }
           // Start after 10 seconds so the first line is visible for a while
           this.tAutoscrollStart = Number(new Date()) + 10 * 1000;
-          setTimeout(this.autoScroll, 10 * 1000);
+          this.autoScrollTimeout = window.setTimeout(
+            this.autoScroll,
+            10 * 1000,
+          );
         } else {
           console.log("WARNING: Could not find first song element.");
         }
       }
     } else {
       this.tAutoscrollStop = Number(new Date());
+      this.autoScrollTimeout = null;
       console.log("toggleAutoScroll: stop");
     }
   };
