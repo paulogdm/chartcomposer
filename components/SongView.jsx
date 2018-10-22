@@ -193,13 +193,13 @@ class PDF extends React.Component {
 }
 
 const Image = ({ part }) => {
-  if (!part.src) {
+  if (!part.url) {
     return null;
   }
-  const { height, src, title, width } = part;
+  const { height, title, url, width } = part;
   return (
     <img
-      src={src}
+      src={url}
       alt={title}
       style={{
         width: width ? width + "px" : "100%",

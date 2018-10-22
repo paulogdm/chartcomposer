@@ -470,6 +470,11 @@ function doDirective(line) {
       // Extract each parameter and set it as a property on the "part".
       var hPart = parseParameters(parameters);
 
+      // map `src` to `url` for internal consistency.
+      if (hPart.src && !hPart.url) {
+        hPart.url = hPart.src;
+      }
+
       // Set a tagName param so we know which implementation to use in SongView
       if (
         directive === "x_audio" &&
