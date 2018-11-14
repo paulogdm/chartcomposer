@@ -37,6 +37,7 @@ class SongEditor extends React.Component {
   convertValueToChordPro = () => {
     const { onChange } = this.props;
     const value = textToChordPro(this.state.value);
+    console.debug("convertValueToChordPro", { value });
     this.setState({ value }, () => onChange(value));
   };
 
