@@ -96,7 +96,7 @@ class IndexPage extends React.Component {
     if (folders) {
       Object.keys(folders).forEach(folderId => {
         const folder = folders[folderId];
-        console.log("reSyncDropboxFolder", { folder });
+        console.debug("reSyncDropboxFolder", { folder });
         this.loadDropboxLink(folder.url, true);
       });
     }
@@ -122,7 +122,7 @@ class IndexPage extends React.Component {
       this.dbx
         .usersGetCurrentAccount()
         .then(user => {
-          console.log({ user });
+          console.debug({ user });
           this.setState({ user });
           if (accessToken !== DROPBOX_PUBLIC_TOKEN) {
             Raven.setUserContext({
@@ -190,7 +190,7 @@ class IndexPage extends React.Component {
     LOCAL_STORAGE_FIELDS.forEach(async field => {
       if (!_.isEqual(this.state[field], nextState[field])) {
         await localforage.setItem(field, JSON.stringify(nextState[field]));
-        console.log("updating local storage", {
+        console.debug("updating local storage", {
           field,
           next: nextState[field],
         });
@@ -223,11 +223,11 @@ class IndexPage extends React.Component {
 
   checkDirty() {
     const { dirty, onLine } = this.state;
-    console.log("checkDirty", { dirty, onLine });
+    console.debug("checkDirty", { dirty, onLine });
     if (_.isEmpty(dirty)) {
       return;
     }
-    console.log("We're ridin dirty...");
+    console.debug("We're ridin dirty...");
   }
 
   loadPreferencesFromDropbox = () => {
@@ -237,7 +237,7 @@ class IndexPage extends React.Component {
         const preferencesStr = await blobToText(response.fileBlob);
         const preferences = JSON.parse(preferencesStr);
         this.setState({ preferences });
-        console.log({ preferences });
+        console.debug({ preferences });
 
         if (
           _.isEmpty(this.state.folders) &&
@@ -246,7 +246,7 @@ class IndexPage extends React.Component {
             Object.keys(this.state.folders),
           )
         ) {
-          console.log(
+          console.debug(
             "UPDATE ME",
             Object.keys(preferences.folders),
             Object.keys(this.state.folders),
@@ -256,7 +256,7 @@ class IndexPage extends React.Component {
             this.loadFilesFromDropboxFolder(folderId);
           });
         } else {
-          console.log("preferences on dropbox and local state match");
+          console.debug("preferences on dropbox and local state match");
         }
       })
       .catch(error => {
@@ -267,8 +267,15 @@ class IndexPage extends React.Component {
 
   getDefaultSmallScreenMode() {
     if (!this.state || !window) {
+      console.debug("no smallScreenModa state, waiting...");
       return null;
     }
+    console.debug(
+      "getDefaultSmallScreenMode",
+      window.innerWidth,
+      " vs ",
+      window.document.body.offsetWidth,
+    );
     let smallScreenMode = this.state.smallScreenMode;
     if (window.innerWidth <= 768 && smallScreenMode === null) {
       smallScreenMode = this.dbx ? "SongList" : "PromoCopy";
@@ -281,18 +288,17 @@ class IndexPage extends React.Component {
   setSmallScreenMode = smallScreenMode => {
     this.setState({
       smallScreenMode,
-      //songId: smallScreenMode === "SongList" ? null : this.state.songId,
     });
   };
 
   onWindowResize = e => {
     const smallScreenMode = this.getDefaultSmallScreenMode();
-    console.log("onWindowResize", window.innerWidth, smallScreenMode);
+    console.debug("onWindowResize", window.innerWidth, smallScreenMode);
     this.setState({ smallScreenMode });
   };
 
   loadDropboxLink = (url, isCheckForChanges = false) => {
-    console.log("loadDropboxLink", { url, isCheckForChanges });
+    console.debug("loadDropboxLink", { url, isCheckForChanges });
     if (!url) {
       return;
     }
@@ -305,7 +311,7 @@ class IndexPage extends React.Component {
     this.dbx
       .sharingGetSharedLinkMetadata({ url })
       .then(response => {
-        console.log({ response });
+        console.debug({ response });
         const tag = response[".tag"];
         if (tag === "folder") {
           const folderId = response.id;
@@ -368,7 +374,7 @@ class IndexPage extends React.Component {
       return;
     }
     const url = this.state.folders[folderId].url;
-    console.log("loadFilesFromDropboxFolder", { url });
+    console.debug("loadFilesFromDropboxFolder", { url });
     if (!url) {
       return;
     }
@@ -377,13 +383,13 @@ class IndexPage extends React.Component {
     this.dbx
       .filesListFolder({ path: "", shared_link: { url } })
       .then(response => {
-        console.log({ response });
+        console.debug({ response });
         const { dirty } = this.state;
         let songs = { ...this.state.folders[folderId].songs };
         let idsOnDropbox = [];
         response.entries.forEach(entry => {
           if (entry[".tag"] === "file" && isChordProFileName(entry.name)) {
-            console.log("got", entry.name, { entry });
+            console.debug("got", entry.name, { entry });
             if (dirty[entry.id]) {
               console.warn("NOT SYNCING CUZ DIRTY", entry.id);
             } else {
@@ -407,7 +413,7 @@ class IndexPage extends React.Component {
             }
           }
         });
-        //console.log({ songs });
+        //console.debug({ songs });
         const folders = {
           ...this.state.folders,
           [folderId]: {
@@ -424,7 +430,7 @@ class IndexPage extends React.Component {
   };
 
   addSong = song => {
-    console.log("addSong", song);
+    console.debug("addSong", song);
     const songs = {
       ...this.state.songs,
       [song.id]: song,
@@ -440,7 +446,7 @@ class IndexPage extends React.Component {
     }
 
     const songId = `${NEW_SONG_ID_MARKER}-${Date.now().toString()}`;
-    console.log("newSong", songId, songName);
+    console.debug("newSong", songId, songName);
     const chordPro = {
       ...this.state.chordPro,
       [songId]: `{title: ${songName}}
@@ -524,14 +530,14 @@ class IndexPage extends React.Component {
         path: song[".tag"] === "file" ? `/${song.name}` : null,
       })
       .then(async response => {
-        //console.log({ response });
+        //console.debug({ response });
         const songChordPro = await blobToText(response.fileBlob);
         const chordPro = {
           ...this.state.chordPro,
           [songId]: songChordPro,
         };
         this.setState({ chordPro, loading: false });
-        //console.log({ chordPro });
+        //console.debug({ chordPro });
       })
       .catch(error => {
         this.setState({ loading: false });
@@ -560,7 +566,7 @@ class IndexPage extends React.Component {
     const [song, folderId] = this.getSongById(songId);
     const path = getPathForSong(song);
     const isNewSong = song.id.indexOf(NEW_SONG_ID_MARKER) === 0;
-    console.log("saveSongChordPro", { folderId, isNewSong, songId, song });
+    console.debug("saveSongChordPro", { folderId, isNewSong, songId, song });
 
     const filesCommitInfo = {
       autorename: false,
@@ -569,12 +575,12 @@ class IndexPage extends React.Component {
       mute: true,
       path,
     };
-    console.log({ filesCommitInfo });
+    console.debug({ filesCommitInfo });
     this.setState({ saving: true });
     this.dbx
       .filesUpload(filesCommitInfo)
       .then(response => {
-        console.log("SAVED song", { response });
+        console.debug("SAVED song", { response });
 
         let dirty = { ...this.state.dirty };
         delete dirty[songId];
@@ -589,9 +595,9 @@ class IndexPage extends React.Component {
           delete folders[folderId].songs[songId];
           delete chordPro[songId];
           songId = response.id;
-          console.log("SAVED NEW SONG! songId is now", songId);
+          console.debug("SAVED NEW SONG! songId is now", songId);
         }
-        console.log({ folders, folderId });
+        console.debug({ folders, folderId });
         folders[folderId] = {
           ...folders[folderId],
           songs: {
@@ -631,7 +637,7 @@ class IndexPage extends React.Component {
   }
 
   toggleFolderOpen = folderId => {
-    console.log("toggleFolderOpen", { folderId }, this.state.closedFolders);
+    console.debug("toggleFolderOpen", { folderId }, this.state.closedFolders);
     const closedFolders = {
       ...this.state.closedFolders,
       [folderId]: !this.state.closedFolders[folderId],
@@ -640,20 +646,20 @@ class IndexPage extends React.Component {
   };
 
   toggleSongListClosed = () => {
-    console.log("toggleSongListClosed");
+    console.debug("toggleSongListClosed");
     this.setState({
       songListClosed: !this.state.songListClosed,
     });
   };
 
   toggleSongEditorClosed = () => {
-    console.log("toggleSongEditorClosed");
+    console.debug("toggleSongEditorClosed");
     this.setState({
       songEditorClosed: !this.state.songEditorClosed,
     });
   };
   toggleSongViewClosed = () => {
-    console.log("toggleSongViewClosed");
+    console.debug("toggleSongViewClosed");
     this.setState({
       songViewClosed: !this.state.songViewClosed,
     });
@@ -719,12 +725,12 @@ class IndexPage extends React.Component {
       mute: true,
       path: PREFERENCES_PATH,
     };
-    console.log("updatePreferences", { filesCommitInfo });
+    console.debug("updatePreferences", { filesCommitInfo });
     this.setState({ loading: true });
     this.dbx
       .filesUpload(filesCommitInfo)
       .then(response => {
-        console.log("SAVED PREFERENCES!", { response });
+        console.debug("SAVED PREFERENCES!", { response });
         this.setState({ loading: false });
       })
       .catch(error => {

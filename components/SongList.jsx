@@ -113,23 +113,19 @@ const SongFolder = ({
         <div style={{ marginRight: 5 }}>
           {isOpen ? <FaFolderOpen /> : <FaFolder />}
         </div>
-        <div style={{ flex: 1 }}>{folder.name}</div>
+        <div style={{ flex: 1 }}>
+          {folder.name} ({Object.keys(folder.songs).length})
+        </div>
 
         <ButtonToolbarGroup buttons={toolbarButtons} />
       </div>
-      {isOpen ? (
-        <SongOrderedList folder={folder} songId={songId} songs={folder.songs} />
-      ) : (
-        <div
-          style={{
-            fontSize: 10,
-            fontStyle: "italic",
-            padding: 5,
-            paddingLeft: 35,
-          }}
-        >
-          {Object.keys(folder.songs).length}{" "}
-          {Object.keys(folder.songs).length === 1 ? "song" : "songs"}
+      {isOpen && (
+        <div style={{ height: "" }}>
+          <SongOrderedList
+            folder={folder}
+            songId={songId}
+            songs={folder.songs}
+          />
         </div>
       )}
     </div>
