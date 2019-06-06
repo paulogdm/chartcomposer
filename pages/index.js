@@ -888,7 +888,7 @@ class IndexPage extends React.Component {
             togglePreferencesOpen={this.togglePreferencesOpen}
             user={user}
           />
-          <div style={{ display: "flex", flex: 1 }}>
+          <div style={{ display: "flex", flex: 1, height: "100%" }}>
             {smallScreenMode === "PromoCopy" ? (
               <PromoCopy />
             ) : songListClosed ? null : (
@@ -916,7 +916,6 @@ class IndexPage extends React.Component {
                     color: "#666",
                     display: "flex",
                     fontWeight: 600,
-
                     justifyContent: "space-between",
                     padding: 10,
                   }}
