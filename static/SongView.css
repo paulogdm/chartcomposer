@@ -4,6 +4,11 @@
   .x_video {
     display: none !important;
   }
+  .note {
+    color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
 }
 
 .SongView .lyricline {
@@ -105,6 +110,11 @@
   margin-bottom: 1px;
 }
 
+.chorddiagrams .diagram {
+  display: flex;
+  flex-direction: column;
+}
+
 .chord-diagramsize-medium .chord .name {
   text-align: center;
   font-size: 13px;
@@ -153,8 +163,11 @@
   text-align: right;
 }
 
+.bar {
+  display: flex;
+}
+
 .fret {
-  float: left;
   position: relative;
   border-top: 0px solid transparent;
   border-right: 1px solid #555;
