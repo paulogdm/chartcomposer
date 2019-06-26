@@ -5,9 +5,9 @@ import chordProParse, {
   displayPreferenceDefaults,
   getChordDiagram,
   parseChordProString,
-} from "../utils/chordProParse.js";
+} from "./../utils/chordProParse.js";
 
-import AutoScroll from "./AutoScroll.jsx";
+import AutoScroll from "./AutoScroll";
 
 const PreferenceContext = React.createContext({
   preferences: displayPreferenceDefaults,

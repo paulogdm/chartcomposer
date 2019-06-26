@@ -1,4 +1,4 @@
-import { initAutoscroll, toggleAutoScroll } from "../components/AutoScroll.jsx";
+import { initAutoscroll, toggleAutoScroll } from "./../components/AutoScroll";
 
 var gSong; // the song object is a global
 

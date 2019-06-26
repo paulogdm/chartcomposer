@@ -7,7 +7,7 @@ import moment from "moment";
 import { Button } from "react-bootstrap";
 
 import LoadingIndicator from "./LoadingIndicator";
-import textToChordPro, { isChordProFormat } from "../utils/textToChordPro";
+import textToChordPro, { isChordProFormat } from "./../utils/textToChordPro";
 
 class SongEditor extends React.Component {
   constructor(props) {

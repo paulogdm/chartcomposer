@@ -3,9 +3,9 @@ import { Button } from "react-bootstrap";
 import Link from "next/link";
 import Router from "next/router";
 
-import { Sender, SignInAsGuest } from "../components/Page";
-import UserMenu from "../components/UserMenu";
-import { APP_NAME } from "../utils/constants";
+import { Sender, SignInAsGuest } from "./../components/Page";
+import UserMenu from "./../components/UserMenu";
+import { APP_NAME } from "./../utils/constants";
 
 const Header = ({
   className,

@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 
-import publicRuntimeConfig from "../utils/publicRuntimeConfig";
+import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
 const { IS_DEV } = publicRuntimeConfig;
 
 class ServiceWorker extends PureComponent {

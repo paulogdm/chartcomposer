@@ -2,7 +2,7 @@ import React from "react";
 import Router from "next/router";
 import localforage from "localforage";
 
-import { Receiver } from "../components/Page";
+import { Receiver } from "./../components/Page";
 
 export default class AuthSuccessPage extends React.Component {
   handleSuccess = async accessToken => {

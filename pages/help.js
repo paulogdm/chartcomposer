@@ -4,10 +4,10 @@ import React from "react";
 import "whatwg-fetch";
 import _ from "lodash";
 
-import Header from "../components/Header";
-import Page from "../components/Page";
-import blobToText from "../utils/blobToText";
-import { APP_NAME } from "../utils/constants";
+import Header from "./../components/Header";
+import Page from "./../components/Page";
+import blobToText from "./../utils/blobToText";
+import { APP_NAME } from "./../utils/constants";
 
 export default class IndexPage extends React.Component {
   constructor(props) {

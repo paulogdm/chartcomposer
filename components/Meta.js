@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import { APP_NAME } from "../utils/constants";
+import { APP_NAME } from "./../utils/constants";
 
 export default () => (
   <div>

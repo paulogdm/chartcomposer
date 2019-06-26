@@ -8,7 +8,7 @@ import FaPlus from "react-icons/lib/fa/plus";
 import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
-import slugify from "../utils/slugify";
+import slugify from "./../utils/slugify";
 
 const SongList = ({
   closedFolders,

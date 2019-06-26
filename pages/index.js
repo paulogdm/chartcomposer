@@ -9,18 +9,18 @@ import localforage from "localforage";
 import "whatwg-fetch";
 import _ from "lodash";
 
-import { AppContext } from "../context/App.js";
-import AddFolder from "../components/AddFolder";
-import ButtonToolbarGroup from "../components/ButtonToolbarGroup";
-import LoadingIndicator from "../components/LoadingIndicator";
-import Header from "../components/Header";
-import Page from "../components/Page";
-import Preferences, { defaultPreferences } from "../components/Preferences";
-import SongEditor from "../components/SongEditor";
-import SongList from "../components/SongList";
-import SongView from "../components/SongView";
+import { AppContext } from "./../context/App.js";
+import AddFolder from "./../components/AddFolder";
+import ButtonToolbarGroup from "./../components/ButtonToolbarGroup";
+import LoadingIndicator from "./../components/LoadingIndicator";
+import Header from "./../components/Header";
+import Page from "./../components/Page";
+import Preferences, { defaultPreferences } from "./../components/Preferences";
+import SongEditor from "./../components/SongEditor";
+import SongList from "./../components/SongList";
+import SongView from "./../components/SongView";
 
-import { APP_NAME } from "../utils/constants";
+import { APP_NAME } from "./../utils/constants";
 
 class IndexPage extends React.Component {
   static contextType = AppContext;

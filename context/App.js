@@ -3,11 +3,11 @@ import Raven from "raven-js";
 import localforage from "localforage";
 import dropbox from "dropbox";
 
-import blobToText from "../utils/blobToText";
-import getPathForSong from "../utils/getPathForSong";
-import isChordProFileName from "../utils/isChordProFileName";
+import blobToText from "./../utils/blobToText";
+import getPathForSong from "./../utils/getPathForSong";
+import isChordProFileName from "./../utils/isChordProFileName";
 
-import { defaultPreferences } from "../components/Preferences";
+import { defaultPreferences } from "./../components/Preferences";
 
 const Dropbox = dropbox.Dropbox;
 

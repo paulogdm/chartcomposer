@@ -2,14 +2,14 @@ import React from "react";
 import { createOauthFlow } from "react-oauth-flow";
 import localforage from "localforage";
 
-import App, { AppContext } from "../context/App";
+import App, { AppContext } from "./../context/App";
 import withSentry from "./withSentry";
 import Meta from "./Meta";
 import Footer from "./Footer";
 import RedirectToBareDomain from "./RedirectToBareDomain";
 import ServiceWorker from "./ServiceWorker";
 
-import publicRuntimeConfig from "../utils/publicRuntimeConfig";
+import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
 const {
   DROPBOX_APP_KEY,
   DROPBOX_APP_SECRET,
