@@ -218,7 +218,11 @@ const ChordsAndLyrics = ({ part }) => {
             if (chunk.type === "text") {
               return <Word key={j} word={chunk} />;
             } else if (chunk.type === "space") {
-              return <span className="space"> </span>;
+              return (
+                <span key={j} className="space">
+                  {" "}
+                </span>
+              );
             } else if (chunk.type === "chord") {
               let nextIsChord = false;
               if (chunks[j + 1] && chunks[j + 1].type === "chord") {
@@ -265,10 +269,9 @@ const Chord = ({ chord, nextIsChord }) => {
           }}
         >
           <span className="visible">{chord.text}</span>
-          {nextIsChord &&
-            x_chordposition === "above" && (
-              <span className="invisible">{chord.text}</span>
-            )}
+          {nextIsChord && x_chordposition === "above" && (
+            <span className="invisible">{chord.text}</span>
+          )}
         </code>
       )}
     </PreferenceContext.Consumer>

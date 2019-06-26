@@ -8,7 +8,7 @@ import publicRuntimeConfig from "../utils/publicRuntimeConfig";
 
 const { DROPBOX_APP_KEY } = publicRuntimeConfig;
 
-const AddFolder = ({ dbx, loadDropboxLink }) => {
+const AddFolder = ({ dbx, dropboxLoadLink }) => {
   let buttons = [];
   if (dbx) {
     buttons.push({
@@ -23,7 +23,7 @@ const AddFolder = ({ dbx, loadDropboxLink }) => {
               alert("Please choose a folder, not a file");
               return;
             }
-            loadDropboxLink(folder.link);
+            dropboxLoadLink(folder.link);
           }}
           multiselect={false}
           extensions={[]}

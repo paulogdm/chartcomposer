@@ -2,6 +2,7 @@ import React from "react";
 import { createOauthFlow } from "react-oauth-flow";
 import localforage from "localforage";
 
+import App, { AppContext } from "../context/App";
 import withSentry from "./withSentry";
 import Meta from "./Meta";
 import Footer from "./Footer";
@@ -16,14 +17,15 @@ const {
   IS_DEV,
 } = publicRuntimeConfig;
 
-export default withSentry(({ children }) => (
-  <div>
+const Page = withSentry(({ children }) => (
+  <App config={publicRuntimeConfig}>
     <Meta />
     <RedirectToBareDomain />
     <ServiceWorker />
     {children}
-  </div>
+  </App>
 ));
+export default Page;
 
 const { Sender, Receiver } = createOauthFlow({
   authorizeUrl: "https://www.dropbox.com/oauth2/authorize",
@@ -51,26 +53,5 @@ const SignInAsGuest = () => (
 export function getGuestAccessToken() {
   return DROPBOX_PUBLIC_TOKEN;
 }
-
-export const LOCAL_STORAGE_FIELDS = [
-  "chordPro", // the raw text of songs
-  "closedFolders",
-  "folders",
-  "songs",
-  "user",
-  "dirty",
-  "preferences",
-];
-
-export const getStateFromLocalStorage = async () => {
-  let localState = {};
-  for (const field of LOCAL_STORAGE_FIELDS) {
-    const localValue = await localforage.getItem(field);
-    if (localValue) {
-      localState[field] = JSON.parse(localValue);
-    }
-  }
-  return localState;
-};
 
 export { Sender, SignInAsGuest, Receiver };
