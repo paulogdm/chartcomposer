@@ -1,49 +1,87 @@
-import React, { Component } from "react";
-import { AppRegistry, SectionList, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import {
+  AppRegistry,
+  Button,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { AuthSession } from "expo";
 
-import App, { AppContext } from "./../context/App";
+import { AppContext } from "./../context/App";
+import dropboxAuth from "./../utils/dropboxAuth";
 
-class SongList extends Component {
+export default class SongList extends React.Component {
   static contextType = AppContext;
+
   static navigationOptions = {
     title: "Song List",
   };
+
+  state = {
+    accessToken: null,
+    result: null,
+  };
+
+  reSyncDropboxTimeout = null;
+
+  componentDidMount = async () => {
+    const {
+      dropboxInitialize,
+      dropboxFoldersSync,
+      setStateFromLocalStorage,
+      setSongId,
+      storage,
+    } = this.context;
+
+    const accessToken = await storage.getAccessToken();
+    await dropboxInitialize(accessToken);
+    this.setState({ accessToken });
+    await setStateFromLocalStorage(() => {
+      this.reSyncDropboxTimeout = setTimeout(dropboxFoldersSync, 1000);
+    });
+  };
+
+  onPressAsync = async () => {
+    const redirectUrl = AuthSession.getRedirectUrl();
+    console.log("redirectUrl", redirectUrl);
+    //const redirectUrl = "chartcomposer://authreceiver";
+    const result = await AuthSession.startAsync({
+      authUrl:
+        `${dropboxAuth.authorizeUrl}` +
+        `?response_type=token` +
+        `&client_id=${config.DROPBOX_APP_KEY}` +
+        `&redirect_uri=${encodeURIComponent(redirectUrl)}`,
+    });
+
+    const accessToken = result["params"]["access_token"];
+    await this.context.storage.setAccessToken(accessToken);
+
+    this.setState({ accessToken, result });
+  };
+
   render() {
+    const { accessToken, result } = this.state;
+    const { folders, songs } = this.context;
     return (
       <View style={styles.container}>
-        <SectionList
-          sections={[
-            { title: "D", data: ["Devin"] },
-            {
-              title: "J",
-              data: [
-                "Jackson",
-                "James",
-                "Jillian",
-                "Jimmy",
-                "Joel",
-                "John",
-                "Julie",
-              ],
-            },
-          ]}
-          renderItem={({ item }) => <Text style={styles.item}>{item}</Text>}
-          renderSectionHeader={({ section }) => (
-            <Text style={styles.sectionHeader}>{section.title}</Text>
-          )}
-          keyExtractor={(item, index) => index}
-        />
+        <Button title="Open DB Auth" onPress={this.onPressAsync} />
+        {result ? (
+          <Text>{JSON.stringify(result)}</Text>
+        ) : (
+          <Text>Nothing yet...</Text>
+        )}
+        <View>
+          <Text>accessToken: {accessToken}</Text>
+        </View>
+        <View>
+          <Text>Folders: {JSON.stringify(folders)}</Text>
+        </View>
+        <View>
+          <Text>Songs: {JSON.stringify(songs)}</Text>
+        </View>
       </View>
-    );
-  }
-}
-
-export default class Wrapper extends React.Component {
-  render() {
-    return (
-      <App>
-        <SongList {...this.props} />
-      </App>
     );
   }
 }

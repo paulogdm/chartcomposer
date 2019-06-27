@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Raven from "raven-js";
-import localforage from "localforage";
 import dropbox from "dropbox";
+import _ from "lodash";
 
 import blobToText from "./../utils/blobToText";
 import getPathForSong from "./../utils/getPathForSong";
@@ -26,28 +27,20 @@ const LOCAL_STORAGE_FIELDS = [
   "preferences",
 ];
 
-const getStateFromLocalStorage = async () => {
-  let localState = {};
-  for (const field of LOCAL_STORAGE_FIELDS) {
-    const localValue = await localforage.getItem(field);
-    if (localValue) {
-      localState[field] = JSON.parse(localValue);
-    }
-  }
-  return localState;
-};
-
 export const AppContext = React.createContext({
   chordPro: {},
   closedFolders: {},
   dirty: {},
   folders: {},
   loading: false,
-  preferences: defaultPreferences,
+  preferences: {},
   saving: false,
   songId: null,
   songs: {},
   user: null,
+
+  config: {},
+  storage: null,
 
   dropbox: null,
   dropboxInitialize: shareLink => {
@@ -104,6 +97,11 @@ export default class App extends React.Component {
     user: null,
   };
 
+  static propTypes = {
+    config: PropTypes.object,
+    storage: PropTypes.object,
+  };
+
   componentDidMount() {
     this.setState({ componentIsMounted: true });
   }
@@ -111,7 +109,10 @@ export default class App extends React.Component {
   componentWillUpdate(nextProps, nextState) {
     LOCAL_STORAGE_FIELDS.forEach(async field => {
       if (!_.isEqual(this.state[field], nextState[field])) {
-        await localforage.setItem(field, JSON.stringify(nextState[field]));
+        await this.props.storage.setItem(
+          field,
+          JSON.stringify(nextState[field]),
+        );
         console.debug("updating local storage", {
           field,
           next: nextState[field],
@@ -120,15 +121,26 @@ export default class App extends React.Component {
     });
   }
 
+  getStateFromLocalStorage = async () => {
+    let localState = {};
+    for (const field of LOCAL_STORAGE_FIELDS) {
+      const localValue = await this.props.storage.getItem(field);
+      if (localValue) {
+        localState[field] = JSON.parse(localValue);
+      }
+    }
+    return localState;
+  };
+
   setStateFromLocalStorage = async cb => {
-    const localState = await getStateFromLocalStorage();
+    const localState = await this.getStateFromLocalStorage();
     this.setState({ ...localState }, cb);
   };
 
   dropboxInitialize = async shareLink => {
     console.debug("dropboxInitialize", this.props, this.state);
     const { DROPBOX_PUBLIC_TOKEN } = this.props.config;
-    let accessToken = await localforage.getItem("db-access-token");
+    let accessToken = await this.props.storage.getAccessToken();
     // Automatically sign a share-link visitor in as a guest
     if (shareLink && !accessToken) {
       accessToken = DROPBOX_PUBLIC_TOKEN;
@@ -610,6 +622,9 @@ export default class App extends React.Component {
   render() {
     const value = {
       ...this.state,
+      config: this.props.config,
+      storage: this.props.storage,
+
       dropbox: this.dropbox,
       dropboxInitialize: this.dropboxInitialize,
       dropboxFoldersSync: this.dropboxFoldersSync,

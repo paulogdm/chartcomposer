@@ -1,13 +1,16 @@
 import React from "react";
 import Router from "next/router";
-import localforage from "localforage";
+
+import { AppContext } from "./../context/App.js";
 
 import { Receiver } from "./../components/Page";
 
-export default class AuthSuccessPage extends React.Component {
+class AuthReceiverPage extends React.Component {
+  static contextType = AppContext;
+
   handleSuccess = async accessToken => {
-    console.log("accessToken!", accessToken);
-    await localforage.setItem("db-access-token", accessToken);
+    console.log("got accessToken!", accessToken);
+    await this.context.storage.setAccessToken(accessToken);
     Router.push("/");
   };
 
@@ -28,9 +31,21 @@ export default class AuthSuccessPage extends React.Component {
           if (error) {
             return <p style={{ color: "red" }}>Error: {error.message}</p>;
           }
-          return <p>REDIRECT!</p>;
+          return <p>Authorization success</p>;
         }}
       />
     );
   }
 }
+
+class AuthReceiverPageWrapper extends React.Component {
+  render() {
+    return (
+      <Page>
+        <AuthReceiverPage {...this.props} />
+      </Page>
+    );
+  }
+}
+
+export default withRouter(AuthReceiverPageWrapper);

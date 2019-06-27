@@ -5,7 +5,6 @@ import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
 import Raven from "raven-js";
 import Router, { withRouter } from "next/router";
-import localforage from "localforage";
 import "whatwg-fetch";
 import _ from "lodash";
 
@@ -21,6 +20,7 @@ import SongList from "./../components/SongList";
 import SongView from "./../components/SongView";
 
 import { APP_NAME } from "./../utils/constants";
+import storage from "./../utils/storage";
 
 class IndexPage extends React.Component {
   static contextType = AppContext;
@@ -58,7 +58,6 @@ class IndexPage extends React.Component {
     if (window) {
       // for console debugging
       window.lodash = _;
-      window.localforage = localforage;
     }
 
     await dropboxInitialize(router.query.share);
@@ -202,7 +201,7 @@ class IndexPage extends React.Component {
   };
 
   signOut = async () => {
-    await localforage.clear();
+    await storage.clear();
     Raven.setUserContext();
     window.location.href = "/";
   };

@@ -1,6 +1,5 @@
 import React from "react";
 import { createOauthFlow } from "react-oauth-flow";
-import localforage from "localforage";
 
 import App, { AppContext } from "./../context/App";
 import withSentry from "./withSentry";
@@ -9,6 +8,8 @@ import Footer from "./Footer";
 import RedirectToBareDomain from "./RedirectToBareDomain";
 import ServiceWorker from "./ServiceWorker";
 
+import dropboxAuth from "./../utils/dropboxAuth";
+import storage from "./../utils/storage";
 import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
 const {
   DROPBOX_APP_KEY,
@@ -18,7 +19,7 @@ const {
 } = publicRuntimeConfig;
 
 const Page = withSentry(({ children }) => (
-  <App config={publicRuntimeConfig}>
+  <App config={publicRuntimeConfig} storage={storage}>
     <Meta />
     <RedirectToBareDomain />
     <ServiceWorker />
@@ -28,8 +29,8 @@ const Page = withSentry(({ children }) => (
 export default Page;
 
 const { Sender, Receiver } = createOauthFlow({
-  authorizeUrl: "https://www.dropbox.com/oauth2/authorize",
-  tokenUrl: "https://api.dropbox.com/oauth2/token",
+  authorizeUrl: dropboxAuth.authorizeUrl,
+  tokenUrl: dropboxAuth.tokenUrl,
   clientId: DROPBOX_APP_KEY,
   clientSecret: DROPBOX_APP_SECRET,
   redirectUri: IS_DEV
@@ -42,7 +43,7 @@ const SignInAsGuest = () => (
     href="/"
     onClick={async () => {
       console.debug("login as guest", { DROPBOX_PUBLIC_TOKEN });
-      await localforage.setItem("db-access-token", DROPBOX_PUBLIC_TOKEN);
+      await storage.setAccessToken(DROPBOX_PUBLIC_TOKEN);
       // href is "/" so letting default event go through here = refresh
     }}
   >
