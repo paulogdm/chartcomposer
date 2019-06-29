@@ -1,19 +1,41 @@
 import React from "react";
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import {
+  createSwitchNavigator,
+  createStackNavigator,
+  createAppContainer,
+} from "react-navigation";
 
 import App from "./../context/App";
 
-import HomeScreen from "./HomeScreen";
-import SongListScreen from "./SongListScreen";
-
 import storage from "./storage";
 
-const RootStack = createStackNavigator({
-  Home: { screen: SongListScreen },
-  Profile: { screen: SongListScreen },
+import AuthLoadingScreen from "./AuthLoadingScreen";
+import HomeScreen from "./HomeScreen";
+import SignInScreen from "./SignInScreen";
+import SongListScreen from "./SongListScreen";
+import SongViewScreen from "./SongViewScreen";
+
+const AppStack = createStackNavigator({
+  Home: HomeScreen,
+  SongList: { screen: SongListScreen },
+  SongView: { screen: SongViewScreen },
+  SongEdit: { screen: SongListScreen },
 });
 
-let Navigation = createAppContainer(RootStack);
+const AuthStack = createStackNavigator({ SignIn: SignInScreen });
+
+let Navigation = createAppContainer(
+  createSwitchNavigator(
+    {
+      AuthLoading: AuthLoadingScreen,
+      App: AppStack,
+      Auth: AuthStack,
+    },
+    {
+      initialRouteName: "AuthLoading",
+    },
+  ),
+);
 
 const config = {
   DROPBOX_APP_KEY: "mhwbhsacakthrrd",

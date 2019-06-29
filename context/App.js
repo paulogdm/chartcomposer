@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Raven from "raven-js";
 import dropbox from "dropbox";
 import _ from "lodash";
+import "whatwg-fetch";
 
 import blobToText from "./../utils/blobToText";
 import getPathForSong from "./../utils/getPathForSong";
@@ -138,7 +139,7 @@ export default class App extends React.Component {
   };
 
   dropboxInitialize = async shareLink => {
-    console.debug("dropboxInitialize", this.props, this.state);
+    console.debug("dropboxInitialize", { shareLink });
     const { DROPBOX_PUBLIC_TOKEN } = this.props.config;
     let accessToken = await this.props.storage.getAccessToken();
     // Automatically sign a share-link visitor in as a guest
@@ -146,14 +147,14 @@ export default class App extends React.Component {
       accessToken = DROPBOX_PUBLIC_TOKEN;
     }
     if (accessToken) {
-      this.dropbox = new Dropbox({ accessToken });
+      this.dropbox = new Dropbox({ accessToken, fetch });
       this.setState({
         signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
       });
       this.dropbox
         .usersGetCurrentAccount()
         .then(user => {
-          console.debug({ user });
+          console.debug("Got dropbox user");
           this.setState({ user });
           if (accessToken !== DROPBOX_PUBLIC_TOKEN) {
             Raven.setUserContext({
@@ -429,8 +430,15 @@ export default class App extends React.Component {
       return;
     }
 
+    if (!folders[folderId]) {
+      console.error("no folder with id", folderId, "in state", { folders });
+    }
+
     if (!folders[folderId] && !songs[songId]) {
-      console.error("no folders and songs in state", { folders, songs });
+      console.error("no folder or song can be found", folderId, songId, {
+        folders,
+        songs,
+      });
       return;
     }
 

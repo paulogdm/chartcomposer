@@ -1,90 +1,71 @@
 import React from "react";
-import {
-  AppRegistry,
-  Button,
-  SectionList,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { AuthSession } from "expo";
+import { Button, SectionList, StyleSheet, Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+
+import _ from "lodash";
 
 import { AppContext } from "../context/App";
-import dropboxAuth from "../utils/dropboxAuth";
 
-import SongList from "./SongList";
+import removeFileExtension from "./../utils/removeFileExtension";
 
-export default class SongListScreen extends React.Component {
+interface Props {
+  navigation: any;
+}
+
+export default class SongList extends React.Component<Props, any> {
   static contextType = AppContext;
 
-  static navigationOptions = {
-    title: "Song List",
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: "Songs",
+      headerLeft: <Button onPress={() => navigation.goBack()} title="Back" />,
+    };
   };
 
-  state = {
-    accessToken: null,
-    result: null,
-  };
-
-  reSyncDropboxTimeout = null;
-
-  componentDidMount = async () => {
-    const {
-      dropboxInitialize,
-      dropboxFoldersSync,
-      setStateFromLocalStorage,
-      setSongId,
-      storage,
-    } = this.context;
-
-    /*
-    const accessToken = await storage.getAccessToken();
-    await dropboxInitialize(accessToken);
-    this.setState({ accessToken });
-    await setStateFromLocalStorage(() => {
-      this.reSyncDropboxTimeout = setTimeout(dropboxFoldersSync, 1000);
-    });
-    */
-    await setStateFromLocalStorage(() => {
-      this.reSyncDropboxTimeout = setTimeout(dropboxFoldersSync, 1000);
-    });
-  };
-
-  onPressAsync = async () => {
-    const redirectUrl = AuthSession.getRedirectUrl();
-    console.log("redirectUrl", redirectUrl);
-    //const redirectUrl = "chartcomposer://authreceiver";
-    const result = await AuthSession.startAsync({
-      authUrl:
-        `${dropboxAuth.authorizeUrl}` +
-        `?response_type=token` +
-        `&client_id=${this.context.config.DROPBOX_APP_KEY}` +
-        `&redirect_uri=${encodeURIComponent(redirectUrl)}`,
-    });
-
-    const accessToken = result["params"]["access_token"];
-    await this.context.storage.setAccessToken(accessToken);
-
-    this.setState({ accessToken, result });
+  onPressSong = (song, section) => {
+    console.log("onPressSong", song, section);
+    this.context.setSongId(song.id, section.folderId);
+    this.props.navigation.push("SongView");
   };
 
   render() {
-    const { accessToken, result } = this.state;
-    const { folders, songs } = this.context;
+    const {
+      closedFolders,
+      copyShareLink,
+      folders,
+      newSong,
+      removeFolder,
+      songId,
+      songs,
+      toggleFolderOpen,
+    } = this.context;
+
+    const sections = _.sortBy(_.values(folders), ["name"]).map(folder => {
+      return {
+        title: folder.name,
+        folderId: folder.id,
+        data: _.sortBy(_.values(folder.songs), ["name"]),
+      };
+    });
+
     return (
-      <View style={styles.container}>
-        <Button title="Open DB Auth" onPress={this.onPressAsync} />
-        {result ? (
-          <Text>{JSON.stringify(result)}</Text>
-        ) : (
-          <Text>Nothing yet...</Text>
-        )}
-        {/*
-        <View>
-          <Text>Folders{JSON.stringify(folders)}</Text>
-        </View>
-        */}
-        <SongList />
+      <View>
+        <SectionList
+          sections={sections}
+          renderItem={({ item, index, section }) => (
+            <View>
+              <TouchableOpacity onPress={() => this.onPressSong(item, section)}>
+                <Text style={styles.item}>
+                  {removeFileExtension(item.name)}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+          )}
+          keyExtractor={(item, index) => item + index}
+        />
       </View>
     );
   }

@@ -5,7 +5,6 @@ import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
 import Raven from "raven-js";
 import Router, { withRouter } from "next/router";
-import "whatwg-fetch";
 import _ from "lodash";
 
 import { AppContext } from "./../context/App.js";
