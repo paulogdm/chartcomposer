@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import { AppRegistry, SectionList, StyleSheet, Text, View } from "react-native";
 
-export default class SongList extends Component {
+export default class SongList extends React.Component {
   static navigationOptions = {
     title: "HomeScreen",
   };

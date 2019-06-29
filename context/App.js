@@ -288,7 +288,7 @@ export default class App extends React.Component {
       })
       .catch(error => {
         this.setState({ loading: false });
-        console.error({ error });
+        console.error(url, "error", { error });
       });
   };
 

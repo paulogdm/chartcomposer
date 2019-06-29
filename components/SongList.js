@@ -8,13 +8,14 @@ import FaPlus from "react-icons/lib/fa/plus";
 import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
+
+import removeFileExtension from "./../utils/removeFileExtension";
 import slugify from "./../utils/slugify";
 
 const SongList = ({
   closedFolders,
   copyShareLink,
   folders,
-  loadDropboxLink,
   newSong,
   removeFolder,
   songId,
@@ -120,7 +121,7 @@ const SongFolder = ({
         <ButtonToolbarGroup buttons={toolbarButtons} />
       </div>
       {isOpen && (
-        <div style={{ height: "" }}>
+        <div>
           <SongOrderedList
             folder={folder}
             songId={songId}
@@ -167,7 +168,7 @@ let SongOrderedList = ({ folder, router, songId, songs }) => {
               songId === song.id
                 ? "/"
                 : `/folder/${folder.id}/song/${song.id}/${slugify(
-                    removeExtension(song.name),
+                    removeFileExtension(song.name),
                   )}`
             }
             href={
@@ -183,7 +184,7 @@ let SongOrderedList = ({ folder, router, songId, songs }) => {
                 paddingLeft,
               }}
             >
-              {removeExtension(song.name)}
+              {removeFileExtension(song.name)}
             </a>
           </Link>
         </li>
@@ -192,12 +193,3 @@ let SongOrderedList = ({ folder, router, songId, songs }) => {
   );
 };
 SongOrderedList = withRouter(SongOrderedList);
-
-function removeExtension(filename) {
-  var iDot = filename.lastIndexOf(".");
-  if (-1 !== iDot) {
-    filename = filename.substring(0, iDot);
-  }
-
-  return filename;
-}

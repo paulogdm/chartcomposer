@@ -1,86 +1,61 @@
 import React from "react";
-import {
-  AppRegistry,
-  Button,
-  SectionList,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { AuthSession } from "expo";
+import { AppRegistry, SectionList, StyleSheet, Text, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
-import { AppContext } from "./../context/App";
-import dropboxAuth from "./../utils/dropboxAuth";
+import _ from "lodash";
+
+import { AppContext } from "../context/App";
+
+import removeFileExtension from "./../utils/removeFileExtension";
+import slugify from "./../utils/slugify";
 
 export default class SongList extends React.Component {
   static contextType = AppContext;
 
-  static navigationOptions = {
-    title: "Song List",
-  };
-
-  state = {
-    accessToken: null,
-    result: null,
-  };
-
-  reSyncDropboxTimeout = null;
-
-  componentDidMount = async () => {
-    const {
-      dropboxInitialize,
-      dropboxFoldersSync,
-      setStateFromLocalStorage,
-      setSongId,
-      storage,
-    } = this.context;
-
-    const accessToken = await storage.getAccessToken();
-    await dropboxInitialize(accessToken);
-    this.setState({ accessToken });
-    await setStateFromLocalStorage(() => {
-      this.reSyncDropboxTimeout = setTimeout(dropboxFoldersSync, 1000);
-    });
-  };
-
-  onPressAsync = async () => {
-    const redirectUrl = AuthSession.getRedirectUrl();
-    console.log("redirectUrl", redirectUrl);
-    //const redirectUrl = "chartcomposer://authreceiver";
-    const result = await AuthSession.startAsync({
-      authUrl:
-        `${dropboxAuth.authorizeUrl}` +
-        `?response_type=token` +
-        `&client_id=${config.DROPBOX_APP_KEY}` +
-        `&redirect_uri=${encodeURIComponent(redirectUrl)}`,
-    });
-
-    const accessToken = result["params"]["access_token"];
-    await this.context.storage.setAccessToken(accessToken);
-
-    this.setState({ accessToken, result });
+  onPressSong = song => {
+    console.log("ONPRESS Song", song.name);
   };
 
   render() {
-    const { accessToken, result } = this.state;
-    const { folders, songs } = this.context;
+    const {
+      closedFolders,
+      copyShareLink,
+      folders,
+      newSong,
+      removeFolder,
+      songId,
+      songs,
+      toggleFolderOpen,
+    } = this.context;
+
+    const sections = _.sortBy(_.values(folders), ["name"]).map(folder => {
+      return {
+        title: folder.name,
+        data: _.sortBy(_.values(folder.songs), ["name"]),
+      };
+    });
+
+    //const sections = [{ title: "D", data: [{ name: "Devin" }] }];
+
     return (
-      <View style={styles.container}>
-        <Button title="Open DB Auth" onPress={this.onPressAsync} />
-        {result ? (
-          <Text>{JSON.stringify(result)}</Text>
-        ) : (
-          <Text>Nothing yet...</Text>
-        )}
-        <View>
-          <Text>accessToken: {accessToken}</Text>
-        </View>
-        <View>
-          <Text>Folders: {JSON.stringify(folders)}</Text>
-        </View>
-        <View>
-          <Text>Songs: {JSON.stringify(songs)}</Text>
-        </View>
+      <View>
+        {/*<Text>{JSON.stringify(sections)}</Text>*/}
+        <SectionList
+          sections={sections}
+          renderItem={({ item }) => (
+            <View>
+              <TouchableOpacity onPress={() => this.onPressSong(item)}>
+                <Text style={styles.item}>
+                  {removeFileExtension(item.name)}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+          )}
+          keyExtractor={(item, index) => item + index}
+        />
       </View>
     );
   }
