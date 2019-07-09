@@ -136,14 +136,7 @@ const SongFolder = ({
 let SongOrderedList = ({ folder, router, songId, songs }) => {
   const padding = 10;
   const paddingLeft = padding + (folder ? 20 : 0);
-  //console.debug({ songs });
-  /*<a
-              onClick={e => {
-                console.debug("ONCLICK LINK", router.query);
-                e.preventDefault();
-              }}
-              style={{ display: "block" }}
-            >*/
+
   return (
     <ol
       style={{

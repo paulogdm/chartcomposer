@@ -12,14 +12,14 @@ import storage from "./storage";
 import AuthLoadingScreen from "./AuthLoadingScreen";
 import HomeScreen from "./HomeScreen";
 import SignInScreen from "./SignInScreen";
+import SongEditScreen from "./SongEditScreen";
 import SongListScreen from "./SongListScreen";
 import SongViewScreen from "./SongViewScreen";
 
 const AppStack = createStackNavigator({
-  Home: HomeScreen,
   SongList: { screen: SongListScreen },
   SongView: { screen: SongViewScreen },
-  SongEdit: { screen: SongListScreen },
+  SongEdit: { screen: SongEditScreen },
 });
 
 const AuthStack = createStackNavigator({ SignIn: SignInScreen });

@@ -20,17 +20,17 @@ export default class AuthLoadingScreen extends React.Component<Props, any> {
       dropboxInitialize,
       dropboxFoldersSync,
       setStateFromLocalStorage,
-      setSongId,
       storage,
     } = this.context;
     console.debug("AuthLoadingScreen...");
-    const accessToken = await this.context.storage.getAccessToken();
+    const accessToken = await storage.getAccessToken();
     if (!accessToken) {
       navigation.navigate("Auth");
       return;
     }
     console.debug("accessToken", accessToken);
     await dropboxInitialize();
+    await setStateFromLocalStorage();
     navigation.navigate("App");
   };
 

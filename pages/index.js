@@ -143,7 +143,7 @@ class IndexPage extends React.Component {
     );
     let smallScreenMode = this.state.smallScreenMode;
     if (window.innerWidth <= 768 && smallScreenMode === null) {
-      smallScreenMode = this.dbx ? "SongList" : "PromoCopy";
+      smallScreenMode = this.context.dropbox ? "SongList" : "PromoCopy";
     } else if (window.innerWidth > 768 && smallScreenMode !== null) {
       smallScreenMode = null;
     }

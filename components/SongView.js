@@ -1,19 +1,21 @@
 import React from "react";
 import classNames from "classnames";
 
-import chordProParse, {
+//import { AppContext } from "./../context/App";
+
+import {
   displayPreferenceDefaults,
   getChordDiagram,
   parseChordProString,
-} from "./../utils/chordProParse.js";
+} from "./../utils/chordProParse";
+
+import titleCase from "./../utils/titleCase";
 
 import AutoScroll from "./AutoScroll";
 
 const PreferenceContext = React.createContext({
   preferences: displayPreferenceDefaults,
 });
-
-const RENDER_IN_REACT = true;
 
 export default class SongView extends React.Component {
   render() {
@@ -30,39 +32,32 @@ export default class SongView extends React.Component {
     return (
       <div>
         {chordPro.duration ? <AutoScroll duration={chordPro.duration} /> : null}
-        {RENDER_IN_REACT ? (
-          <PreferenceContext.Provider value={preferences}>
-            <div
-              className={classNames("SongView", {
-                "chord-position-above": preferences.x_chordposition === "above",
-              })}
-              style={{
-                color: preferences.textcolour,
-                fontFamily: preferences.textfont,
-                fontSize: window.parseInt(preferences.textsize, 10),
-              }}
-            >
-              <SongProperties chordPro={chordPro} />
-              <div>
-                <div
-                  className={classNames(
-                    "chorddiagrams",
-                    `chord-diagramsize-${preferences.x_diagramsize}`,
-                  )}
-                  dangerouslySetInnerHTML={{ __html: chordDiagramsHtml }}
-                />
-              </div>
-              {chordPro.parts.map((part, i) => (
-                <Section key={part.url ? part.url : i} part={part} />
-              ))}
-            </div>
-          </PreferenceContext.Provider>
-        ) : (
+        <PreferenceContext.Provider value={preferences}>
           <div
-            className="SongView"
-            dangerouslySetInnerHTML={chordProParse(value, preferences)}
-          />
-        )}
+            className={classNames("SongView", {
+              "chord-position-above": preferences.x_chordposition === "above",
+            })}
+            style={{
+              color: preferences.textcolour,
+              fontFamily: preferences.textfont,
+              fontSize: window.parseInt(preferences.textsize, 10),
+            }}
+          >
+            <SongProperties chordPro={chordPro} />
+            <div>
+              <div
+                className={classNames(
+                  "chorddiagrams",
+                  `chord-diagramsize-${preferences.x_diagramsize}`,
+                )}
+                dangerouslySetInnerHTML={{ __html: chordDiagramsHtml }}
+              />
+            </div>
+            {chordPro.parts.map((part, i) => (
+              <Section key={part.url ? part.url : i} part={part} />
+            ))}
+          </div>
+        </PreferenceContext.Provider>
       </div>
     );
   }
@@ -276,10 +271,6 @@ const Chord = ({ chord, nextIsChord }) => {
       )}
     </PreferenceContext.Consumer>
   );
-};
-
-const titleCase = str => {
-  return `${str.charAt(0).toUpperCase()}${str.substr(1)}`;
 };
 
 const SongProperties = ({ chordPro }) => {

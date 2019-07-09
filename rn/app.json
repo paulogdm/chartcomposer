@@ -17,6 +17,9 @@
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.elsigh.chartcomposer"
+    },
     "ios": {
       "supportsTablet": true
     },

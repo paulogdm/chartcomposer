@@ -9,7 +9,7 @@ interface Props {
 }
 export default class HomeScreen extends React.Component<Props, any> {
   static navigationOptions = {
-    title: "Home",
+    title: "Home Screen",
   };
 
   render() {

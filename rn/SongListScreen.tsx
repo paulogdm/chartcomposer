@@ -4,6 +4,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 import _ from "lodash";
 
+import { Ionicons } from "@expo/vector-icons";
+
 import { AppContext } from "../context/App";
 
 import removeFileExtension from "./../utils/removeFileExtension";
@@ -17,13 +19,12 @@ export default class SongList extends React.Component<Props, any> {
 
   static navigationOptions = ({ navigation }) => {
     return {
-      title: "Songs",
-      headerLeft: <Button onPress={() => navigation.goBack()} title="Back" />,
+      title: "ChartComposer",
     };
   };
 
   onPressSong = (song, section) => {
-    console.log("onPressSong", song, section);
+    //console.log("onPressSong", song, section);
     this.context.setSongId(song.id, section.folderId);
     this.props.navigation.push("SongView");
   };
@@ -52,17 +53,53 @@ export default class SongList extends React.Component<Props, any> {
       <View>
         <SectionList
           sections={sections}
-          renderItem={({ item, index, section }) => (
+          renderItem={({ item, index, section }) => {
+            const isFolderOpen = !closedFolders[section.folderId];
+            if (!isFolderOpen) {
+              return null;
+            }
+            return (
+              <View>
+                <TouchableOpacity
+                  onPress={() => this.onPressSong(item, section)}
+                >
+                  <Text style={styles.item}>
+                    {removeFileExtension(item.name)}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+          renderSectionHeader={({ section }) => (
             <View>
-              <TouchableOpacity onPress={() => this.onPressSong(item, section)}>
-                <Text style={styles.item}>
-                  {removeFileExtension(item.name)}
+              <TouchableOpacity
+                style={styles.sectionHeader}
+                onPress={() => {
+                  toggleFolderOpen(section.folderId);
+                }}
+              >
+                <View style={{ marginRight: 5 }}>
+                  <Ionicons
+                    name={
+                      closedFolders[section.folderId]
+                        ? "md-folder"
+                        : "md-folder-open"
+                    }
+                    size={24}
+                  />
+                </View>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    paddingLeft: 10,
+                  }}
+                >
+                  {section.title}
                 </Text>
               </TouchableOpacity>
             </View>
-          )}
-          renderSectionHeader={({ section }) => (
-            <Text style={styles.sectionHeader}>{section.title}</Text>
           )}
           keyExtractor={(item, index) => item + index}
         />
@@ -77,17 +114,25 @@ const styles = StyleSheet.create({
     paddingTop: 22,
   },
   sectionHeader: {
-    paddingTop: 2,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 2,
-    fontSize: 14,
+    alignItems: "center",
+    borderColor: "#cccccc",
+    borderStyle: "solid",
+    borderBottomWidth: 1,
+    borderTopWidth: 1,
+    display: "flex",
+    flexDirection: "row",
+    fontSize: 18,
     fontWeight: "bold",
-    backgroundColor: "rgba(247,247,247,1.0)",
+    paddingTop: 4,
+    paddingBottom: 4,
+    paddingLeft: 10,
+    paddingRight: 4,
   },
   item: {
-    padding: 10,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    paddingRight: 10,
+    paddingTop: 10,
     fontSize: 18,
-    height: 44,
   },
 });
