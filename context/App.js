@@ -114,10 +114,15 @@ export default class App extends React.Component {
           field,
           JSON.stringify(nextState[field]),
         );
-        console.debug("updating local storage", {
+        console.debug(
+          "App.cwu updating",
           field,
-          next: nextState[field],
-        });
+          "in storage due to state change",
+          {
+            current: this.state[field],
+            next: nextState[field],
+          },
+        );
       }
     });
   }
@@ -197,22 +202,22 @@ export default class App extends React.Component {
         this.setState({ preferences });
         console.debug({ preferences });
 
-        if (
-          _.isEmpty(this.state.folders) &&
-          !_.isEqual(
-            Object.keys(preferences.folders),
-            Object.keys(this.state.folders),
-          )
-        ) {
+        const folderStateIsEmpty = _.isEmpty(this.state.folders);
+        const prefsAndStateMismatch = !_.isEqual(
+          Object.keys(preferences.folders),
+          Object.keys(this.state.folders),
+        );
+        if (folderStateIsEmpty && prefsAndStateMismatch) {
           console.debug(
-            "UPDATE ME",
+            "dropboxLoadPreferences updating folders / files cuz mismatch",
+            { folderStateIsEmpty, prefsAndStateMismatch },
             Object.keys(preferences.folders),
             Object.keys(this.state.folders),
           );
           this.setState({ folders: preferences.folders });
-          Object.keys(preferences.folders).forEach(folderId => {
-            this.dropboxLoadFilesFromFolder(folderId);
-          });
+          Object.keys(preferences.folders).forEach(
+            this.dropboxLoadFilesFromFolder,
+          );
         } else {
           console.debug("preferences on dropbox and local state match");
         }
@@ -454,7 +459,7 @@ export default class App extends React.Component {
       songEditorPercentWidth: 50,
     });
     const [song, _] = this.getSongById(songId);
-    console.debug("got song", song);
+    //console.debug("got song", song);
 
     const url = folderId ? folders[folderId].url : songs[songId].url;
     this.dropbox
