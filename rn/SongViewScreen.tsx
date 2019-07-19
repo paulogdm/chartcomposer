@@ -4,6 +4,7 @@ import {
   Button,
   Image,
   Linking,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -60,18 +61,29 @@ export default class SongViewScreen extends React.Component<Props, any> {
     const chordProString = this.context.chordPro[songId];
     if (!chordProString) {
       console.log("No chordpro string parsed yet..");
-      return <ActivityIndicator />;
+      return (
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            alignContent: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" />
+        </View>
+      );
     }
     const chordPro = parseChordProString(this.context.chordPro[songId]);
     return (
-      <View style={{ flex: 1, padding: 10 }}>
+      <ScrollView style={{ flex: 1, padding: 10, paddingBottom: 30 }}>
         <PreferenceContext.Provider value={preferences.display}>
           <SongProperties chordPro={chordPro} />
           {chordPro.parts.map((part, i: number) => (
             <Section key={part.url ? part.url : i} part={part} />
           ))}
         </PreferenceContext.Provider>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -231,24 +243,38 @@ const ChordsAndLyrics = ({ part }) => {
   return (
     <View>
       {part.linesParsed.map((parsed, i: number) => (
-        <View key={i} style={{ display: "flex", flexDirection: "row" }}>
+        <View
+          key={i}
+          style={{ display: "flex", flexDirection: "row", marginTop: 10 }}
+        >
           {parsed.map((chunk, j: number, chunks) => {
+            let nextIsChord = false;
+            if (chunks[j + 1] && chunks[j + 1].type === "chord") {
+              nextIsChord = true;
+            } else if (
+              chunks[j + 1] &&
+              chunks[j + 1].type === "space" &&
+              chunks[j + 2] &&
+              chunks[j + 2].type === "chord"
+            ) {
+              nextIsChord = true;
+            }
+            let lastChord = false;
+            if (chunks[j - 1] && chunks[j - 1].type === "chord") {
+              lastChord = chunks[j - 1];
+            } else if (
+              chunks[j - 1] &&
+              chunks[j - 1].type === "space" &&
+              chunks[j - 2] &&
+              chunks[j - 2].type === "chord"
+            ) {
+              lastChord = chunks[j - 2];
+            }
             if (chunk.type === "text") {
-              return <Word key={j} word={chunk} />;
+              return <Word key={j} word={chunk} lastChord={lastChord} />;
             } else if (chunk.type === "space") {
               return <Text key={j}> </Text>;
             } else if (chunk.type === "chord") {
-              let nextIsChord = false;
-              if (chunks[j + 1] && chunks[j + 1].type === "chord") {
-                nextIsChord = true;
-              } else if (
-                chunks[j + 1] &&
-                chunks[j + 1].type === "space" &&
-                chunks[j + 2] &&
-                chunks[j + 2].type === "chord"
-              ) {
-                nextIsChord = true;
-              }
               return <Chord key={j} chord={chunk} nextIsChord={nextIsChord} />;
             } else {
               throw new Error("Found chunk with unknown type: " + chunk.type);
@@ -260,13 +286,16 @@ const ChordsAndLyrics = ({ part }) => {
   );
 };
 
-const Word = ({ word }) => {
+const CHAR_SIZE = 10;
+
+const Word = ({ lastChord, word }) => {
   return (
     <PreferenceContext.Consumer>
       {({ textcolour, textfont, textsize }) => (
         <Text
           style={{
             lineHeight: 50,
+            marginLeft: lastChord ? -(lastChord.text.length * CHAR_SIZE) : null,
           }}
         >
           {word.text}
@@ -322,7 +351,7 @@ const SongProperties = ({ chordPro }) => {
     //"x_chordposition",
   ];
   return (
-    <View>
+    <View style={{ marginBottom: 20 }}>
       {songProperties.map(
         property =>
           chordPro[property] && (
@@ -335,7 +364,14 @@ const SongProperties = ({ chordPro }) => {
                   property,
                 )}: `}</Text>
               )}
-              <Text style={{ fontSize: 18 }}>{chordPro[property]}</Text>
+              <Text
+                style={{
+                  fontSize:
+                    ["title", "subtitle"].indexOf(property) !== -1 ? 24 : 18,
+                }}
+              >
+                {chordPro[property]}
+              </Text>
             </View>
           ),
       )}

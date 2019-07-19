@@ -100,11 +100,6 @@ class IndexPage extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (!this.isNotFirstUpdate) {
-      console.debug("ignoring cwu first update");
-      this.isNotFirstUpdate = true;
-      return;
-    }
     if (!this.state.onLine && nextState.onLine) {
       this.context.checkDirty();
     }

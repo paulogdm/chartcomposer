@@ -41,7 +41,7 @@ export default class SignInScreen extends React.Component<Props, any> {
     await storage.setAccessToken(accessToken);
 
     //this.setState({ accessToken, result });
-    navigation.navigate("Auth");
+    navigation.navigate("AuthLoading");
   };
 
   render() {

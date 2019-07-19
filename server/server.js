@@ -57,6 +57,6 @@ app
     });
   })
   .catch(err => {
-    console.error(err.stack);
+    console.error("serving error", err.stack);
     process.exit(1);
   });

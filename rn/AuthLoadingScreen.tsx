@@ -32,6 +32,8 @@ export default class AuthLoadingScreen extends React.Component<Props, any> {
     await dropboxInitialize();
     await setStateFromLocalStorage();
     navigation.navigate("App");
+    const getSongChordPro = true;
+    dropboxFoldersSync(getSongChordPro);
   };
 
   render() {

@@ -8,6 +8,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { AppContext } from "../context/App";
 
+import UserMenuIcon from "./UserMenuIcon";
+
 import removeFileExtension from "./../utils/removeFileExtension";
 
 interface Props {
@@ -19,7 +21,8 @@ export default class SongList extends React.Component<Props, any> {
 
   static navigationOptions = ({ navigation }) => {
     return {
-      title: "ChartComposer",
+      title: "Chart Composer",
+      headerRight: <UserMenuIcon navigation={navigation} />,
     };
   };
 
@@ -71,34 +74,74 @@ export default class SongList extends React.Component<Props, any> {
             );
           }}
           renderSectionHeader={({ section }) => (
-            <View>
-              <TouchableOpacity
-                style={styles.sectionHeader}
-                onPress={() => {
-                  toggleFolderOpen(section.folderId);
-                }}
-              >
-                <View style={{ marginRight: 5 }}>
-                  <Ionicons
-                    name={
-                      closedFolders[section.folderId]
-                        ? "md-folder"
-                        : "md-folder-open"
-                    }
-                    size={24}
-                  />
-                </View>
-                <Text
+            <View style={styles.sectionHeader}>
+              <View style={{ flex: 1 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    toggleFolderOpen(section.folderId);
+                  }}
                   style={{
-                    flex: 1,
-                    fontSize: 18,
-                    fontWeight: "bold",
-                    paddingLeft: 10,
+                    alignItems: "center",
+                    display: "flex",
+                    flexDirection: "row",
                   }}
                 >
-                  {section.title}
-                </Text>
-              </TouchableOpacity>
+                  <View
+                    style={{
+                      marginRight: 5,
+                    }}
+                  >
+                    <Ionicons
+                      name={
+                        closedFolders[section.folderId]
+                          ? "md-folder"
+                          : "md-folder-open"
+                      }
+                      size={24}
+                    />
+                  </View>
+                  <Text
+                    style={{
+                      flex: 1,
+                      fontSize: 18,
+                      fontWeight: "bold",
+                      paddingLeft: 5,
+                    }}
+                  >
+                    {section.title}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  display: closedFolders[section.folderId] ? "none" : null,
+                  marginRight: 5,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    console.debug("hit add");
+                  }}
+                >
+                  <Ionicons name={"md-add"} size={24} />
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  //display: closedFolders[section.folderId] ? "none" : null,
+                  display: "none", // TODO: need Dropbox chooser before we want this
+                  marginRight: 5,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    console.debug("hit close");
+                  }}
+                  style={{ flex: 0 }}
+                >
+                  <Ionicons name={"md-close"} size={24} />
+                </TouchableOpacity>
+              </View>
             </View>
           )}
           keyExtractor={(item, index) => item + index}
@@ -120,6 +163,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderTopWidth: 1,
     display: "flex",
+    flex: 1,
     flexDirection: "row",
     fontSize: 18,
     fontWeight: "bold",
@@ -127,6 +171,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
     paddingLeft: 10,
     paddingRight: 4,
+    width: "100%",
   },
   item: {
     paddingBottom: 10,

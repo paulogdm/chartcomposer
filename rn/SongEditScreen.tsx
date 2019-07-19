@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, StyleSheet, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 
 import { AppContext } from "./../context/App";
 
