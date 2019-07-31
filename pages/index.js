@@ -4,7 +4,7 @@ import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
 import Raven from "raven-js";
-import Router, { withRouter } from "next/router";
+import { withRouter } from "next/router";
 import _ from "lodash";
 
 import { AppContext } from "./../context/App.js";
@@ -59,16 +59,18 @@ class IndexPage extends React.Component {
       window.lodash = _;
     }
 
-    await dropboxInitialize(router.query.share);
     await setStateFromLocalStorage(() => {
       if (router.query.songId) {
         setSongId(router.query.songId, router.query.folderId);
       }
-      this.reSyncDropboxTimeout = window.setTimeout(
-        () => dropboxFoldersSync(),
-        1000,
-      );
     });
+
+    dropboxInitialize(router.query.share);
+    this.reSyncDropboxTimeout = window.setTimeout(() => {
+      if (this.context.dropbox) {
+        dropboxFoldersSync();
+      }
+    }, 5000);
 
     const onLine = navigator.onLine;
     const smallScreenMode = this.getDefaultSmallScreenMode();

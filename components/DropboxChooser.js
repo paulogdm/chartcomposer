@@ -61,7 +61,6 @@ export default class DropboxChooser extends Component {
       extensions,
       folderselect,
     } = this.props;
-    console.warn({ folderselect });
     window.Dropbox.choose({
       success,
       cancel,
