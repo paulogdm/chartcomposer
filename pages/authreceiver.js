@@ -3,7 +3,7 @@ import Router, { withRouter } from "next/router";
 
 import { AppContext } from "./../context/App.js";
 
-import { Receiver } from "./../components/Page";
+import Page, { Receiver } from "./../components/Page";
 
 class AuthReceiverPage extends React.Component {
   static contextType = AppContext;
