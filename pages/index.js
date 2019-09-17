@@ -13,7 +13,7 @@ import ButtonToolbarGroup from "./../components/ButtonToolbarGroup";
 import LoadingIndicator from "./../components/LoadingIndicator";
 import Header from "./../components/Header";
 import Page from "./../components/Page";
-import Preferences, { defaultPreferences } from "./../components/Preferences";
+import Preferences from "./../components/Preferences";
 import SongEditor from "./../components/SongEditor";
 import SongList from "./../components/SongList";
 import SongView from "./../components/SongView";
@@ -21,21 +21,21 @@ import SongView from "./../components/SongView";
 import { APP_NAME } from "./../utils/constants";
 import storage from "./../utils/storage";
 
+const SMALL_SCREEN_WIDTH = 768;
+
 class IndexPage extends React.Component {
   static contextType = AppContext;
 
   constructor(props, context) {
     console.debug("IndexPage constructor", { props, context });
     super();
-    const smallScreenMode = this.getDefaultSmallScreenMode();
-    console.debug({ smallScreenMode });
+
     this.state = {
       componentIsMounted: false,
       preferencesOpen: false,
-      smallScreenMode,
+      smallScreenMode: null,
       songListClosed: false,
       songEditorClosed: false,
-
       songViewClosed: false,
     };
     this.debouncedOnWindowResize = _.debounce(this.onWindowResize, 300);
@@ -54,11 +54,6 @@ class IndexPage extends React.Component {
       setSongId,
     } = this.context;
 
-    if (window) {
-      // for console debugging
-      window.lodash = _;
-    }
-
     await setStateFromLocalStorage(() => {
       if (router.query.songId) {
         setSongId(router.query.songId, router.query.folderId);
@@ -73,11 +68,11 @@ class IndexPage extends React.Component {
     }, 5000);
 
     const onLine = navigator.onLine;
-    const smallScreenMode = this.getDefaultSmallScreenMode();
     this.setState({
       onLine,
-      smallScreenMode,
+      smallScreenMode: this.getSmallScreenMode(router.query.songId),
     });
+
     if (onLine) {
       this.context.checkDirty();
     }
@@ -105,10 +100,10 @@ class IndexPage extends React.Component {
     if (!this.state.onLine && nextState.onLine) {
       this.context.checkDirty();
     }
+    const nextSongId = nextProps.router.query.songId;
+    const nextFolderId = nextProps.router.query.folderId;
 
-    if (nextProps.router.query.songId !== this.props.router.query.songId) {
-      const nextSongId = nextProps.router.query.songId;
-      const nextFolderId = nextProps.router.query.folderId;
+    if (nextSongId !== this.props.router.query.songId) {
       /*console.debug(
         "-0-0-0-0-0-0-0-0-0-0 nextProps.router",
         nextProps.router,
@@ -121,40 +116,50 @@ class IndexPage extends React.Component {
       */
       this.context.setSongId(nextSongId, nextFolderId);
     }
+    const nextSmallScreenMode = this.getSmallScreenMode(nextSongId);
+    if (nextSmallScreenMode !== this.state.smallScreenMode) {
+      this.setSmallScreenMode(nextSmallScreenMode);
+    }
   }
 
-  updateOnlineStatus = e => {
-    this.setState({ onLine: navigator.onLine });
+  updateOnlineStatus = () => {
+    this.setState({ onLine: window.navigator.onLine });
   };
 
-  getDefaultSmallScreenMode() {
-    if (!this.state || !window) {
-      console.debug("no smallScreenModa state, waiting...");
+  getSmallScreenMode(songId = null) {
+    if (!this.state || !window || !this.context) {
+      console.debug("no smallScreenMode state, waiting...");
       return null;
     }
+    if (window.innerWidth > SMALL_SCREEN_WIDTH) {
+      return null;
+    }
+
+    songId = songId || this.props.router.query.songId;
     console.debug(
-      "getDefaultSmallScreenMode",
+      "getSmallScreenMode",
       window.innerWidth,
       " vs ",
       window.document.body.offsetWidth,
+      songId,
     );
+
     let smallScreenMode = this.state.smallScreenMode;
-    if (window.innerWidth <= 768 && smallScreenMode === null) {
+    if (songId) {
+      smallScreenMode =
+        smallScreenMode !== "SongEditor" ? "SongView" : smallScreenMode;
+    } else {
       smallScreenMode = this.context.dropbox ? "SongList" : "PromoCopy";
-    } else if (window.innerWidth > 768 && smallScreenMode !== null) {
-      smallScreenMode = null;
     }
     return smallScreenMode;
   }
 
   setSmallScreenMode = smallScreenMode => {
-    this.setState({
-      smallScreenMode,
-    });
+    this.setState({ smallScreenMode });
   };
 
   onWindowResize = e => {
-    const smallScreenMode = this.getDefaultSmallScreenMode();
+    const smallScreenMode = this.getSmallScreenMode();
     console.debug("onWindowResize", window.innerWidth, smallScreenMode);
     this.setState({ smallScreenMode });
   };
@@ -203,8 +208,6 @@ class IndexPage extends React.Component {
   };
 
   render() {
-    const { router } = this.props;
-    //console.debug("Index.render", this.context);
     const {
       chordPro,
       closedFolders,
@@ -227,26 +230,29 @@ class IndexPage extends React.Component {
     const {
       componentIsMounted,
       preferencesOpen,
+      smallScreenMode,
       songListClosed,
       songEditorClosed,
       songViewClosed,
-      smallScreenMode,
     } = this.state;
 
     const [song, _] = getSongById(songId);
     const readOnly = song && !song.path_lower;
 
-    const renderSongEditor =
+    const renderSongEditor = !!(
       songId &&
       song &&
       !readOnly &&
       chordPro[songId] &&
-      (smallScreenMode === "SongEditor" || smallScreenMode === null);
-    const renderSongView =
+      (smallScreenMode === "SongEditor" || smallScreenMode === null)
+    );
+    const renderSongView = !!(
       chordPro[songId] &&
-      (smallScreenMode === "SongView" || smallScreenMode === null);
+      (smallScreenMode === "SongView" || smallScreenMode === null)
+    );
+    console.debug("render smallScreenMode", smallScreenMode);
 
-    if (!componentIsMounted) {
+    if (!componentIsMounted || !this.state || !window || !this.context) {
       return (
         <LoadingIndicator
           style={{
@@ -259,6 +265,7 @@ class IndexPage extends React.Component {
         />
       );
     }
+
     return (
       <div>
         <style jsx global>{`
@@ -302,6 +309,7 @@ class IndexPage extends React.Component {
             }}
           />
         ) : null}
+
         {preferencesOpen ? (
           <Preferences
             preferences={preferences}
@@ -310,6 +318,7 @@ class IndexPage extends React.Component {
             updatePreferences={updatePreferences}
           />
         ) : null}
+
         <div
           className={classNames("panel-container", {
             [`smallScreenMode-${smallScreenMode}`]: !!smallScreenMode,
@@ -445,7 +454,7 @@ class IndexPage extends React.Component {
                     height: "100%",
                     padding: "0",
                     display: songEditorClosed ? "none" : "block",
-                    width: "50%",
+                    width: smallScreenMode === "SongEditor" ? "100%" : "50%",
                   }}
                 >
                   <SongEditor

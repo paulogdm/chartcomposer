@@ -513,18 +513,10 @@ export default class App extends React.Component {
 
   setSongId = async (songId, folderId) => {
     console.debug("setSongId", { songId, folderId });
-    const { folders, smallScreenMode, songs } = this.state;
+    const { folders, songs } = this.state;
 
     if (!songId) {
-      this.setState({
-        songId: null,
-        smallScreenMode:
-          smallScreenMode !== null &&
-          smallScreenMode !== "SongList" &&
-          smallScreenMode !== "PromoCopy"
-            ? "SongList"
-            : smallScreenMode,
-      });
+      this.setState({ songId: null });
       return;
     }
 
@@ -540,14 +532,7 @@ export default class App extends React.Component {
       return;
     }
 
-    let nextSmallScreenMode = null;
-    if (smallScreenMode === "SongList") {
-      nextSmallScreenMode = "SongView";
-    }
-    this.setState({
-      smallScreenMode: nextSmallScreenMode,
-      songId,
-    });
+    this.setState({ songId });
 
     const songChordPro = await this.dropboxGetSongChordPro(songId, folderId);
     if (!songChordPro) {
