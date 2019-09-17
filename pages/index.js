@@ -60,7 +60,7 @@ class IndexPage extends React.Component {
       }
     });
 
-    dropboxInitialize(router.query.share);
+    await dropboxInitialize(router.query.share);
     this.reSyncDropboxTimeout = window.setTimeout(() => {
       if (this.context.dropbox) {
         dropboxFoldersSync();

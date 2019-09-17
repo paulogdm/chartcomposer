@@ -1,4 +1,4 @@
-import chordProParse, { parseLine } from "./chordProParse";
+import chordProParse, { parseLine, transpose } from "./chordProParse";
 
 const SPACE = { type: "space", text: " " };
 
@@ -13,8 +13,15 @@ const text = text => {
   return { type: "text", text: text };
 };
 
+test("transpose", () => {
+  expect(transpose("Am", 0)).toEqual("Am");
+  expect(transpose("Am", "4")).toEqual("C#m");
+  expect(transpose("Am", 4)).toEqual("C#m");
+});
+
 test("parseLine word and chord splitting", () => {
   expect(parseLine("[C]")).toEqual([chord("C")]);
+  expect(parseLine("[Am]")).toEqual([chord("Am")]);
   expect(parseLine("[C] [C]")).toEqual([chord("C"), SPACE, chord("C")]);
 
   expect(parseLine("[C]Make[A#]")).toEqual([

@@ -8,7 +8,6 @@ import { fetch } from "whatwg-fetch";
 import blobToText from "./../utils/blobToText";
 import getPathForSong from "./../utils/getPathForSong";
 import isChordProFileName from "./../utils/isChordProFileName";
-//import getObjectDiffFields from "./../utils/getObjectDiffFields";
 
 import { defaultPreferences } from "./../components/Preferences";
 
@@ -178,7 +177,7 @@ export default class App extends React.Component {
       accessToken = DROPBOX_PUBLIC_TOKEN;
     }
     if (accessToken) {
-      this.dropbox = new Dropbox({ accessToken, fetch });
+      this.dropbox = new Dropbox({ accessToken, fetch: fetch });
       this.setState({
         signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
       });
@@ -268,12 +267,15 @@ export default class App extends React.Component {
     if (!url) {
       return;
     }
-
+    console.debug("this.dropbox", this.dropbox);
+    console.debug(
+      "this.dropbox.sharingGetSharedLinkMetadata",
+      this.dropbox.sharingGetSharedLinkMetadata,
+    );
     this.setState({
       loading: !isCheckForChanges,
       songId: isCheckForChanges ? this.state.songId : null,
     });
-
     this.dropbox
       .sharingGetSharedLinkMetadata({ url })
       .then(response => {
