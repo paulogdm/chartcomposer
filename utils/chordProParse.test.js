@@ -1,4 +1,4 @@
-import chordProParse, { parseLine, transpose } from "./chordProParse";
+import { parseLine, transpose, parseChordProString } from "./chordProParse";
 
 const SPACE = { type: "space", text: " " };
 
@@ -86,3 +86,27 @@ test("parseLine with punctuation", () => {
     text("think"),
   ]);
 });
+
+const carriageReturn = () => {
+  return { type: "carriage-return" };
+};
+test("multiLine", () => {
+  const parsedStringVerse = parseChordProString(`a\nb`);
+  expect(parsedStringVerse.parts.length).toEqual(1);
+  expect(parsedStringVerse.parts[0].type).toEqual("verse");
+
+  const parsedStringWithTwoNewlines = parseChordProString(`a\n\nb`);
+  expect(parsedStringWithTwoNewlines.parts.length).toEqual(2);
+  expect(parsedStringWithTwoNewlines.parts[0].type).toEqual("verse");
+  expect(parsedStringWithTwoNewlines.parts[1].type).toEqual("verse");
+
+  const parsedStringWithThreeNewlines = parseChordProString(`a\n\n\nb`);
+  expect(parsedStringWithThreeNewlines.parts.length).toEqual(3);
+  expect(parsedStringWithThreeNewlines.parts[0].type).toEqual("verse");
+  expect(parsedStringWithThreeNewlines.parts[1].type).toEqual(
+    "carriage-return",
+  );
+  expect(parsedStringWithThreeNewlines.parts[2].type).toEqual("verse");
+});
+
+test("parseChordProString", () => {});

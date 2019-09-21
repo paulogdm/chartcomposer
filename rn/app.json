@@ -21,6 +21,9 @@
       "package": "com.elsigh.chartcomposer"
     },
     "ios": {
+
+      "bundleIdentifier": "com.commoner.chartcomposer",
+
       "supportsTablet": true
     },
     "scheme": "chartcomposer"

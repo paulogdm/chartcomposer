@@ -24,6 +24,7 @@ export default class SongView extends React.Component {
       preferences[name] = preferences[name] || displayPreferenceDefaults[name];
     });
     const chordPro = parseChordProString(value);
+    console.debug("chordPro parsed", chordPro);
     let chordDiagramsHtml = "";
     chordPro.chords.forEach(chord => {
       const diagram = getChordDiagram(chord, preferences.x_instrument);
@@ -74,9 +75,23 @@ const Section = ({ part }) => {
     case "image":
       content = <Image part={part} />;
       break;
+    case "carriage-return":
+      content = <div className="carriage-return" />;
+      break;
     case "comment":
     case "choruscomment":
-      content = <div className="lyriccomment">{part.lines[0]}</div>;
+      content = <div className="lyriccomment">{part.linesParsed[0]}</div>;
+      break;
+    case "tab":
+      content = (
+        <div className="tab" style={{ fontFamily: "monospace" }}>
+          {part.linesParsed.map(line => {
+            return (
+              <div>{line.type === "carriage-return" ? <br /> : line.text}</div>
+            );
+          })}
+        </div>
+      );
       break;
     case "x_url":
       content = (
@@ -204,11 +219,25 @@ const Image = ({ part }) => {
   );
 };
 
+const lineHasAnyText = parsed => {
+  for (let j = 0, chunk; (chunk = parsed[j]); j++) {
+    if (chunk.type === "text") {
+      return true;
+    }
+  }
+  return false;
+};
+
 const ChordsAndLyrics = ({ part }) => {
   return (
     <div>
       {part.linesParsed.map((parsed, i) => (
-        <div key={i} className="SongView-line lyricline">
+        <div
+          key={i}
+          className={classNames("SongView-line", "lyricline", {
+            "SongView-line-only-chords": !lineHasAnyText(parsed),
+          })}
+        >
           {parsed.map((chunk, j, chunks) => {
             if (chunk.type === "text") {
               return <Word key={j} word={chunk} />;

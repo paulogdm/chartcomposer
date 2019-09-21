@@ -250,7 +250,7 @@ class IndexPage extends React.Component {
       chordPro[songId] &&
       (smallScreenMode === "SongView" || smallScreenMode === null)
     );
-    console.debug("render smallScreenMode", smallScreenMode);
+    //console.debug("render smallScreenMode", smallScreenMode);
 
     if (!componentIsMounted || !this.state || !window || !this.context) {
       return (

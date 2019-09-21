@@ -58,15 +58,17 @@ export function parseChordProString(text, preferences = {}) {
 
   gaLines = text.split("\n");
   giLine = 0;
+  //console.debug("Initial gaLines", gaLines);
   while (giLine < gaLines.length) {
-    var line = gaLines[giLine].trim();
+    const line = gaLines[giLine].trim();
+    //console.debug("line", line.toString());
     giLine++;
     if (isDirective(line)) {
       doDirective(line);
     } else if (isComment(line)) {
-      // do nothing
-    } else if ("" === line) {
-      //console.debug("DEBUG: blank line");
+      // do nothing for comments
+    } else if (!line) {
+      doBlock("carriage-return");
     } else {
       // A line with no directive and it must NOT be within a directive block
       // like chorus or verse. We assume this is lyrics so we create a verse.
@@ -78,8 +80,8 @@ export function parseChordProString(text, preferences = {}) {
   return gSong;
 }
 
-//   closingdirective - a single string or an array of strings
 function doBlock(type, closingdirectives) {
+  //console.debug("doBlock type:", type);
   // Convert closingdirectives to an array of lowercase strings.
   var aClosingDirectives = [];
   if ("string" === typeof closingdirectives) {
@@ -96,31 +98,41 @@ function doBlock(type, closingdirectives) {
 
   var block = {};
   block.type = type || "verse";
-  block.lines = []; // lines in this block
   block.linesParsed = [];
+
+  if (block.type === "carriage-return") {
+    // Don't want our first part to be a return
+    if (gSong.parts.length) {
+      gSong.parts.push(block);
+    }
+    return;
+  }
+
   while (giLine < gaLines.length) {
     var line = gaLines[giLine].trim();
+    //console.debug("line", line, "isEmptyString?", line === "");
     giLine++;
     if (matchesClosingDirectives(line, aClosingDirectives)) {
       // Yay! This specific block type has a matching closing directive!
       break;
     } else if ("" === line && 0 === aClosingDirectives.length) {
-      console.debug(
+      /*console.debug(
         'debug: assuming this blank line closes the current "' +
           type +
           '" block',
-      );
+      );*/
       break;
     } else if (isDirective(line)) {
       doDirective(line);
     } else if (isComment(line)) {
       // do nothing
-    } else {
-      block.lines.push(line ? line : "&nbsp;");
-      // TODO: remove `lines` in favor if `linesParsed`.
-      if (line) {
-        block.linesParsed.push(parseLine(line, gSong.capo));
-      }
+    } else if (type === "tab") {
+      block.linesParsed.push({
+        type: line ? "text" : "carriage-return",
+        text: line || null,
+      });
+    } else if (line) {
+      block.linesParsed.push(parseLine(line, gSong.capo));
     }
   }
 
@@ -508,7 +520,7 @@ function doDirective(line) {
         }
       }
       hPart.type = directive;
-      hPart.lines = [parameters];
+      hPart.linesParsed = [parameters];
       gSong.parts.push(hPart);
       break;
 
@@ -617,106 +629,6 @@ function addChord(parameters) {
 
 ///////////////////////////////////////////////////
 
-function exportHtml(song) {
-  var aResults = [];
-
-  aResults.push("<div class=songproperties>");
-  var aProperties = [
-    "title",
-    "subtitle",
-    "composer",
-    "artist",
-    "key",
-    "tempo",
-    "time",
-    "capo",
-    "duration",
-    //"x_diagramposition",
-    //"x_diagramsize",
-    //"x_instrument",
-    // These are properties that we do NOT want to show in the viewer.
-    //"textfont",
-    //"textsize",
-    //"textcolour",
-    //"chordfont",
-    //"chordsize",
-    //"chordcolour",
-    //"x_chordposition",
-  ];
-
-  for (var i = 0; i < aProperties.length; i++) {
-    var prop = aProperties[i];
-    if (song[prop]) {
-      switch (prop) {
-        default:
-          aResults.push(
-            "<div class=song" +
-              prop +
-              ">" +
-              ("title" === prop || "subtitle" === prop ? "" : prop + ": ") +
-              song[prop] +
-              "</div>",
-          );
-      }
-    }
-  }
-  aResults.push("</div>");
-
-  // chord diagrams
-  if (
-    "none" !== song.x_diagramposition && // "diagrams" is enabled
-    ghChordLibrary[song.x_instrument]
-  ) {
-    // we have chords for the chosen instrument
-    var sChordDiagrams = getChordDiagrams(song, song);
-
-    if (sChordDiagrams && "top" === song.x_diagramposition) {
-      aResults.push(sChordDiagrams);
-    }
-  }
-
-  aResults.push("<div class=songparts style='float: left; min-width: 95%;'>");
-  for (var i = 0; i < song.parts.length; i++) {
-    aResults.push(exportHtmlPart(song.parts, i));
-  }
-  aResults.push("</div>");
-  if (sChordDiagrams && "right" === song.x_diagramposition) {
-    aResults.push(sChordDiagrams);
-  }
-
-  return aResults.join("\n");
-}
-
-function getChordDiagrams(song) {
-  if (!ghChordLibrary[song.x_instrument]) {
-    console.debug(
-      "we do not have chords for the chosen instrument",
-      song.x_instrument,
-    );
-    return "";
-  }
-
-  // collect the HTML for each chord diagram
-  var sChordDiagrams = "";
-  for (var c = 0; c < song.chords.length; c++) {
-    var chord = song.chords[c];
-    sChordDiagrams += getChordDiagram(chord, song.x_instrument, song.hChords);
-  }
-
-  sChordDiagrams =
-    "<div class='chorddiagrams chord-diagramsize-" +
-    song.x_diagramsize +
-    "'" +
-    ("right" === song.x_diagramposition
-      ? " style='float: right; width: 100px;'"
-      : "") + // TODO - better width
-    ">" +
-    sChordDiagrams +
-    '</div><div style="clear: both;"></div>'; // TODO - need clear both?
-
-  return sChordDiagrams;
-}
-
 // chord - a string ex "A", "Gbm"
 // We need song to know the instrument and any custom-defined chords for the song,
 // plus prefs like size and position.
@@ -772,205 +684,6 @@ export function getChordDiagram(chord, instrument, hChords = null) {
   var sChord = "<div class=chord> " + sChord + "</div>";
 
   return sChord;
-}
-
-function exportHtmlPart(aParts, i) {
-  var aResults = [];
-  var part = aParts[i];
-  var capo = gSong.capo; // transpose?
-
-  var nextPart = i < aParts.length - 1 ? aParts[i + 1] : null;
-  var sStyle = "";
-  if (
-    "comment" === part.type &&
-    nextPart &&
-    ("verse" === nextPart.type ||
-      "chorus" === nextPart.type ||
-      "tab" === nextPart.type)
-  ) {
-    sStyle = " style='margin-bottom: -0.5em; padding-top: 0.5em;'";
-  }
-
-  aResults.push("<div class=" + part.type + sStyle + ">");
-
-  var sChordSize =
-    gSong.chordsize == parseInt(gSong.chordsize)
-      ? gSong.chordsize + "px"
-      : gSong.chordsize; // add "px" to integers, ow allow % and em
-  var sChordStyle =
-    " style='color: " +
-    gSong.chordcolour +
-    "; font-size: " +
-    sChordSize +
-    "; font-family: " +
-    gSong.chordfont +
-    "; background: transparent;'";
-  if (part.lines) {
-    for (var i = 0; i < part.lines.length; i++) {
-      var line = part.lines[i];
-      if (capo) {
-        // If a capo was specified then transpose each chord.
-        var matches;
-        while ((matches = line.match(/\[(.*?)\]/))) {
-          // TODO - Should we do a map to cache chords that are already transposed?
-          var sChord = matches[1];
-          var sBaseChord = sChord.substr(0, 1);
-          var sBaseChordNew = transpose(sBaseChord, capo);
-          var sChordNew = sChord.replace(sBaseChord, sBaseChordNew);
-          line = line.replace(
-            "[" + sChord + "]",
-            "<code class='chord settingschord'" +
-              sChordStyle +
-              "><span>" +
-              sChordNew +
-              "</span></code>",
-          );
-        }
-      } else {
-        // If no capo then just wrap the chord in a span.
-        line = line
-          .replace(
-            /\[/g,
-            "<code class='chord settingschord'" + sChordStyle + "><span>",
-          )
-          .replace(/\]/g, "</span></code>");
-      }
-
-      // Special CSS for comment and choruscomment.
-      if ("comment" === part.type || "choruscomment" === part.type) {
-        line =
-          "<div class=lyriccomment>" +
-          line +
-          "</div><div style='clear: both;'></div>";
-      } else if ("x_audio" === part.type) {
-        // syntax: {x_audio: url="url" [title="name"]}
-        var hParams = parseParameters(line);
-        var url = hParams["url"];
-        if (!url) {
-          continue; // must have URL
-        }
-        // When people copy the Spotify link it is not in the format necessary to embed.
-        // The only way to get the correct format is to copy the "embed code", but people
-        // typically do not know that and anyway that would be too combursome to put into ChordPro.
-        // If they DO get the embed code and give us just the embed URL, that should work fine
-        // in the first "embed.spotify.com" block.
-        // If instead they have the web page URL we try to convert it.
-        // I have found that without the "user" part it will only play 20 seconds.
-        else if (0 === url.indexOf("https://embed.spotify.com/")) {
-          line =
-            "<iframe src='" +
-            url +
-            "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
-        } else if (0 === url.indexOf("https://open.spotify.com/")) {
-          // Extract the URI and convert "/" to ":".
-          var uri = url
-            .substring("https://open.spotify.com/".length)
-            .replace(/\//g, ":");
-          if (uri) {
-            // Here is an example that works and actually plays the entire song:
-            // line = "<iframe src='https://embed.spotify.com/?uri=spotify:user:richardcook2:playlist:7opdOnDak9hMWlOeGcuk02' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
-            line =
-              "<iframe src='https://embed.spotify.com/?uri=spotify:" +
-              uri +
-              "' width='300' height='380' frameborder='0' allowtransparency='true'></iframe>\n";
-          }
-        } else {
-          line =
-            (hParams["title"]
-              ? "<span style='float: left;'>" + hParams["title"] + ": </span>"
-              : "") +
-            "<audio src='" +
-            fixDropboxUrl(url) +
-            "' controls style='width: 80%'></audio>";
-        }
-      } else if ("x_pdf" === part.type) {
-        // syntax: {x_pdf: url="url" [pages="2"]}
-        var hParams = parseParameters(line);
-        if (!hParams["url"]) {
-          continue; // must have URL
-        } else {
-          var url = fixDropboxUrl(hParams["url"]);
-          var songView = document.getElementsByClassName(
-            "panel-song-editor",
-          )[0];
-          var width = Math.min(
-            800,
-            songView && 0 < songView.clientWidth ? songView.clientWidth : 800,
-          );
-          var height =
-            Math.round((1100 * width) / 800) *
-            (hParams["pages"] ? hParams["pages"] : 1);
-          line =
-            "<object data='" +
-            url +
-            "' type='application/pdf' width='95%' height='" +
-            height +
-            "'>" +
-            "<p>You don't have a PDF plugin, but you can <a href='" +
-            url +
-            "'>download the PDF file.</a></p></object>";
-          //line = "<iframe src='http://docs.google.com/viewer?url=http://ukulelecraig.com/tennessee.pdf&embedded=true' width='100%' height='12000' style='border: none;'></iframe>";
-        }
-      } else if ("x_video" === part.type) {
-        // syntax: {x_video: url="url" [title="name"]}
-        var hParams = parseParameters(line);
-        if (!hParams["url"]) {
-          continue; // must have URL
-        } else {
-          var youtubeUrl = getYoutubeUrl(hParams["url"]);
-          if (youtubeUrl) {
-            // https://www.youtube.com/embed/R0fQm9OsMcw
-            line =
-              "<iframe width='560' height='315' src='" +
-              youtubeUrl +
-              "' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen style='padding-left: 5%;'></iframe>";
-          } else {
-            line =
-              "<video src='" +
-              fixDropboxUrl(hParams["url"]) +
-              "' controls style='width: 80%'></video>";
-          }
-        }
-      } else if ("x_url" === part.type) {
-        // syntax: {x_url: url="url" [title="name"]}
-        var hParams = parseParameters(line);
-        if (!hParams["url"]) {
-          continue; // must have URL
-        }
-        line =
-          "<a href='" +
-          hParams["url"] +
-          "'>" +
-          (hParams["title"] ? hParams["title"] : hParams["url"]) +
-          "</a>";
-      } else if ("image" === part.type) {
-        // syntax: {image: src=filename options }
-        // possible options: see http://www.chordpro.org/chordpro/Directives-image.html
-        // example: {image: src="https://example.com/score.png" width=100 height=80 title='Bob and Mary'}
-        line =
-          "<img " +
-          fixDropboxUrl(line) +
-          (-1 === line.indexOf("width") ? " style='width: 100%'" : "") +
-          ">";
-        /*
-		  var hParams = parseParameters(line);
-		  if ( ! hParams['src'] ) {
-			  continue; // must have URL
-		  }
-		  else {
-			  line = "<img src='" + hParams['src'] + "'>";
-		  }
-		  */
-      }
-
-      // Add this line to the results.
-      aResults.push("<div class=lyricline>" + line + "</div>");
-    }
-  }
-
-  aResults.push("</div>");
-
-  return aResults.join("\n");
 }
 
 function getYoutubeUrl(url) {
@@ -1047,78 +760,6 @@ function cleanQuotes(s) {
   }
 
   return s;
-}
-
-// TODO - If you import ChordPro text that contains "#" comments, blank lines, etc.
-// those will be lost when you export back to ChordPro.
-function exportChordPro(song) {
-  var aResults = [];
-
-  // song properties
-  // We read these properties directly from the song object and output them in this order.
-  var aProperties = [
-    "title",
-    "subtitle",
-    "composer",
-    "artist",
-    "key",
-    "tempo",
-    "capo",
-  ];
-  for (var i = 0; i < aProperties.length; i++) {
-    var prop = aProperties[i];
-    if (song[prop]) {
-      aResults.push("{" + prop + ": " + song[prop] + "}");
-    }
-  }
-
-  // song settings (color, size, font)
-  // Only export the settings that DIFFER from the defaults.
-  for (var name in gaDefaultSettings) {
-    if (
-      gaDefaultSettings.hasOwnProperty(name) && // export every default setting
-      "undefined" !== typeof song[name] && // that exists in the current song
-      gaDefaultSettings[name] !== song[name] // and the value differs from the default
-    ) {
-      aResults.push("{" + name + ": " + song[name] + "}");
-    }
-  }
-
-  aResults.push(""); // blank line after song properties
-
-  var aParts = song.parts;
-  for (var i = 0; i < aParts.length; i++) {
-    aResults.push(exportChordProPart(aParts, i));
-  }
-
-  return aResults.join("\n");
-}
-
-function exportChordProPart(aParts, i) {
-  var part = aParts[i];
-  var aResults = [];
-
-  if ("comment" === part.type) {
-    aResults.push("{comment: " + part.lines[0] + "}");
-  }
-  if ("choruscomment" === part.type) {
-    // Technically the "chorus" directive just displays a comment that says "Chorus".
-    aResults.push("{chorus}");
-  } else if (
-    "verse" === part.type ||
-    "chorus" === part.type ||
-    "tab" === part.type
-  ) {
-    aResults.push("{start_of_" + part.type + "}");
-
-    for (var i = 0; i < part.lines.length; i++) {
-      aResults.push(part.lines[i]);
-    }
-
-    aResults.push("{end_of_" + part.type + "}\n"); // add an extra line after this part
-  }
-
-  return aResults.join("\n");
 }
 
 // https://stackoverflow.com/questions/7936843/how-do-i-transpose-music-chords-using-javascript

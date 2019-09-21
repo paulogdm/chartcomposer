@@ -11,8 +11,8 @@
   }
 }
 
-.SongView .lyricline {
-  line-height: 2.3;
+.SongView .lyricline:not(.SongView-line-only-chords) {
+  line-height: 2;
 }
 
 .SongView .directives {
@@ -39,8 +39,12 @@
 .SongView-section-verse,
 .SongView-section-chorus {
   padding-top: 0.5em;
-  margin-bottom: 0.5em;
+  margin-bottom: 1.5em;
   clear: both;
+}
+
+.SongView-section-carriage-return {
+  height: 1.2em;
 }
 
 .SongView .tab {
@@ -65,7 +69,10 @@
   padding: 0;
 }
 
-.SongView.chord-position-above .chord > .visible {
+.SongView.chord-position-above
+  .SongView-line:not(.SongView-line-only-chords)
+  .chord
+  > .visible {
   position: absolute;
   top: -1em;
 }

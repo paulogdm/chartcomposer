@@ -41,7 +41,12 @@ class SongEditor extends React.Component {
     this.setState({ value }, () => onChange(value));
   };
 
-  handleResize = () => this.editor.layout();
+  handleResize = () => {
+    if (!this.editor) {
+      return;
+    }
+    this.editor.layout();
+  };
 
   render() {
     const { readOnly, saving, serverModified } = this.props;
@@ -81,7 +86,7 @@ class SongEditor extends React.Component {
 
           {saving ? <Saving /> : <LastSaved timestamp={serverModified} />}
         </div>
-        <div style={{ flex: 1, position: "relative" }}>
+        <div style={{ height: "100%", position: "relative" }}>
           <MonacoEditorWithNoSSR
             width="100%"
             height="100%"

@@ -22,7 +22,7 @@ export default class AutoScroll extends React.Component {
   }
 
   componentWillUnmount() {
-    console.debug("AUTOSCROLL CWU");
+    //console.debug("AUTOSCROLL CWU");
     const songView = document.querySelector(".panel-song-view");
     songView.scrollTo(0, 0);
     if (this.autoScrollTimeout) {
