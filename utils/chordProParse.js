@@ -473,7 +473,7 @@ function doDirective(line) {
     // one-line but possibly recurring directives
     case "chorus":
       // Technically the "chorus" directive just displays a comment that says "Chorus".
-      gSong.parts.push({ type: "choruscomment", lines: ["Chorus"] }); // TODO - this will NOT be styled like comments
+      gSong.parts.push({ type: "choruscomment", linesParsed: ["Chorus"] });
       break;
     case "comment":
     case "x_audio":

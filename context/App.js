@@ -608,6 +608,7 @@ export default class App extends React.Component {
           songId = response.id;
           console.debug("SAVED NEW SONG! songId is now", songId);
         }
+
         //console.debug({ folders, folderId });
         folders[folderId] = {
           ...folders[folderId],
@@ -620,7 +621,7 @@ export default class App extends React.Component {
           },
         };
 
-        this.setState({ chordPro, dirty, folders, saving: false, songId });
+        this.setState({ chordPro, dirty, folders, saving: false });
       })
       .catch(error => {
         this.setState({ saving: false });
