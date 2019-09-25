@@ -1,18 +1,27 @@
 import React from "react";
+import PropTypes from "prop-types";
 import dynamic from "next/dynamic";
 const MonacoEditorWithNoSSR = dynamic(() => import("react-monaco-editor"), {
   ssr: false,
 });
 import moment from "moment";
 import { Button } from "react-bootstrap";
+import _ from "lodash";
 
-import LoadingIndicator from "./LoadingIndicator";
 import textToChordPro, { isChordProFormat } from "./../utils/textToChordPro";
 
 class SongEditor extends React.Component {
+  static propTypes = {
+    onChange: PropTypes.func,
+    readOnly: PropTypes.bool,
+    saving: PropTypes.bool,
+    serverModified: PropTypes.string,
+    value: PropTypes.string,
+  };
   constructor(props) {
     super();
     this.state = { value: props.value };
+    this.debouncedOnChange = _.debounce(props.onChange, 250);
   }
 
   componentDidMount() {
@@ -23,15 +32,9 @@ class SongEditor extends React.Component {
     window.removeEventListener("resize", this.handleResize);
   }
 
-  onChangeMonaco = value => {
-    const { onChange } = this.props;
-    this.setState({ value }, () => onChange(value));
-  };
-
-  onChange = e => {
-    const { onChange } = this.props;
-    const value = e.target.value;
-    this.setState({ value }, () => onChange(value));
+  onChange = value => {
+    // update editor state immediately, then call our HOC onChange debounced
+    this.setState({ value }, () => this.debouncedOnChange(value));
   };
 
   convertValueToChordPro = () => {
@@ -106,23 +109,9 @@ class SongEditor extends React.Component {
               wordBasedSuggestions: false,
               wordWrap: "on",
             }}
-            onChange={this.onChangeMonaco}
+            onChange={this.onChange}
             editorDidMount={editor => (this.editor = editor)}
           />
-          {/*
-          <textarea
-            value={value}
-            onChange={this.onChange}
-            readOnly={readOnly}
-            style={{
-              border: "1px solid transparent",
-              boxSizing: "border-box",
-              fontSize: 14,
-              height: "100%",
-              padding: "3px",
-              width: "100%",
-            }}
-          />*/}
         </div>
       </div>
     );

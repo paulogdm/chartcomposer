@@ -106,6 +106,10 @@ export default class App extends React.Component {
     storage: PropTypes.object,
   };
 
+  constructor() {
+    super();
+    this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 1000);
+  }
   componentDidMount() {
     this.setState({ componentIsMounted: true });
   }
@@ -554,9 +558,8 @@ export default class App extends React.Component {
       [songId]: true,
     };
 
-    const debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 1000);
     this.setState({ chordPro, dirty }, () => {
-      debouncedSaveSongChordPro(songId);
+      this.debouncedSaveSongChordPro(songId);
     });
   };
 
@@ -566,21 +569,29 @@ export default class App extends React.Component {
     const [song, folderId] = this.getSongById(songId);
     const path = getPathForSong(song);
     const isNewSong = song.id.indexOf(NEW_SONG_ID_MARKER) === 0;
-    console.debug("saveSongChordPro", { folderId, isNewSong, songId, song });
 
+    // http://dropbox.github.io/dropbox-sdk-js/global.html#FilesCommitInfo
     const filesCommitInfo = {
       autorename: false,
+      client_modified: new Date().toISOString().split(".")[0] + "Z",
       contents: songChordPro,
       mode: { ".tag": "overwrite" },
       mute: true,
       path,
     };
-    console.debug({ filesCommitInfo });
+    console.debug("saveSongChordPro", {
+      filesCommitInfo,
+      folderId,
+      isNewSong,
+      songId,
+      song,
+      songChordPro,
+    });
     this.setState({ saving: true });
     this.dropbox
       .filesUpload(filesCommitInfo)
       .then(response => {
-        console.debug("SAVED song", { response });
+        console.debug("SAVED song", { response, songChordPro });
 
         let dirty = { ...this.state.dirty };
         delete dirty[songId];
@@ -597,7 +608,7 @@ export default class App extends React.Component {
           songId = response.id;
           console.debug("SAVED NEW SONG! songId is now", songId);
         }
-        console.debug({ folders, folderId });
+        //console.debug({ folders, folderId });
         folders[folderId] = {
           ...folders[folderId],
           songs: {
@@ -609,7 +620,6 @@ export default class App extends React.Component {
           },
         };
 
-        chordPro[songId] = songChordPro;
         this.setState({ chordPro, dirty, folders, saving: false, songId });
       })
       .catch(error => {

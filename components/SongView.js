@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classNames from "classnames";
 
-//import { AppContext } from "./../context/App";
+import _ from "lodash";
 
 import {
   displayPreferenceDefaults,
@@ -18,13 +19,36 @@ const PreferenceContext = React.createContext({
 });
 
 export default class SongView extends React.Component {
+  static propTypes = {
+    preferences: PropTypes.object,
+    value: PropTypes.string,
+  };
+
+  constructor(props) {
+    super();
+
+    this.parseChordProString = _.memoize(parseChordProString);
+
+    this.state = {
+      chordPro: props.value ? parseChordProString(props.value) : null,
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    const { value } = this.props;
+    if (value != prevProps.value) {
+      //console.debug("value update in SongView", value);
+      this.setState({ chordPro: this.parseChordProString(value) });
+    }
+  }
+
   render() {
-    const { preferences = {}, value = "" } = this.props;
+    const { preferences = {} } = this.props;
+    const { chordPro } = this.state;
+
     Object.keys(displayPreferenceDefaults).forEach(name => {
       preferences[name] = preferences[name] || displayPreferenceDefaults[name];
     });
-    const chordPro = parseChordProString(value);
-    console.debug("chordPro parsed", chordPro);
     let chordDiagramsHtml = "";
     chordPro.chords.forEach(chord => {
       const diagram = getChordDiagram(chord, preferences.x_instrument);
@@ -85,9 +109,11 @@ const Section = ({ part }) => {
     case "tab":
       content = (
         <div className="tab" style={{ fontFamily: "monospace" }}>
-          {part.linesParsed.map(line => {
+          {part.linesParsed.map((line, i) => {
             return (
-              <div>{line.type === "carriage-return" ? <br /> : line.text}</div>
+              <div key={i}>
+                {line.type === "carriage-return" ? <br /> : line.text}
+              </div>
             );
           })}
         </div>
@@ -95,7 +121,7 @@ const Section = ({ part }) => {
       break;
     case "x_url":
       content = (
-        <a href={part.url} target="_blank">
+        <a href={part.url} target="_blank" rel="noopener noreferrer">
           {part.title || part.url}
         </a>
       );
@@ -119,6 +145,10 @@ const Section = ({ part }) => {
   );
 };
 
+Section.propTypes = {
+  part: PropTypes.object,
+};
+
 const Audio = ({ part }) => {
   if (!part.url) {
     return null;
@@ -130,11 +160,15 @@ const Audio = ({ part }) => {
         width="300"
         height="380"
         frameBorder="0"
-        allowtransparency="true"
+        allowTransparency="true"
       />
     );
   }
   return <audio src={part.url} controls style={{ width: "80%" }} />;
+};
+
+Audio.propTypes = {
+  part: PropTypes.object,
 };
 
 const Video = ({ part }) => {
@@ -157,8 +191,15 @@ const Video = ({ part }) => {
   return <video src={part.url} controls style={{ width: "80%" }} />;
 };
 
+Video.propTypes = {
+  part: PropTypes.object,
+};
+
 class PDF extends React.Component {
-  constructor(props) {
+  static propTypes = {
+    part: PropTypes.object,
+  };
+  constructor() {
     super();
     this.state = {
       height: 500,
@@ -219,6 +260,10 @@ const Image = ({ part }) => {
   );
 };
 
+Image.propTypes = {
+  part: PropTypes.object,
+};
+
 const lineHasAnyText = parsed => {
   for (let j = 0, chunk; (chunk = parsed[j]); j++) {
     if (chunk.type === "text") {
@@ -270,6 +315,10 @@ const ChordsAndLyrics = ({ part }) => {
   );
 };
 
+ChordsAndLyrics.propTypes = {
+  part: PropTypes.object,
+};
+
 const Word = ({ word }) => {
   return (
     <PreferenceContext.Consumer>
@@ -278,6 +327,10 @@ const Word = ({ word }) => {
       )}
     </PreferenceContext.Consumer>
   );
+};
+
+Word.propTypes = {
+  word: PropTypes.object,
 };
 
 const Chord = ({ chord, nextIsChord }) => {
@@ -300,6 +353,11 @@ const Chord = ({ chord, nextIsChord }) => {
       )}
     </PreferenceContext.Consumer>
   );
+};
+
+Chord.propTypes = {
+  chord: PropTypes.object,
+  nextIsChord: PropTypes.bool,
 };
 
 const SongProperties = ({ chordPro }) => {
