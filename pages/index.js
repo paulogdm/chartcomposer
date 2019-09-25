@@ -233,7 +233,6 @@ class IndexPage extends React.Component {
       smallScreenMode,
       songListClosed,
       songEditorClosed,
-      songViewClosed,
     } = this.state;
 
     const [song, _] = getSongById(songId);

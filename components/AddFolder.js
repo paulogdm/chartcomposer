@@ -1,5 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
 import FaChain from "react-icons/lib/fa/chain";
-import FaPlus from "react-icons/lib/fa/plus";
 import FaFolderOpen from "react-icons/lib/fa/folder-open";
 
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
@@ -42,7 +43,7 @@ const AddFolder = ({ dbx, dropboxLoadLink }) => {
       if (!url) {
         return;
       }
-      loadDropboxLink(url);
+      dropboxLoadLink(url);
     },
     content: (
       <div>
@@ -61,6 +62,11 @@ const AddFolder = ({ dbx, dropboxLoadLink }) => {
       <ButtonToolbarGroup buttons={buttons} />
     </div>
   );
+};
+
+AddFolder.propTypes = {
+  dbx: PropTypes.object,
+  dropboxLoadLink: PropTypes.func,
 };
 
 export default AddFolder;
