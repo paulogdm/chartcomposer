@@ -16,8 +16,10 @@ class SongEditor extends React.Component {
     readOnly: PropTypes.bool,
     saving: PropTypes.bool,
     serverModified: PropTypes.string,
+    smallScreenMode: PropTypes.string,
     value: PropTypes.string,
   };
+
   constructor(props) {
     super();
     this.state = { value: props.value };
@@ -52,8 +54,47 @@ class SongEditor extends React.Component {
   };
 
   render() {
-    const { readOnly, saving, serverModified } = this.props;
+    const { readOnly, saving, serverModified, smallScreenMode } = this.props;
     const { value } = this.state;
+
+    let editor;
+    if (smallScreenMode) {
+      editor = (
+        <textarea
+          value={value}
+          onChange={e => {
+            this.onChange(e.target.value);
+          }}
+          style={{ display: "flex", height: "100%", width: "100%" }}
+        />
+      );
+    } else {
+      editor = (
+        <MonacoEditorWithNoSSR
+          width="100%"
+          height="100%"
+          language="markdown"
+          theme="vs-light"
+          value={value}
+          options={{
+            fontSize: 14,
+            glyphMargin: false,
+            lineNumbers: "off",
+            minimap: { enabled: false },
+            readOnly,
+            renderLineHighlight: "none",
+            roundedSelection: false,
+            scrollBeyondLastLine: false,
+            selectionHighlight: false,
+            wordBasedSuggestions: false,
+            wordWrap: "on",
+          }}
+          onChange={this.onChange}
+          editorDidMount={editor => (this.editor = editor)}
+        />
+      );
+    }
+
     return (
       <div
         style={{
@@ -89,30 +130,7 @@ class SongEditor extends React.Component {
 
           {saving ? <Saving /> : <LastSaved timestamp={serverModified} />}
         </div>
-        <div style={{ height: "100%", position: "relative" }}>
-          <MonacoEditorWithNoSSR
-            width="100%"
-            height="100%"
-            language="markdown"
-            theme="vs-light"
-            value={value}
-            options={{
-              fontSize: 14,
-              glyphMargin: false,
-              lineNumbers: "off",
-              minimap: { enabled: false },
-              readOnly,
-              renderLineHighlight: "none",
-              roundedSelection: false,
-              scrollBeyondLastLine: false,
-              selectionHighlight: false,
-              wordBasedSuggestions: false,
-              wordWrap: "on",
-            }}
-            onChange={this.onChange}
-            editorDidMount={editor => (this.editor = editor)}
-          />
-        </div>
+        <div style={{ height: "100%", position: "relative" }}>{editor}</div>
       </div>
     );
   }

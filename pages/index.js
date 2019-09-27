@@ -462,6 +462,7 @@ class IndexPage extends React.Component {
                     readOnly={readOnly}
                     saving={saving}
                     serverModified={song.server_modified}
+                    smallScreenMode={smallScreenMode}
                     value={chordPro[songId]}
                   />
                 </div>
