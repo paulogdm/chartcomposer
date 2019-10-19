@@ -27,8 +27,8 @@ class IndexPage extends React.Component {
   static contextType = AppContext;
 
   constructor(props, context) {
-    console.debug("IndexPage constructor", { props, context });
-    super();
+    //console.debug("IndexPage constructor", { props, context });
+    super(props);
 
     this.state = {
       componentIsMounted: false,
@@ -45,7 +45,12 @@ class IndexPage extends React.Component {
     }
   }
 
+  getInitialProps(c) {
+    console.debug("getInitialProps", JSON.stringify(c));
+  }
+
   async componentDidMount() {
+    console.debug("componentDidMount", this.props);
     const { router } = this.props;
     const {
       dropboxInitialize,
@@ -53,8 +58,8 @@ class IndexPage extends React.Component {
       setStateFromLocalStorage,
       setSongId,
     } = this.context;
-
     await setStateFromLocalStorage(() => {
+      console.debug("router.query.songId", router.query.songId);
       if (router.query.songId) {
         setSongId(router.query.songId, router.query.folderId);
       }
@@ -96,7 +101,38 @@ class IndexPage extends React.Component {
     window.removeEventListener("online", this.updateOnlineStatus);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.onLine && !prevState.onLine) {
+      this.context.checkDirty();
+    }
+    const prevSongId = prevProps.router.query.songId;
+    const prevFolderId = prevProps.router.query.folderId;
+
+    //console.debug("CDU", this.props.router, prevProps.router);
+    if (prevSongId !== this.props.router.query.songId) {
+      console.debug(
+        "-0-0-0-0-0-0-0-0-0-0",
+        this.props.router,
+        "prevSongId",
+        prevSongId,
+        "prevFolderId",
+        prevFolderId,
+        this.state.songs,
+      );
+      this.context.setSongId(
+        this.props.router.query.songId,
+        this.props.router.query.folderId,
+      );
+    }
+    const smallScreenMode = this.getSmallScreenMode(this.state.songId);
+    if (smallScreenMode !== this.state.smallScreenMode) {
+      this.setSmallScreenMode(smallScreenMode);
+    }
+  }
+
+  /*
   componentWillUpdate(nextProps, nextState) {
+
     if (!this.state.onLine && nextState.onLine) {
       this.context.checkDirty();
     }
@@ -104,7 +140,7 @@ class IndexPage extends React.Component {
     const nextFolderId = nextProps.router.query.folderId;
 
     if (nextSongId !== this.props.router.query.songId) {
-      /*console.debug(
+      console.debug(
         "-0-0-0-0-0-0-0-0-0-0 nextProps.router",
         nextProps.router,
         "nextSongId",
@@ -113,7 +149,6 @@ class IndexPage extends React.Component {
         nextFolderId,
         this.state.songs,
       );
-      */
       this.context.setSongId(nextSongId, nextFolderId);
     }
     const nextSmallScreenMode = this.getSmallScreenMode(nextSongId);
@@ -121,7 +156,7 @@ class IndexPage extends React.Component {
       this.setSmallScreenMode(nextSmallScreenMode);
     }
   }
-
+*/
   updateOnlineStatus = () => {
     this.setState({ onLine: window.navigator.onLine });
   };
@@ -496,6 +531,10 @@ class IndexPage extends React.Component {
 }
 
 class IndexPageWrapper extends React.Component {
+  static async getInitialProps() {
+    return {};
+  }
+
   render() {
     return (
       <Page>
