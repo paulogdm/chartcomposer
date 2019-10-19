@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Chart Composer",
+    "name": "SongDocs",
     "slug": "rn",
     "privacy": "public",
     "sdkVersion": "33.0.0",
@@ -18,14 +18,26 @@
     },
     "assetBundlePatterns": ["**/*"],
     "android": {
-      "package": "com.elsigh.chartcomposer"
+      "package": "com.elsigh.songdocs"
     },
     "ios": {
-
-      "bundleIdentifier": "com.commoner.chartcomposer",
+      "bundleIdentifier": "com.commoner.songdocs",
 
       "supportsTablet": true
     },
-    "scheme": "chartcomposer"
+    "scheme": "songdocs",
+
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "Commoner",
+            "project": "songdocs",
+            "authToken": "66f2664e5bbd4b588cf4b1faf031300978a9098c912042449eacf405caf1080e"
+          }
+        }
+      ]
+    }
   }
 }

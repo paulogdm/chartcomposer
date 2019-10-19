@@ -1,6 +1,7 @@
 {
   "name": "chartcomposer",
   "alias": "chartcomposer.com",
+  "version": 2,
   "scale": {
     "sfo1": {
       "min": 1,

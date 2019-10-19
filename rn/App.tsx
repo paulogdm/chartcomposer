@@ -5,6 +5,15 @@ import {
   createAppContainer,
 } from "react-navigation";
 
+import * as Sentry from 'sentry-expo';
+import { SENTRY_DSN } from "./../utils/constants";
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  enableInExpoDevelopment: true,
+  debug: true
+});
+
 import App from "./../context/App";
 
 import storage from "./storage";

@@ -12,6 +12,8 @@ import UserMenuIcon from "./UserMenuIcon";
 
 import removeFileExtension from "./../utils/removeFileExtension";
 
+import { APP_NAME } from "./../utils/constants";
+
 interface Props {
   navigation: any;
 }
@@ -21,7 +23,7 @@ export default class SongList extends React.Component<Props, any> {
 
   static navigationOptions = ({ navigation }) => {
     return {
-      title: "Chart Composer",
+      title: APP_NAME,
       headerRight: <UserMenuIcon navigation={navigation} />,
     };
   };
