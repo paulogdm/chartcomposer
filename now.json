@@ -1,6 +1,6 @@
 {
   "name": "chartcomposer",
-  "alias": "chartcomposer.com",
+  "alias": ["chartcomposer.com", "songdocs.io"],
   "version": 2,
   "scale": {
     "sfo1": {
