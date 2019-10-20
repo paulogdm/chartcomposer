@@ -1,13 +1,13 @@
-# ChartComposer
+# SongDocs
 
-ChartComposer is a website (https://chartcomposer.com) for displaying and
+SongDocs is a website (https://chartcomposer.com) for displaying and
 editing ChordPro files.
 
 To run / develop locally:
 
-- Download the Now Desktop at https://zeit.co/download
 - Clone this repository
 - Obtain a copy of `secrets.js` from elsigh
+- Every push to `master` is auto-deployed
 
 ```
 npm install

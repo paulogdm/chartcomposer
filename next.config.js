@@ -16,6 +16,7 @@ module.exports = withCSS({
     DROPBOX_PUBLIC_TOKEN: process.env.DROPBOX_PUBLIC_TOKEN,
     IS_DEV: process.env.NODE_ENV === "development",
   },
+  target: "server",
   webpack: config => {
     config.plugins.push(
       new SWPrecacheWebpackPlugin({
