@@ -15,7 +15,6 @@ const Dropbox = dropbox.Dropbox;
 
 const DROPBOX_APP_DIR = "/Apps/ChartComposer";
 const PREFERENCES_PATH = `${DROPBOX_APP_DIR}/.preferences.json`;
-const NEW_SONG_NAME = "new_song.pro";
 const NEW_SONG_ID_MARKER = "NEW-SONG";
 
 const LOCAL_STORAGE_FIELDS = [

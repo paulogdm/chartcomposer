@@ -261,7 +261,7 @@ export default class IndexPage extends React.Component {
                   marginLeft: "1em",
                 }}
               >
-                <img src={"/static/amazing-grace.png"} alt="Amazing Grace" />
+                <img src={"/public/amazing-grace.png"} alt="Amazing Grace" />
               </div>
 
               <h3 id="chordpro-directives">ChordPro Directives</h3>
@@ -391,7 +391,7 @@ export default class IndexPage extends React.Component {
               <div style={{ marginBottom: "1em" }}>
                 A: Go into your Dropbox preferences and uncheck "Edits to
                 files".
-                <img src={"/static/dropbox-prefs.png"} style={{ width: 300 }} />
+                <img src={"/public/dropbox-prefs.png"} style={{ width: 300 }} />
               </div>
 
               <div style={{ fontWeight: "bold" }}>Q: What's "ChordPro"?</div>

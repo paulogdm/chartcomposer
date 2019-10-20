@@ -101,7 +101,8 @@ const Section = ({ part }) => {
       break;
     case "comment":
     case "choruscomment":
-      content = <Text>{part.lines[0]}</Text>;
+      content =
+        part.lines && part.lines.length ? <Text>{part.lines[0]}</Text> : null;
       break;
     case "x_url":
       content = (
@@ -118,6 +119,9 @@ const Section = ({ part }) => {
       break;
     case "x_pdf":
       content = <PDF part={part} />;
+      break;
+    case "carriage-return":
+      content = <Text>{"\n"}</Text>;
       break;
     default:
       console.warn("No implementation yet for part.type", part.type, part);
@@ -314,7 +318,7 @@ const Chord = ({ chord, nextIsChord }) => {
             style={{
               color: chordcolour,
               //fontFamily: chordfont,
-              fontSize: chordsize,
+              fontSize: parseInt(chordsize, 10),
               position: "absolute",
               left: 0,
             }}

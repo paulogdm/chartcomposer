@@ -2,21 +2,18 @@ import React from "react";
 // elsigh-hacked version of the Dropbox-sdk to work on next where
 // the missing `window` ref doesn't mean we're in a web worker.
 import "whatwg-fetch";
-import _ from "lodash";
 
 import Header from "./../components/Header";
 import Page from "./../components/Page";
-import blobToText from "./../utils/blobToText";
 import { APP_NAME } from "./../utils/constants";
 
 export default class IndexPage extends React.Component {
-  constructor(props) {
+  constructor() {
     super();
     this.state = {};
   }
 
   render() {
-    const {} = this.state;
     return (
       <Page>
         <div

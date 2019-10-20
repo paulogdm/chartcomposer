@@ -5,13 +5,15 @@ import {
   createAppContainer,
 } from "react-navigation";
 
-import * as Sentry from 'sentry-expo';
+import * as Sentry from "sentry-expo";
 import { SENTRY_DSN } from "./../utils/constants";
+
+import { DROPBOX_APP_KEY, DROPBOX_PUBLIC_TOKEN } from "./../secrets";
 
 Sentry.init({
   dsn: SENTRY_DSN,
   enableInExpoDevelopment: true,
-  debug: true
+  debug: true,
 });
 
 import App from "./../context/App";
@@ -46,16 +48,17 @@ let Navigation = createAppContainer(
   ),
 );
 
-const config = {
-  DROPBOX_APP_KEY: "mhwbhsacakthrrd",
-  DROPBOX_PUBLIC_TOKEN:
-    "ZpzAt52HX2AAAAAAAAAACSUIb2R7YTb6px6sBJm2xauYYo4FJJ9dq6S3dLum4jDW",
-  IS_DEV: true,
-};
 export default class ReactNativeApp extends React.Component {
   render() {
     return (
-      <App config={config} storage={storage}>
+      <App
+        config={{
+          DROPBOX_APP_KEY,
+          DROPBOX_PUBLIC_TOKEN,
+          IS_DEV: true,
+        }}
+        storage={storage}
+      >
         <Navigation />
       </App>
     );

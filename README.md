@@ -5,13 +5,13 @@ editing ChordPro files.
 
 To run / develop locally:
 
-* Download the Now Desktop at https://zeit.co/download
-* Clone this repository
+- Download the Now Desktop at https://zeit.co/download
+- Clone this repository
+- Obtain a copy of `secrets.js` from elsigh
 
 ```
-cd chartcomposer
 npm install
-dev.sh
+./dev.js
 ```
 
 Deployment using `now` is done automatically via Travis

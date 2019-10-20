@@ -1,8 +1,9 @@
+import React from "react";
 import Head from "next/head";
 
 import { APP_NAME } from "./../utils/constants";
 
-export default () => (
+const Meta = () => (
   <div>
     <Head>
       <title>{APP_NAME}</title>
@@ -17,8 +18,8 @@ export default () => (
       />
       <link rel="manifest" href="/manifest.json" />
       <meta name="theme-color" content="#eeeeee" />
-      <link rel="stylesheet" href="/static/bootstrap.min.css" />
-      <link rel="stylesheet" href="/static/SongView.css" />
+      <link rel="stylesheet" href="/bootstrap.min.css" />
+      <link rel="stylesheet" href="/SongView.css" />
     </Head>
     <style jsx global>{`
       body {
@@ -36,3 +37,4 @@ export default () => (
     `}</style>
   </div>
 );
+export default Meta;

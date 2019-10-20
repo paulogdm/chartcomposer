@@ -1,3 +1,5 @@
 node_modules
 .next
+secrets.js
+dev.js
 dev.sh

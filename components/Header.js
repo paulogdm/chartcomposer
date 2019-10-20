@@ -122,7 +122,7 @@ const Header = ({
           render={({ url }) => (
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src="/static/notes.png"
+                src="/public/notes.png"
                 alt=""
                 style={{
                   height: 20,
