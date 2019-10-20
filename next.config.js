@@ -9,6 +9,7 @@ const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 const APP_NAME = "ChartComposer";
 
 module.exports = withCSS({
+  target: "server",
   publicRuntimeConfig: {
     // Will be available on both server and client
     DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
@@ -16,7 +17,6 @@ module.exports = withCSS({
     DROPBOX_PUBLIC_TOKEN: process.env.DROPBOX_PUBLIC_TOKEN,
     IS_DEV: process.env.NODE_ENV === "development",
   },
-  target: "server",
   webpack: config => {
     config.plugins.push(
       new SWPrecacheWebpackPlugin({
