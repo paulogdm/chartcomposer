@@ -10,7 +10,6 @@ import ServiceWorker from "./ServiceWorker";
 import dropboxAuth from "./../utils/dropboxAuth";
 import storage from "./../utils/storage";
 import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
-import { DOMAIN_NAME } from "./../utils/constants";
 
 const {
   DROPBOX_APP_KEY,
@@ -36,7 +35,7 @@ const { Sender, Receiver } = createOauthFlow({
   clientSecret: DROPBOX_APP_SECRET,
   redirectUri: IS_DEV
     ? "http://localhost:3000/authreceiver"
-    : `https://${DOMAIN_NAME}/authreceiver`,
+    : `https://${window.location.host}/authreceiver`,
 });
 
 const SignInAsGuest = () => (
