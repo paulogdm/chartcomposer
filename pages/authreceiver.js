@@ -1,5 +1,5 @@
 import React from "react";
-import { withRouter } from "next/router";
+import Router, { withRouter } from "next/router";
 
 import { AppContext } from "./../context/App.js";
 
