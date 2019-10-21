@@ -5,7 +5,7 @@
     "enabled": true,
     "autoAlias": true
   },
-  "version": 2,
+  "version": 1,
   "regions": ["sfo1"],
   "env": {
     "DROPBOX_APP_KEY": "@dropbox_app_key",
