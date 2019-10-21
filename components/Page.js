@@ -36,7 +36,7 @@ const { Sender, Receiver } = createOauthFlow({
   clientSecret: DROPBOX_APP_SECRET,
   redirectUri: IS_DEV
     ? "http://localhost:3000/authreceiver"
-    : `https://songdocs.io/authreceiver`,
+    : `https://${DOMAIN_NAME}/authreceiver`,
 });
 
 const SignInAsGuest = () => (

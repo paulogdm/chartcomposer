@@ -53,6 +53,9 @@ class AuthReceiverPage extends React.Component {
 }
 
 class AuthReceiverPageWrapper extends React.Component {
+  static async getInitialProps() {
+    return {};
+  }
   render() {
     return (
       <Page>
