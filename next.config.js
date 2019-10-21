@@ -20,6 +20,7 @@ module.exports = withCSS({
   webpack: config => {
     config.plugins.push(
       new SWPrecacheWebpackPlugin({
+        filename: `public/service-worker.js`,
         verbose: true,
         staticFileGlobsIgnorePatterns: [/\.next\//],
         runtimeCaching: [
@@ -32,8 +33,9 @@ module.exports = withCSS({
     );
     config.plugins.push(
       new WebpackPwaManifest({
+        filename: `public/manifest.json`,
         name: APP_NAME,
-        short_name: "CC",
+        short_name: APP_NAME,
         description: `${APP_NAME} lets you create and share sheet music with your friends.`,
         background_color: "#ffffff",
         theme_color: "#eeeeee",
@@ -50,16 +52,15 @@ module.exports = withCSS({
           {
             src: path.resolve("public/logo-1356.png"),
             sizes: [96, 128, 144, 192, 256, 384, 512],
-            destination: "/",
+            destination: "/public",
           },
         ],
-        //includeDirectory: true,
-        //publicPath: "/_next",
       }),
     );
 
     config.plugins.push(
       new MonacoWebpackPlugin({
+        output: "public",
         languages: ["markdown"],
         features: [
           //"accessibilityHelp",
