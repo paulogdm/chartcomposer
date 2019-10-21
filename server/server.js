@@ -34,10 +34,11 @@ app
 
     STATIC_FILES.forEach(pathName => {
       server.get(pathName, (req, res) => {
-        const filePath = join(__dirname, ".next", pathName);
+        const filePath = join(__dirname, "../", ".next", pathName);
         console.log("server.js STATIC_FILES " + pathName + " :: " + filePath);
         app.serveStatic(req, res, filePath);
 
+        /*
         fs.access(filePath, fs.F_OK, err => {
           if (err) {
             console.log(filePath, "does not exist");
@@ -51,6 +52,7 @@ app
           }
           console.log(filePath, "exists!");
         });
+        */
       });
     });
 
