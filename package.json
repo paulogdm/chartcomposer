@@ -2,7 +2,7 @@
   "name": "chartcomposer",
   "version": "0.0.3",
   "repository": "https://github.com/elsigh/chartcomposer",
-  "description": "ChartComposer is a website (https://chartcomposer.com) for displaying and editing ChordPro files.",
+  "description": "SongDocs is a website (https://songdocs.io) for displaying and editing ChordPro files.",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test jest",

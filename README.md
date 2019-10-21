@@ -1,6 +1,6 @@
 # SongDocs
 
-SongDocs is a website (https://chartcomposer.com) for displaying and
+SongDocs is a website (https://songdocs.io) for displaying and
 editing ChordPro files.
 
 To run / develop locally:

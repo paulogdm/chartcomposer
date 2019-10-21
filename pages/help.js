@@ -106,12 +106,10 @@ export default class IndexPage extends React.Component {
               <h3 id="guest-mode">Guest mode</h3>
               <p>
                 You can take a quick look at {APP_NAME} by going to{" "}
-                <a href="https://chartcomposer.com">
-                  https://chartcomposer.com
-                </a>{" "}
-                and clicking "Guest". Click on one of the sample songs to see
-                what it looks like. As "guest" you're in View-only mode - you
-                can <em>see</em> songs but you can't <em>edit</em> or
+                <a href="/">HOME</a> and clicking "Guest". Click on one of the
+                sample songs to see what it looks like. As "guest" you're in
+                View-only mode - you can <em>see</em> songs but you can't{" "}
+                <em>edit</em> or
                 <em>create</em> songs. Here are things you can do as "guest":
               </p>
               <ul>

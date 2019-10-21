@@ -4,13 +4,14 @@ import { createOauthFlow } from "react-oauth-flow";
 import App, { AppContext } from "./../context/App";
 import withSentry from "./withSentry";
 import Meta from "./Meta";
-import Footer from "./Footer";
 import RedirectToBareDomain from "./RedirectToBareDomain";
 import ServiceWorker from "./ServiceWorker";
 
 import dropboxAuth from "./../utils/dropboxAuth";
 import storage from "./../utils/storage";
 import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
+import { DOMAIN_NAME } from "./../utils/constants";
+
 const {
   DROPBOX_APP_KEY,
   DROPBOX_APP_SECRET,
@@ -35,7 +36,7 @@ const { Sender, Receiver } = createOauthFlow({
   clientSecret: DROPBOX_APP_SECRET,
   redirectUri: IS_DEV
     ? "http://localhost:3000/authreceiver"
-    : "https://chartcomposer.com/authreceiver",
+    : `https://${DOMAIN_NAME}/authreceiver`,
 });
 
 const SignInAsGuest = () => (
