@@ -7,11 +7,9 @@
   },
   "version": 1,
   "regions": ["sfo1"],
-  "build": {
-    "env": {
-      "DROPBOX_APP_KEY": "@dropbox_app_key",
-      "DROPBOX_APP_SECRET": "@dropbox_app_secret",
-      "DROPBOX_PUBLIC_TOKEN": "@dropbox_public_token"
-    }
+  "env": {
+    "DROPBOX_APP_KEY": "@dropbox_app_key",
+    "DROPBOX_APP_SECRET": "@dropbox_app_secret",
+    "DROPBOX_PUBLIC_TOKEN": "@dropbox_public_token"
   }
 }
