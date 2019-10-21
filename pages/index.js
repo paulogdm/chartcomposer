@@ -50,7 +50,7 @@ class IndexPage extends React.Component {
   }
 
   async componentDidMount() {
-    console.debug("componentDidMount", this.props);
+    //console.debug("componentDidMount", this.props);
     const { router } = this.props;
     const {
       dropboxInitialize,

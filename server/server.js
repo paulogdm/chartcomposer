@@ -1,5 +1,6 @@
 const { createServer } = require("http");
 const express = require("express");
+const fs = require("fs");
 const { join } = require("path");
 const { parse } = require("url");
 const next = require("next");
@@ -31,19 +32,25 @@ app
       app.render(req, res, actualPage, queryParams);
     });
 
-    /*
-    server.get("/song/:songId/:songName", (req, res) => {
-      const actualPage = "/";
-      const queryParams = { songId: req.params.songId };
-      app.render(req, res, actualPage, queryParams);
-    });
-    */
-
     STATIC_FILES.forEach(pathName => {
       server.get(pathName, (req, res) => {
         const filePath = join(__dirname, ".next", pathName);
-        console.log("GO STATIC_FILES " + pathName + " :: " + filePath);
+        console.log("server.js STATIC_FILES " + pathName + " :: " + filePath);
         app.serveStatic(req, res, filePath);
+
+        fs.access(filePath, fs.F_OK, err => {
+          if (err) {
+            console.log(filePath, "does not exist");
+            fs.readdir(__dirname, function(err, items) {
+              console.log(__dirname, "has items: ", items);
+            });
+            fs.readdir(join(__dirname, ".next"), function(err, items) {
+              console.log(join(__dirname, ".next"), "has items: ", items);
+            });
+            return;
+          }
+          console.log(filePath, "exists!");
+        });
       });
     });
 
