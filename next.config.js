@@ -54,7 +54,7 @@ module.exports = withCSS({
           },
         ],
         //includeDirectory: true,
-        publicPath: "/public",
+        publicPath: "/_next",
       }),
     );
 
