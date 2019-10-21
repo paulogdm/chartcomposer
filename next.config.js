@@ -6,7 +6,7 @@ const WebpackPwaManifest = require("webpack-pwa-manifest");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 // TODO: how to import from utils/constants?
-const APP_NAME = "ChartComposer";
+const APP_NAME = "SongDocs";
 
 module.exports = withCSS({
   target: "server",
@@ -54,7 +54,7 @@ module.exports = withCSS({
           },
         ],
         //includeDirectory: true,
-        publicPath: "/_next",
+        //publicPath: "/_next",
       }),
     );
 

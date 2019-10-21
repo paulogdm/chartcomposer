@@ -1,15 +1,22 @@
 import React from "react";
-import Router, { withRouter } from "next/router";
+import { withRouter } from "next/router";
 
 import { AppContext } from "./../context/App.js";
 
 import Page, { Receiver } from "./../components/Page";
 
+import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
+
+const { DROPBOX_APP_KEY, IS_DEV } = publicRuntimeConfig;
+
 class AuthReceiverPage extends React.Component {
   static contextType = AppContext;
 
   componentDidMount() {
-    console.debug("AuthReceiverPage componentDidMount");
+    console.debug("AuthReceiverPage componentDidMount", {
+      DROPBOX_APP_KEY,
+      IS_DEV,
+    });
   }
 
   handleSuccess = async accessToken => {
