@@ -8,6 +8,10 @@ import Page, { Receiver } from "./../components/Page";
 class AuthReceiverPage extends React.Component {
   static contextType = AppContext;
 
+  componentDidMount() {
+    console.debug("AuthReceiverPage componentDidMount");
+  }
+
   handleSuccess = async accessToken => {
     console.log("got accessToken!", accessToken);
     await this.context.storage.setAccessToken(accessToken);
@@ -29,6 +33,7 @@ class AuthReceiverPage extends React.Component {
           }
 
           if (error) {
+            console.debug("AuthReceiverPage Receiver error", error);
             return <p style={{ color: "red" }}>Error: {error.message}</p>;
           }
           return <p>Authorization success</p>;

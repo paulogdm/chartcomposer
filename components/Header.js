@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "react-bootstrap";
 
 import Link from "next/link";
@@ -122,7 +123,7 @@ const Header = ({
           render={({ url }) => (
             <div style={{ display: "flex", alignItems: "center" }}>
               <img
-                src="/public/notes.png"
+                src="/notes.png"
                 alt=""
                 style={{
                   height: 20,
