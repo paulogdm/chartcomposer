@@ -12,8 +12,9 @@ const { DROPBOX_APP_KEY, IS_DEV } = publicRuntimeConfig;
 class AuthReceiverPage extends React.Component {
   static contextType = AppContext;
 
-  componentDidMount() {
-    console.debug("AuthReceiverPage componentDidMount", {
+  constructor() {
+    super();
+    console.debug("AuthReceiverPage constructor", {
       DROPBOX_APP_KEY,
       IS_DEV,
     });
