@@ -50,7 +50,7 @@ module.exports = withCSS({
           {
             src: path.resolve("public/logo-1356.png"),
             sizes: [96, 128, 144, 192, 256, 384, 512],
-            destination: "public",
+            destination: "/",
           },
         ],
         //includeDirectory: true,

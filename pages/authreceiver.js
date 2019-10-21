@@ -22,8 +22,7 @@ class AuthReceiverPage extends React.Component {
   handleSuccess = async accessToken => {
     console.log("got accessToken!", accessToken);
     await this.context.storage.setAccessToken(accessToken);
-
-    // NOCOMMIT Router.push("/");
+    Router.push("/");
   };
 
   handleError = err => {
