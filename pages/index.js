@@ -555,7 +555,8 @@ const PromoCopy = () => (
       fontSize: "1.2em",
     }}
   >
-    <h1>Welcome to {APP_NAME}!</h1>
+    <h1>Welcome to</h1>
+    <img src="/logo-256.png" alt="SongDocs" />
     <ul
       style={{
         listStyleType: "none",

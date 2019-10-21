@@ -2,7 +2,6 @@ import React from "react";
 import { Button } from "react-bootstrap";
 
 import Link from "next/link";
-import Router from "next/router";
 
 import { Sender, SignInAsGuest } from "./../components/Page";
 import UserMenu from "./../components/UserMenu";
@@ -38,6 +37,7 @@ const Header = ({
       .title-and-input > h1 {
         padding-right: 20px;
       }
+
       @media (max-width: 600px) {
         .title-and-input {
           align-items: left;
@@ -68,13 +68,23 @@ const Header = ({
       ) : null}
       <h1
         style={{
+          alignItems: "center",
           fontSize: 20,
           margin: 0,
           paddingBottom: 0,
           paddingTop: 0,
+          display: "flex",
         }}
       >
-        {title ? title : APP_NAME}
+        <img
+          src="/icon-64.png"
+          style={{
+            display: "inline-block",
+            width: 32,
+            height: 32,
+          }}
+        />{" "}
+        <span>{title ? title : APP_NAME}</span>
       </h1>
     </div>
 

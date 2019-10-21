@@ -48,7 +48,7 @@ module.exports = withCSS({
         },
         icons: [
           {
-            src: path.resolve("public/icon.png"),
+            src: path.resolve("public/logo-1356.png"),
             sizes: [96, 128, 144, 192, 256, 384, 512],
             destination: "public",
           },

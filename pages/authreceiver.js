@@ -19,7 +19,8 @@ class AuthReceiverPage extends React.Component {
   };
 
   handleError = err => {
-    console.error("Error in auth", err);
+    console.error("AuthPageReceiver handleError", err);
+    this.context.storage.clear();
   };
 
   render() {
