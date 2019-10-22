@@ -70,7 +70,7 @@ module.exports = withCSS(
 
       config.plugins.push(
         new MonacoWebpackPlugin({
-          output: "public",
+          output: path.join(__dirname, "public"),
           languages: ["markdown"],
           features: [
             //"accessibilityHelp",
