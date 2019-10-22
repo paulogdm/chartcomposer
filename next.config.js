@@ -14,6 +14,9 @@ const IS_DEV = process.env.NODE_ENV === "development";
 module.exports = withCSS(
   withOffline({
     target: "server",
+    workboxOpts: {
+      swDest: path.join(__dirname, "public/service-worker.js"),
+    },
     publicRuntimeConfig: {
       // Will be available on both server and client
       DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
