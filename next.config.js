@@ -25,48 +25,32 @@ module.exports = withCSS(
       IS_DEV,
     },
     webpack: config => {
-      // if (!IS_DEV) {
-      //   config.plugins.push(
-      //     new SWPrecacheWebpackPlugin({
-      //       filename: `../public/service-worker.js`,
-      //       verbose: true,
-      //       staticFileGlobsIgnorePatterns: [/\.next\//],
-      //       runtimeCaching: [
-      //         {
-      //           handler: "networkFirst",
-      //           urlPattern: /^https?.*/,
-      //         },
-      //       ],
-      //     }),
-      //   );
-
-      //   config.plugins.push(
-      //     new WebpackPwaManifest({
-      //       filename: `public/manifest.json`,
-      //       name: APP_NAME,
-      //       short_name: APP_NAME,
-      //       description: `${APP_NAME} lets you create and share sheet music with your friends.`,
-      //       background_color: "#ffffff",
-      //       theme_color: "#eeeeee",
-      //       display: "standalone",
-      //       orientation: "portrait",
-      //       fingerprints: false,
-      //       inject: false,
-      //       start_url: "/",
-      //       ios: {
-      //         "apple-mobile-web-app-title": APP_NAME,
-      //         "apple-mobile-web-app-status-bar-style": "#eeeeee",
-      //       },
-      //       icons: [
-      //         {
-      //           src: path.resolve("public/logo-1356.png"),
-      //           sizes: [96, 128, 144, 192, 256, 384, 512],
-      //           destination: "../public",
-      //         },
-      //       ],
-      //     }),
-      //   );
-      // }
+      config.plugins.push(
+        new WebpackPwaManifest({
+          filename: path.join(__dirname, "public", "manifest.json"),
+          name: APP_NAME,
+          short_name: APP_NAME,
+          description: `${APP_NAME} lets you create and share sheet music with your friends.`,
+          background_color: "#ffffff",
+          theme_color: "#eeeeee",
+          display: "standalone",
+          orientation: "portrait",
+          fingerprints: false,
+          inject: false,
+          start_url: "/",
+          ios: {
+            "apple-mobile-web-app-title": APP_NAME,
+            "apple-mobile-web-app-status-bar-style": "#eeeeee",
+          },
+          icons: [
+            {
+              src: path.resolve("public/logo-1356.png"),
+              sizes: [96, 128, 144, 192, 256, 384, 512],
+              destination: path.join(__dirname, "public"),
+            },
+          ],
+        }),
+      );
 
       config.plugins.push(
         new MonacoWebpackPlugin({
