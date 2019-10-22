@@ -29,6 +29,7 @@
     "monaco-editor": "^0.18.1",
     "monaco-editor-webpack-plugin": "^1.7.0",
     "next": "^9.1.1",
+    "next-offline": "^4.0.6",
     "prop-types": "^15.6.2",
     "raven-js": "^3.27.2",
     "raw-loader": "^0.5.1",

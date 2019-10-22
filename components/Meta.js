@@ -2,7 +2,7 @@ import React from "react";
 import Head from "next/head";
 
 import { APP_NAME } from "./../utils/constants";
-
+//<link rel="manifest" href="/manifest.json" />
 const Meta = () => (
   <div>
     <Head>
@@ -16,7 +16,6 @@ const Meta = () => (
         name="viewport"
         content="width=device-width, initial-scale=1, user-scalable=no"
       />
-      <link rel="manifest" href="/manifest.json" />
       <meta name="theme-color" content="#eeeeee" />
       <link rel="stylesheet" href="/bootstrap.min.css" />
       <link rel="stylesheet" href="/SongView.css" />
