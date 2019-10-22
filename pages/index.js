@@ -287,17 +287,7 @@ class IndexPage extends React.Component {
     //console.debug("render smallScreenMode", smallScreenMode);
 
     if (!componentIsMounted || !this.state || !window || !this.context) {
-      return (
-        <LoadingIndicator
-          style={{
-            position: "fixed",
-            left: "50%",
-            top: "50%",
-            transform: "translate3d(-50%, -50%, 0)",
-            zIndex: 2,
-          }}
-        />
-      );
+      return <LoadingIndicator />;
     }
 
     return (
@@ -332,17 +322,7 @@ class IndexPage extends React.Component {
           }
         `}</style>
 
-        {loading ? (
-          <LoadingIndicator
-            style={{
-              position: "fixed",
-              left: "50%",
-              top: "50%",
-              transform: "translate3d(-50%, -50%, 0)",
-              zIndex: 2,
-            }}
-          />
-        ) : null}
+        {loading ? <LoadingIndicator /> : null}
 
         {preferencesOpen ? (
           <Preferences

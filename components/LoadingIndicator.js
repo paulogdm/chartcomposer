@@ -11,7 +11,13 @@ const LoadingIndicator = ({
   style,
 }) => {
   hasBackground = hasBackground !== false;
-  style = style || {};
+  style = style || {
+    position: "fixed",
+    left: "50%",
+    top: "50%",
+    transform: "translate3d(-50%, -50%, 0)",
+    zIndex: 2,
+  };
   return (
     <div>
       <style jsx>{`

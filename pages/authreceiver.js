@@ -4,6 +4,7 @@ import Router, { withRouter } from "next/router";
 import { AppContext } from "./../context/App.js";
 
 import Page, { Receiver } from "./../components/Page";
+import LoadingIndicator from "./../components/LoadingIndicator";
 
 import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
 
@@ -37,15 +38,12 @@ class AuthReceiverPage extends React.Component {
         onAuthSuccess={this.handleSuccess}
         onAuthError={this.handleError}
         render={({ processing, state, error }) => {
-          if (processing) {
-            return <p>Processing ...</p>;
-          }
-
+          console.debug("AuthReceiver render", { processing, state, error });
           if (error) {
             console.debug("AuthReceiverPage Receiver error", error);
             return <p style={{ color: "red" }}>Error: {error.message}</p>;
           }
-          return <p>Authorization success</p>;
+          return <LoadingIndicator />;
         }}
       />
     );
