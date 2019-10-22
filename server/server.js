@@ -1,14 +1,22 @@
-const { createServer } = require("http");
 const express = require("express");
 const fs = require("fs");
 const { join } = require("path");
-const { parse } = require("url");
 const next = require("next");
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
+
+const buildDir = join(__dirname, "../", ".next");
+fs.readdir(buildDir, function(err, items) {
+  console.log(buildDir, "has items: ", items);
+
+  const publicDir = join(__dirname, "../", ".next", "public");
+  fs.readdir(publicDir, function(err, items) {
+    console.log(publicDir, "has items: ", items);
+  });
+});
 
 app
   .prepare()
@@ -21,7 +29,7 @@ app
         folderId: req.params.folderId,
         songId: req.params.songId,
       };
-      console.log("QUERY PARAMS", queryParams);
+      console.log("server.s queryParams for folder page", queryParams);
       app.render(req, res, actualPage, queryParams);
     });
 
@@ -30,7 +38,10 @@ app
     });
 
     server.listen(port, err => {
-      if (err) throw err;
+      if (err) {
+        console.error("ERROR listening", err);
+        throw err;
+      }
       console.log(`> Ready on http://localhost:${port}`);
     });
   })
