@@ -290,6 +290,10 @@ class IndexPage extends React.Component {
       return <LoadingIndicator />;
     }
 
+    if (songId) {
+      console.debug("chordpro", chordPro[songId]);
+    }
+
     return (
       <div>
         <style jsx global>{`

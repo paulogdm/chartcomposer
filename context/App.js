@@ -501,7 +501,9 @@ export default class App extends React.Component {
       const response = await this.dropbox.sharingGetSharedLinkFile(
         sharedLinkFile,
       );
-      console.debug("dropboxGetSongChordPro", songId, { response });
+      console.debug("dropboxGetSongChordPro got response", songId, {
+        response,
+      });
       const songChordPro = await blobToText(response.fileBlob);
       const chordPro = {
         ...this.state.chordPro,
@@ -538,12 +540,6 @@ export default class App extends React.Component {
     }
 
     this.setState({ songId });
-
-    const songChordPro = await this.dropboxGetSongChordPro(songId, folderId);
-    if (!songChordPro) {
-      console.warn("setSongId got no songChordPro");
-      return;
-    }
   };
 
   onChangeSongChordPro = songChordPro => {
