@@ -2,7 +2,7 @@ import React from "react";
 import Head from "next/head";
 
 import { APP_NAME } from "./../utils/constants";
-//<link rel="manifest" href="/manifest.json" />
+
 const Meta = () => (
   <div>
     <Head>
@@ -18,6 +18,7 @@ const Meta = () => (
       />
       <meta name="theme-color" content="#eeeeee" />
       <link rel="icon" href="/favicon.ico" />
+      <link rel="manifest" href="/manifest.json" />
       <link rel="stylesheet" href="/bootstrap.min.css" />
       <link rel="stylesheet" href="/SongView.css" />
     </Head>

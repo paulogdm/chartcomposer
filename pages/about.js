@@ -1,7 +1,4 @@
 import React from "react";
-// elsigh-hacked version of the Dropbox-sdk to work on next where
-// the missing `window` ref doesn't mean we're in a web worker.
-import "whatwg-fetch";
 
 import Header from "./../components/Header";
 import Page from "./../components/Page";

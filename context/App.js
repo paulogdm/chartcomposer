@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import Raven from "raven-js";
 import dropbox from "dropbox";
 import _ from "lodash";
-import { fetch } from "whatwg-fetch";
+import fetch from "fetch-everywhere";
 
 import blobToText from "./../utils/blobToText";
 import getPathForSong from "./../utils/getPathForSong";

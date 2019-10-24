@@ -107,7 +107,7 @@ const Section = ({ part }) => {
     case "x_url":
       content = (
         <TouchableOpacity onPress={() => Linking.openURL(part.url)}>
-          {part.title || part.url}
+          <Text>{part.title || part.url}</Text>
         </TouchableOpacity>
       );
       break;
@@ -232,9 +232,10 @@ const ImageSection = ({ part }) => {
     return null;
   }
   const { height, title, url, width } = part;
+  console.debug("Image:", height, title, url, width);
   return (
     <Image
-      source={url}
+      source={{ uri: url }}
       style={{
         width: width ? width + "px" : "100%",
         height: height ? height + "px" : null,
@@ -356,9 +357,10 @@ const SongProperties = ({ chordPro }) => {
   ];
   return (
     <View style={{ marginBottom: 20 }}>
-      {songProperties.map(
-        property =>
-          chordPro[property] && (
+      {songProperties.map(property => {
+        if (chordPro[property]) {
+          //console.debug("PROP", property, chordPro[property]);
+          return (
             <View
               key={property}
               style={{ display: "flex", flexDirection: "row" }}
@@ -377,8 +379,11 @@ const SongProperties = ({ chordPro }) => {
                 {chordPro[property]}
               </Text>
             </View>
-          ),
-      )}
+          );
+        } else {
+          return null;
+        }
+      })}
     </View>
   );
 };
