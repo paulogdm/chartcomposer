@@ -27,7 +27,9 @@ module.exports = withCSS(
     webpack: config => {
       config.plugins.push(
         new WebpackPwaManifest({
-          filename: path.join(__dirname, "public", "manifest.json"),
+          //filename: path.join(__dirname, "public", "manifest.json"),
+          filename: "manifest.json",
+          output: path.join(__dirname, "public"),
           name: APP_NAME,
           short_name: APP_NAME,
           description: `${APP_NAME} lets you create and share sheet music with your friends.`,
