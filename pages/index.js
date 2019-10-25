@@ -135,7 +135,9 @@ class IndexPage extends React.Component {
       this.context.setSongId(songId, folderId);
 
       // refresh chordPro in the background
-      this.context.dropboxGetSongChordPro(songId, folderId);
+      if (songId) {
+        this.context.dropboxGetSongChordPro(songId, folderId);
+      }
     }
   }
 
