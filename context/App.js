@@ -711,6 +711,7 @@ export default class App extends React.Component {
       dropboxInitialize: this.dropboxInitialize,
       dropboxFoldersSync: this.dropboxFoldersSync,
       dropboxLoadLink: this.dropboxLoadLink,
+      dropboxGetSongChordPro: this.dropboxGetSongChordPro,
 
       checkDirty: this.checkDirty,
       getSongById: this.getSongById,
