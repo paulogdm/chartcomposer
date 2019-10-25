@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import classNames from "classnames";
 import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
@@ -18,7 +19,6 @@ import SongEditor from "./../components/SongEditor";
 import SongList from "./../components/SongList";
 import SongView from "./../components/SongView";
 
-import { APP_NAME } from "./../utils/constants";
 import storage from "./../utils/storage";
 
 const SMALL_SCREEN_WIDTH = 768;
@@ -26,12 +26,17 @@ const SMALL_SCREEN_WIDTH = 768;
 class IndexPage extends React.Component {
   static contextType = AppContext;
 
-  constructor(props, context) {
-    //console.debug("IndexPage constructor", { props, context });
+  static propTypes = {
+    router: PropTypes.object,
+  };
+
+  constructor(props) {
+    //console.debug("IndexPage constructor", { props });
     super(props);
 
     this.state = {
       componentIsMounted: false,
+      onLine: true,
       preferencesOpen: false,
       smallScreenMode: null,
       songListClosed: false,
@@ -108,8 +113,16 @@ class IndexPage extends React.Component {
     const prevSongId = prevProps.router.query.songId;
     const prevFolderId = prevProps.router.query.folderId;
 
+    const songId = this.props.router.query.songId;
+    const folderId = this.props.router.query.folderId;
+
+    const smallScreenMode = this.getSmallScreenMode(this.state.songId);
+    if (smallScreenMode !== this.state.smallScreenMode) {
+      this.setSmallScreenMode(smallScreenMode);
+    }
+
     //console.debug("CDU", this.props.router, prevProps.router);
-    if (prevSongId !== this.props.router.query.songId) {
+    if (prevSongId !== songId) {
       console.debug(
         "-0-0-0-0-0-0-0-0-0-0",
         this.props.router,
@@ -119,44 +132,13 @@ class IndexPage extends React.Component {
         prevFolderId,
         this.state.songs,
       );
-      this.context.setSongId(
-        this.props.router.query.songId,
-        this.props.router.query.folderId,
-      );
-    }
-    const smallScreenMode = this.getSmallScreenMode(this.state.songId);
-    if (smallScreenMode !== this.state.smallScreenMode) {
-      this.setSmallScreenMode(smallScreenMode);
+      this.context.setSongId(songId, folderId);
+
+      // refresh chordPro in the background
+      this.context.dropboxGetSongChordPro(songId, folderId);
     }
   }
 
-  /*
-  componentWillUpdate(nextProps, nextState) {
-
-    if (!this.state.onLine && nextState.onLine) {
-      this.context.checkDirty();
-    }
-    const nextSongId = nextProps.router.query.songId;
-    const nextFolderId = nextProps.router.query.folderId;
-
-    if (nextSongId !== this.props.router.query.songId) {
-      console.debug(
-        "-0-0-0-0-0-0-0-0-0-0 nextProps.router",
-        nextProps.router,
-        "nextSongId",
-        nextSongId,
-        "nextFolderId",
-        nextFolderId,
-        this.state.songs,
-      );
-      this.context.setSongId(nextSongId, nextFolderId);
-    }
-    const nextSmallScreenMode = this.getSmallScreenMode(nextSongId);
-    if (nextSmallScreenMode !== this.state.smallScreenMode) {
-      this.setSmallScreenMode(nextSmallScreenMode);
-    }
-  }
-*/
   updateOnlineStatus = () => {
     this.setState({ onLine: window.navigator.onLine });
   };

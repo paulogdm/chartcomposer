@@ -32,6 +32,9 @@ export default class SongList extends React.Component<Props, any> {
     //console.log("onPressSong", song, section);
     this.context.setSongId(song.id, section.folderId);
     this.props.navigation.push("SongView");
+
+    // refresh chordPro in the background
+    this.context.dropboxGetSongChordPro(song.id, section.folderId);
   };
 
   render() {

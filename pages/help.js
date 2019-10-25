@@ -1,12 +1,17 @@
 import React from "react";
 
+import { AppContext } from "./../context/App.js";
+
 import Header from "./../components/Header";
 import Page from "./../components/Page";
+
 import { APP_NAME } from "./../utils/constants";
 
 export default class HelpPage extends React.Component {
+  static contextType = AppContext;
+
   render() {
-    const { user } = this.state;
+    const { user } = this.context;
     return (
       <Page>
         <div
