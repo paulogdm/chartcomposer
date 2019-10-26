@@ -22,7 +22,7 @@ class SongEditor extends React.Component {
 
   constructor(props) {
     super();
-    this.state = { value: props.value };
+    this.state = { value: props.value || "" };
     this.debouncedOnChange = _.debounce(props.onChange, 250);
   }
 

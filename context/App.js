@@ -435,6 +435,8 @@ export default class App extends React.Component {
       return;
     }
 
+    this.setSongId(null);
+
     const songId = `${NEW_SONG_ID_MARKER}-${Date.now().toString()}`;
     console.debug("newSong", songId, songName);
     const chordPro = {
@@ -602,6 +604,7 @@ export default class App extends React.Component {
           delete chordPro[songId];
           songId = response.id;
           console.debug("SAVED NEW SONG! songId is now", songId);
+          this.setSongId(songId);
         }
 
         //console.debug({ folders, folderId });

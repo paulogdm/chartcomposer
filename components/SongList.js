@@ -52,10 +52,10 @@ SongList.propTypes = {
   closedFolders: PropTypes.object,
   copyShareLink: PropTypes.func,
   folders: PropTypes.object,
-  newSong: PropTypes.object,
+  newSong: PropTypes.func,
   removeFolder: PropTypes.func,
   songId: PropTypes.string,
-  songs: PropTypes.arrayOf(PropTypes.object),
+  songs: PropTypes.object,
   toggleFolderOpen: PropTypes.func,
 };
 
@@ -134,17 +134,26 @@ const SongFolder = ({
         </div>
 
         <DropdownButton
+          id={`song-list-actions-${folder.id}`}
+          bsStyle="link"
+          title=""
           pullRight
-          onSelect={eventKey => {
+          onSelect={(eventKey, e) => {
             console.log("onSelect", eventKey);
+            e.stopPropagation();
+            const selection = toolbarButtons.find(b => b.title == eventKey);
+            selection.onClick(e);
           }}
           onClick={e => {
             // don't toggle the folder
             e.stopPropagation();
           }}
+          style={{ color: "inherit" }}
         >
           {toolbarButtons.map((b, i) => (
-            <MenuItem eventKey={b.title}>{b.content}</MenuItem>
+            <MenuItem eventKey={b.title} key={i}>
+              {b.content} {b.title}
+            </MenuItem>
           ))}
         </DropdownButton>
       </div>
@@ -162,9 +171,9 @@ const SongFolder = ({
 };
 
 SongFolder.propTypes = {
-  folder: PropTypes.string,
+  folder: PropTypes.object,
   isOpen: PropTypes.bool,
-  newSong: PropTypes.object,
+  newSong: PropTypes.func,
   removeFolder: PropTypes.func,
   copyShareLink: PropTypes.func,
   songId: PropTypes.string,
@@ -227,6 +236,6 @@ SongOrderedList.propTypes = {
   folder: PropTypes.object,
   router: PropTypes.object,
   songId: PropTypes.string,
-  songs: PropTypes.arrayOf(PropTypes.object),
+  songs: PropTypes.object,
 };
 SongOrderedList = withRouter(SongOrderedList);

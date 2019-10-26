@@ -273,7 +273,7 @@ class IndexPage extends React.Component {
     }
 
     if (songId) {
-      console.debug("chordpro", chordPro[songId]);
+      //console.debug("chordpro", chordPro[songId]);
     }
 
     return (
@@ -384,7 +384,11 @@ class IndexPage extends React.Component {
                   width:
                     songListClosed || smallScreenMode === "SongList"
                       ? null
-                      : "300px",
+                      : 300,
+                  minWidth:
+                    songListClosed || smallScreenMode === "SongList"
+                      ? null
+                      : 300,
                 }}
               >
                 <div
