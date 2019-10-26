@@ -46,6 +46,11 @@ export default class SongView extends React.Component {
     const { preferences = {} } = this.props;
     const { chordPro } = this.state;
 
+    // e.g. if someone deletes the contents of the editor pane.
+    if (!chordPro) {
+      return null;
+    }
+
     Object.keys(displayPreferenceDefaults).forEach(name => {
       preferences[name] = preferences[name] || displayPreferenceDefaults[name];
     });

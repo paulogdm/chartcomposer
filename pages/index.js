@@ -259,13 +259,11 @@ class IndexPage extends React.Component {
 
     const renderSongEditor = !!(
       songId &&
-      song &&
       !readOnly &&
-      chordPro[songId] &&
       (smallScreenMode === "SongEditor" || smallScreenMode === null)
     );
     const renderSongView = !!(
-      chordPro[songId] &&
+      songId &&
       (smallScreenMode === "SongView" || smallScreenMode === null)
     );
     //console.debug("render smallScreenMode", smallScreenMode);

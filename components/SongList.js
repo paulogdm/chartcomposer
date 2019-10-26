@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import FaClose from "react-icons/lib/fa/close";
@@ -8,6 +9,8 @@ import FaPlus from "react-icons/lib/fa/plus";
 import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
+
+import { MenuItem, DropdownButton, Button } from "react-bootstrap";
 
 import removeFileExtension from "./../utils/removeFileExtension";
 import slugify from "./../utils/slugify";
@@ -44,6 +47,18 @@ const SongList = ({
     </div>
   );
 };
+
+SongList.propTypes = {
+  closedFolders: PropTypes.object,
+  copyShareLink: PropTypes.func,
+  folders: PropTypes.object,
+  newSong: PropTypes.object,
+  removeFolder: PropTypes.func,
+  songId: PropTypes.string,
+  songs: PropTypes.arrayOf(PropTypes.object),
+  toggleFolderOpen: PropTypes.func,
+};
+
 export default SongList;
 
 const SongFolder = ({
@@ -118,7 +133,20 @@ const SongFolder = ({
           {folder.name} ({Object.keys(folder.songs).length})
         </div>
 
-        <ButtonToolbarGroup buttons={toolbarButtons} />
+        <DropdownButton
+          pullRight
+          onSelect={eventKey => {
+            console.log("onSelect", eventKey);
+          }}
+          onClick={e => {
+            // don't toggle the folder
+            e.stopPropagation();
+          }}
+        >
+          {toolbarButtons.map((b, i) => (
+            <MenuItem eventKey={b.title}>{b.content}</MenuItem>
+          ))}
+        </DropdownButton>
       </div>
       {isOpen && (
         <div>
@@ -131,6 +159,16 @@ const SongFolder = ({
       )}
     </div>
   );
+};
+
+SongFolder.propTypes = {
+  folder: PropTypes.string,
+  isOpen: PropTypes.bool,
+  newSong: PropTypes.object,
+  removeFolder: PropTypes.func,
+  copyShareLink: PropTypes.func,
+  songId: PropTypes.string,
+  toggleFolderOpen: PropTypes.func,
 };
 
 let SongOrderedList = ({ folder, router, songId, songs }) => {
@@ -184,5 +222,11 @@ let SongOrderedList = ({ folder, router, songId, songs }) => {
       ))}
     </ol>
   );
+};
+SongOrderedList.propTypes = {
+  folder: PropTypes.object,
+  router: PropTypes.object,
+  songId: PropTypes.string,
+  songs: PropTypes.arrayOf(PropTypes.object),
 };
 SongOrderedList = withRouter(SongOrderedList);
