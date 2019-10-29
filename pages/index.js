@@ -8,7 +8,7 @@ import Raven from "raven-js";
 import { withRouter } from "next/router";
 import _ from "lodash";
 
-import { AppContext } from "./../context/App.js";
+import { AppContext, isNewSongId } from "./../context/App.js";
 import AddFolder from "./../components/AddFolder";
 import ButtonToolbarGroup from "./../components/ButtonToolbarGroup";
 import LoadingIndicator from "./../components/LoadingIndicator";
@@ -19,6 +19,7 @@ import SongEditor from "./../components/SongEditor";
 import SongList from "./../components/SongList";
 import SongView from "./../components/SongView";
 
+import getSongHref from "./../utils/getSongHref";
 import storage from "./../utils/storage";
 
 const SMALL_SCREEN_WIDTH = 768;
@@ -28,6 +29,7 @@ class IndexPage extends React.Component {
 
   static propTypes = {
     router: PropTypes.object,
+    songId: PropTypes.string,
   };
 
   constructor(props) {
@@ -50,10 +52,6 @@ class IndexPage extends React.Component {
     }
   }
 
-  getInitialProps(c) {
-    console.debug("getInitialProps", JSON.stringify(c));
-  }
-
   async componentDidMount() {
     //console.debug("componentDidMount", this.props);
     const { router } = this.props;
@@ -64,7 +62,7 @@ class IndexPage extends React.Component {
       setSongId,
     } = this.context;
     await setStateFromLocalStorage(() => {
-      console.debug("router.query.songId", router.query.songId);
+      //console.debug("Index CDM router.query.songId", router.query.songId);
       if (router.query.songId) {
         setSongId(router.query.songId, router.query.folderId);
       }
@@ -75,7 +73,7 @@ class IndexPage extends React.Component {
       if (this.context.dropbox) {
         dropboxFoldersSync();
       }
-    }, 5000);
+    }, 1000);
 
     const onLine = navigator.onLine;
     this.setState({
@@ -107,36 +105,37 @@ class IndexPage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    //console.debug("Index CDU", this.props);
     if (this.state.onLine && !prevState.onLine) {
       this.context.checkDirty();
     }
-    const prevSongId = prevProps.router.query.songId;
-    const prevFolderId = prevProps.router.query.folderId;
-
-    const songId = this.props.router.query.songId;
-    const folderId = this.props.router.query.folderId;
 
     const smallScreenMode = this.getSmallScreenMode(this.state.songId);
     if (smallScreenMode !== this.state.smallScreenMode) {
       this.setSmallScreenMode(smallScreenMode);
     }
 
+    const prevRouterSongId = prevProps.router.query.songId;
+
+    const routerSongId = this.props.router.query.songId;
+    const routerFolderId = this.props.router.query.folderId;
     //console.debug("CDU", this.props.router, prevProps.router);
-    if (prevSongId !== songId) {
+    if (prevRouterSongId !== routerSongId) {
       console.debug(
-        "-0-0-0-0-0-0-0-0-0-0",
-        this.props.router,
-        "prevSongId",
-        prevSongId,
-        "prevFolderId",
-        prevFolderId,
-        this.state.songs,
+        "-0-0-0-0-0-0-0-0-0-0 router songId update",
+        "routerSongId",
+        routerSongId,
+        "prevRouterSongId",
+        prevRouterSongId,
       );
-      this.context.setSongId(songId, folderId);
+
+      if (this.context.songId !== routerSongId) {
+        this.context.setSongId(routerSongId, routerFolderId);
+      }
 
       // refresh chordPro in the background
-      if (songId) {
-        this.context.dropboxGetSongChordPro(songId, folderId);
+      if (routerSongId && !isNewSongId(routerSongId)) {
+        this.context.dropboxGetSongChordPro(routerSongId, routerFolderId);
       }
     }
   }
@@ -226,6 +225,24 @@ class IndexPage extends React.Component {
     window.location.href = "/";
   };
 
+  onNewSong = (songId, folderId) => {
+    console.debug(
+      "Index onNewSong callback",
+      songId,
+      folderId,
+      this.context.songId,
+    );
+    const { router } = this.props;
+    const [song, unused] = this.context.getSongById(songId);
+    const as = getSongHref(songId, song.name, folderId);
+    const url = `/?folderId=${folderId}&songId=${songId}`;
+    if (isNewSongId(songId)) {
+      router.push(url, as);
+    } else {
+      router.replace(url, as);
+    }
+  };
+
   render() {
     const {
       chordPro,
@@ -246,6 +263,8 @@ class IndexPage extends React.Component {
       user,
     } = this.context;
 
+    //console.debug("index render", songId);
+
     const {
       componentIsMounted,
       preferencesOpen,
@@ -254,7 +273,7 @@ class IndexPage extends React.Component {
       songEditorClosed,
     } = this.state;
 
-    const [song, _] = getSongById(songId);
+    const [song, unused] = getSongById(songId);
     const readOnly = song && !song.path_lower;
 
     const renderSongEditor = !!(
@@ -272,9 +291,14 @@ class IndexPage extends React.Component {
       return <LoadingIndicator />;
     }
 
+    /*
     if (songId) {
-      //console.debug("chordpro", chordPro[songId]);
+      console.debug(
+        "chordpro",
+        chordPro[songId] && chordPro[songId].substring(0, 20),
+      );
     }
+    */
 
     return (
       <div>
@@ -346,14 +370,6 @@ class IndexPage extends React.Component {
                       content: <FaEdit />,
                       active: !songEditorClosed,
                     },
-                    /*
-                    {
-                      onClick: this.toggleSongViewClosed,
-                      title: "View",
-                      content: "V",
-                      active: songViewClosed,
-                    },
-                    */
                   ]}
                   size="small"
                 />
@@ -430,6 +446,7 @@ class IndexPage extends React.Component {
                       copyShareLink={this.copyShareLink}
                       folders={folders}
                       newSong={newSong}
+                      onNewSong={this.onNewSong}
                       removeFolder={removeFolder}
                       smallScreenMode={smallScreenMode}
                       songId={songId}
@@ -466,8 +483,9 @@ class IndexPage extends React.Component {
                     onChange={onChangeSongChordPro}
                     readOnly={readOnly}
                     saving={saving}
-                    serverModified={song.server_modified}
+                    serverModified={song ? song.server_modified : ""}
                     smallScreenMode={smallScreenMode}
+                    songId={songId}
                     value={chordPro[songId]}
                   />
                 </div>

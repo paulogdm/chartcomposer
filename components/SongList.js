@@ -8,18 +8,18 @@ import FaFolderOpen from "react-icons/lib/fa/folder-open";
 import FaPlus from "react-icons/lib/fa/plus";
 import FaShareAlt from "react-icons/lib/fa/share-alt";
 import _ from "lodash";
-import ButtonToolbarGroup from "./ButtonToolbarGroup";
 
-import { MenuItem, DropdownButton, Button } from "react-bootstrap";
+import { MenuItem, DropdownButton } from "react-bootstrap";
 
 import removeFileExtension from "./../utils/removeFileExtension";
-import slugify from "./../utils/slugify";
+import getSongHref from "./../utils/getSongHref";
 
 const SongList = ({
   closedFolders,
   copyShareLink,
   folders,
   newSong,
+  onNewSong,
   removeFolder,
   songId,
   songs,
@@ -34,6 +34,7 @@ const SongList = ({
               folder={folder}
               isOpen={!closedFolders[folder.id]}
               newSong={newSong}
+              onNewSong={onNewSong}
               removeFolder={removeFolder}
               copyShareLink={copyShareLink}
               songId={songId}
@@ -53,6 +54,7 @@ SongList.propTypes = {
   copyShareLink: PropTypes.func,
   folders: PropTypes.object,
   newSong: PropTypes.func,
+  onNewSong: PropTypes.func,
   removeFolder: PropTypes.func,
   songId: PropTypes.string,
   songs: PropTypes.object,
@@ -65,6 +67,7 @@ const SongFolder = ({
   folder,
   isOpen,
   newSong,
+  onNewSong,
   removeFolder,
   copyShareLink,
   songId,
@@ -75,9 +78,9 @@ const SongFolder = ({
   let toolbarButtons = [];
   if (canCreateNewSong) {
     toolbarButtons.push({
-      onClick: e => {
+      onClick: async e => {
         e.stopPropagation();
-        newSong(folder.id);
+        newSong(folder.id, onNewSong);
       },
       title: "New song",
       content: <FaPlus color="#666" />,
@@ -94,11 +97,11 @@ const SongFolder = ({
   toolbarButtons.push({
     onClick: e => {
       e.stopPropagation();
-      if (confirm("Hide this folder?")) {
+      if (confirm("Remove this folder?")) {
         removeFolder(folder.id);
       }
     },
-    title: "Hide folder",
+    title: "Remove folder",
     content: <FaClose color="#666" />,
   });
 
@@ -174,13 +177,14 @@ SongFolder.propTypes = {
   folder: PropTypes.object,
   isOpen: PropTypes.bool,
   newSong: PropTypes.func,
+  onNewSong: PropTypes.func,
   removeFolder: PropTypes.func,
   copyShareLink: PropTypes.func,
   songId: PropTypes.string,
   toggleFolderOpen: PropTypes.func,
 };
 
-let SongOrderedList = ({ folder, router, songId, songs }) => {
+let SongOrderedList = ({ folder, songId, songs }) => {
   const padding = 10;
   const paddingLeft = padding + (folder ? 20 : 0);
 
@@ -207,9 +211,7 @@ let SongOrderedList = ({ folder, router, songId, songs }) => {
             as={
               songId === song.id
                 ? "/"
-                : `/folder/${folder.id}/song/${song.id}/${slugify(
-                    removeFileExtension(song.name),
-                  )}`
+                : getSongHref(song.id, song.name, folder.id)
             }
             href={
               songId === song.id
@@ -234,7 +236,6 @@ let SongOrderedList = ({ folder, router, songId, songs }) => {
 };
 SongOrderedList.propTypes = {
   folder: PropTypes.object,
-  router: PropTypes.object,
   songId: PropTypes.string,
   songs: PropTypes.object,
 };

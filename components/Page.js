@@ -1,7 +1,7 @@
 import React from "react";
 import { createOauthFlow } from "react-oauth-flow";
 
-import App, { AppContext } from "./../context/App";
+import App from "./../context/App";
 import withSentry from "./withSentry";
 import Meta from "./Meta";
 import RedirectToBareDomain from "./RedirectToBareDomain";

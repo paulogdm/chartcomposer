@@ -38,7 +38,9 @@ export default class SongView extends React.Component {
     const { value } = this.props;
     if (value != prevProps.value) {
       //console.debug("value update in SongView", value);
-      this.setState({ chordPro: this.parseChordProString(value) });
+      this.setState({
+        chordPro: value ? this.parseChordProString(value) : null,
+      });
     }
   }
 

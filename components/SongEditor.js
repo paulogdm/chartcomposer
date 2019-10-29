@@ -17,12 +17,13 @@ class SongEditor extends React.Component {
     saving: PropTypes.bool,
     serverModified: PropTypes.string,
     smallScreenMode: PropTypes.string,
+    songId: PropTypes.string,
     value: PropTypes.string,
   };
 
   constructor(props) {
     super();
-    this.state = { value: props.value || "" };
+    this.state = { value: props.value };
     this.debouncedOnChange = _.debounce(props.onChange, 250);
   }
 
@@ -54,8 +55,20 @@ class SongEditor extends React.Component {
   };
 
   render() {
-    const { readOnly, saving, serverModified, smallScreenMode } = this.props;
+    const {
+      readOnly,
+      saving,
+      serverModified,
+      smallScreenMode,
+      //songId,
+    } = this.props;
     const { value } = this.state;
+    //console.debug("SongEditor value", value && value.substring(0, 20));
+
+    if (value === undefined) {
+      //console.debug("SongEditor value is undefined, null for songId", songId);
+      return null;
+    }
 
     let editor;
     if (smallScreenMode) {

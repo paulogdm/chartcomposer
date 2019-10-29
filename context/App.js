@@ -79,11 +79,14 @@ export const AppContext = React.createContext({
   },
 });
 
+export const isNewSongId = songId => songId.indexOf(NEW_SONG_ID_MARKER) === 0;
+
 export default class App extends React.Component {
   isFirstUpdate = true;
 
   dropbox = null;
 
+  /* TODO(elsigh): https://reactjs.org/docs/context.html#caveats
   state = {
     componentIsMounted: false,
     chordPro: {},
@@ -98,17 +101,58 @@ export default class App extends React.Component {
     songs: {},
     user: null,
     isUserMenuOpen: false,
-  };
+  };*/
 
   static propTypes = {
+    children: PropTypes.node,
     config: PropTypes.object,
     storage: PropTypes.object,
   };
 
-  constructor() {
+  constructor(props) {
     super();
     this.debouncedSaveSongChordPro = _.debounce(this.saveSongChordPro, 1000);
+
+    this.state = {
+      componentIsMounted: false,
+      chordPro: {},
+      closedFolders: {},
+      dirty: {},
+      folders: {},
+      loading: false,
+      preferences: defaultPreferences,
+      saving: false,
+      signedInAsGuest: false,
+      songId: null,
+      songs: {},
+      user: null,
+      isUserMenuOpen: false,
+
+      ///
+
+      config: props.config,
+      storage: props.storage,
+
+      dropbox: this.dropbox,
+      dropboxInitialize: this.dropboxInitialize,
+      dropboxFoldersSync: this.dropboxFoldersSync,
+      dropboxLoadLink: this.dropboxLoadLink,
+      dropboxGetSongChordPro: this.dropboxGetSongChordPro,
+
+      checkDirty: this.checkDirty,
+      getSongById: this.getSongById,
+      setSongId: this.setSongId,
+      newSong: this.newSong,
+      setStateFromLocalStorage: this.setStateFromLocalStorage,
+      toggleFolderOpen: this.toggleFolderOpen,
+      removeFolder: this.removeFolder,
+      onChangeSongChordPro: this.onChangeSongChordPro,
+      updatePreferences: this.updatePreferences,
+
+      toggleUserMenuOpen: this.toggleUserMenuOpen,
+    };
   }
+
   componentDidMount() {
     this.setState({ componentIsMounted: true });
   }
@@ -118,14 +162,14 @@ export default class App extends React.Component {
       this.state.settingStateFromLocalStorage &&
       !prevState.settingStateFromLocalStorage
     ) {
-      console.debug("App.cwu ignore when settingStateFromLocalStorage");
+      //console.debug("App.cwu ignore when settingStateFromLocalStorage");
       this.setState({ settingStateFromLocalStorage: false });
       return;
     } else if (
       prevState.settingStateFromLocalStorage &&
       !this.state.settingStateFromLocalStorage
     ) {
-      console.debug("App.cwu ignore flip settingStateFromLocalStorage");
+      //console.debug("App.cwu ignore flip settingStateFromLocalStorage");
       return;
     }
 
@@ -182,6 +226,7 @@ export default class App extends React.Component {
     if (accessToken) {
       this.dropbox = new Dropbox({ accessToken, fetch: fetch });
       this.setState({
+        dropbox,
         signedInAsGuest: accessToken === DROPBOX_PUBLIC_TOKEN,
       });
       this.dropbox
@@ -198,7 +243,11 @@ export default class App extends React.Component {
             });
           }
         })
-        .catch(error => console.warn("usersGetCurrentAccount fail", { error }));
+        .catch(error =>
+          console.warn("dropboxInitialize usersGetCurrentAccount failed", {
+            error,
+          }),
+        );
       this.dropboxLoadPreferences();
 
       if (shareLink) {
@@ -208,6 +257,7 @@ export default class App extends React.Component {
   };
 
   dropboxFoldersSync = async (getSongChordPro = false) => {
+    //console.debug("dropboxFoldersSync getSongChordPro:", getSongChordPro);
     const { folders } = this.state;
     // Sync the folder contents in the background in case there have
     // been changes in the user's dropbox that are out of sync with local
@@ -262,19 +312,21 @@ export default class App extends React.Component {
     isCheckForChanges = false,
     getSongChordPro = false,
   ) => {
-    console.debug("dropboxLoadLink", {
-      url,
+    console.debug("dropboxLoadLink -->", {
+      url: url && url.substring(0, 20),
       isCheckForChanges,
       getSongChordPro,
     });
     if (!url) {
       return;
     }
+    /*
     console.debug("this.dropbox", this.dropbox);
     console.debug(
       "this.dropbox.sharingGetSharedLinkMetadata",
       this.dropbox.sharingGetSharedLinkMetadata,
     );
+    */
     this.setState({
       loading: !isCheckForChanges,
       songId: isCheckForChanges ? this.state.songId : null,
@@ -282,7 +334,9 @@ export default class App extends React.Component {
     this.dropbox
       .sharingGetSharedLinkMetadata({ url })
       .then(response => {
-        console.debug("dropboxLoadLink response", { response });
+        console.debug("dropboxLoadLink <-- response", url.substring(0, 20), {
+          response,
+        });
         const tag = response[".tag"];
         if (tag === "folder") {
           const folderId = response.id;
@@ -354,7 +408,7 @@ export default class App extends React.Component {
       return;
     }
     const url = this.state.folders[folderId].url;
-    console.debug("dropboxLoadFilesFromFolder", folderId, { url });
+    console.debug("dropboxLoadFilesFromFolder -->", folderId, { url });
     if (!url) {
       return;
     }
@@ -363,15 +417,18 @@ export default class App extends React.Component {
     this.dropbox
       .filesListFolder({ path: "", shared_link: { url } })
       .then(response => {
-        console.debug("dropboxLoadFilesFromFolder", folderId, { response });
-        const { chordPro, dirty } = this.state;
+        console.debug("dropboxLoadFilesFromFolder <--", folderId, { response });
+        const { dirty } = this.state;
         let songs = { ...this.state.folders[folderId].songs };
         let idsOnDropbox = [];
         response.entries.forEach(entry => {
           if (entry[".tag"] === "file" && isChordProFileName(entry.name)) {
             //console.debug("got", entry.name, { entry });
             if (dirty[entry.id]) {
-              console.warn("NOT SYNCING CUZ DIRTY", entry.id);
+              console.warn(
+                "NOT SYNCING CUZ DIRTY - would overwrite local",
+                entry.id,
+              );
             } else {
               songs[entry.id] = entry;
             }
@@ -390,6 +447,8 @@ export default class App extends React.Component {
             if (Object.keys(dirty).indexOf(songId) === -1) {
               console.warn("and", songId, "not dirty, so nuking");
               delete songs[songId];
+            } else {
+              console.debug(songId, "is dirty, so leaving alone for now");
             }
           }
         });
@@ -428,14 +487,12 @@ export default class App extends React.Component {
     this.setState({ songs });
   };
 
-  newSong = folderId => {
+  newSong = async (folderId, newSongCallback = null) => {
     const songName = window.prompt("Name of new song");
     if (!songName) {
       console.warn("User cancelled the new song prompt.");
       return;
     }
-
-    this.setSongId(null);
 
     const songId = `${NEW_SONG_ID_MARKER}-${Date.now().toString()}`;
     console.debug("newSong", songId, songName);
@@ -474,13 +531,21 @@ export default class App extends React.Component {
         },
       },
     };
-    this.setState({ chordPro, folders, songId }, () => {
-      this.saveSongChordPro(songId);
+    const dirty = {
+      ...this.state.dirty,
+      [songId]: true,
+    };
+    this.setState({ chordPro, dirty, folders, songId }, () => {
+      newSongCallback && newSongCallback(songId, folderId);
+
+      this.saveNewSongTimeout_ = window.setTimeout(() => {
+        this.saveSongChordPro(songId, newSongCallback);
+      }, 250);
     });
   };
 
   dropboxGetSongChordPro = async (songId, folderId) => {
-    console.debug("dropboxGetSongChordPro", songId, { songId, folderId });
+    console.debug("dropboxGetSongChordPro -->", songId, { songId, folderId });
 
     const { folders, songs } = this.state;
 
@@ -503,7 +568,7 @@ export default class App extends React.Component {
       const response = await this.dropbox.sharingGetSharedLinkFile(
         sharedLinkFile,
       );
-      console.debug("dropboxGetSongChordPro got response", songId, {
+      console.debug("dropboxGetSongChordPro <-- response", songId, {
         response,
       });
       const songChordPro = await blobToText(response.fileBlob);
@@ -520,12 +585,14 @@ export default class App extends React.Component {
     }
   };
 
-  setSongId = async (songId, folderId) => {
+  // Most use cases should not call this if they're otherwise
+  // setting state with chordPro and songId.
+  setSongId = async (songId, folderId, cb = null) => {
     console.debug("setSongId", { songId, folderId });
     const { folders, songs } = this.state;
 
     if (!songId) {
-      this.setState({ songId: null });
+      this.setState({ songId: null }, cb);
       return;
     }
 
@@ -541,7 +608,7 @@ export default class App extends React.Component {
       return;
     }
 
-    this.setState({ songId });
+    this.setState({ songId }, cb);
   };
 
   onChangeSongChordPro = songChordPro => {
@@ -560,12 +627,12 @@ export default class App extends React.Component {
     });
   };
 
-  saveSongChordPro = songId => {
+  saveSongChordPro = (songId, newSongCallback = null) => {
     const { chordPro, folders } = this.state;
     const songChordPro = chordPro[songId];
     const [song, folderId] = this.getSongById(songId);
     const path = getPathForSong(song);
-    const isNewSong = song.id.indexOf(NEW_SONG_ID_MARKER) === 0;
+    const isNewSong = isNewSongId(song.id);
 
     // http://dropbox.github.io/dropbox-sdk-js/global.html#FilesCommitInfo
     const filesCommitInfo = {
@@ -588,7 +655,7 @@ export default class App extends React.Component {
     this.dropbox
       .filesUpload(filesCommitInfo)
       .then(response => {
-        console.debug("SAVED song", { response, songChordPro });
+        console.debug("SAVED song", { response, songChordPro, songId });
 
         let dirty = { ...this.state.dirty };
         delete dirty[songId];
@@ -603,8 +670,8 @@ export default class App extends React.Component {
           delete folders[folderId].songs[songId];
           delete chordPro[songId];
           songId = response.id;
+          chordPro[songId] = songChordPro;
           console.debug("SAVED NEW SONG! songId is now", songId);
-          this.setSongId(songId);
         }
 
         //console.debug({ folders, folderId });
@@ -619,7 +686,15 @@ export default class App extends React.Component {
           },
         };
 
-        this.setState({ chordPro, dirty, folders, saving: false });
+        this.setState(
+          { chordPro, dirty, folders, saving: false, songId },
+          () => {
+            if (isNewSong) {
+              console.debug("upated state with NEW SONG", songId);
+              newSongCallback && newSongCallback(songId, folderId);
+            }
+          },
+        );
       })
       .catch(error => {
         this.setState({ saving: false });
@@ -705,32 +780,9 @@ export default class App extends React.Component {
   };
 
   render() {
-    const value = {
-      ...this.state,
-      config: this.props.config,
-      storage: this.props.storage,
-
-      dropbox: this.dropbox,
-      dropboxInitialize: this.dropboxInitialize,
-      dropboxFoldersSync: this.dropboxFoldersSync,
-      dropboxLoadLink: this.dropboxLoadLink,
-      dropboxGetSongChordPro: this.dropboxGetSongChordPro,
-
-      checkDirty: this.checkDirty,
-      getSongById: this.getSongById,
-      setSongId: this.setSongId,
-      newSong: this.newSong,
-      setStateFromLocalStorage: this.setStateFromLocalStorage,
-      toggleFolderOpen: this.toggleFolderOpen,
-      removeFolder: this.removeFolder,
-      onChangeSongChordPro: this.onChangeSongChordPro,
-      updatePreferences: this.updatePreferences,
-
-      toggleUserMenuOpen: this.toggleUserMenuOpen,
-    };
-    //console.debug("App.render", value);
+    //console.debug("AppContext.render", this.state.songId);
     return (
-      <AppContext.Provider value={value}>
+      <AppContext.Provider value={this.state}>
         {this.props.children}
       </AppContext.Provider>
     );
