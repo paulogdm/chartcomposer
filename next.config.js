@@ -1,9 +1,10 @@
 const path = require("path");
 const withCSS = require("@zeit/next-css");
 const withOffline = require("next-offline");
+const withManifest = require("next-manifest");
 
-const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
-const WebpackPwaManifest = require("webpack-pwa-manifest");
+//const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
+//const WebpackPwaManifest = require("webpack-pwa-manifest");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 // TODO: how to import from utils/constants?
@@ -11,25 +12,44 @@ const APP_NAME = "SongDocs";
 
 const IS_DEV = process.env.NODE_ENV === "development";
 
+const manifest = {
+  output: path.join(__dirname, "public"),
+  name: "SongDocs",
+  description: `${APP_NAME} lets you create and share sheet music with your friends.`,
+  icons: [
+    {
+      src: "/icon-64.png",
+      sizes: "64x64",
+      type: "image/png",
+    },
+    {
+      src: "/icon-512.png",
+      sizes: "512x512",
+      type: "image/png",
+    },
+  ],
+};
+
 module.exports = withCSS(
-  withOffline({
-    target: "server",
-    workboxOpts: {
-      swDest: path.join(__dirname, "public/service-worker.js"),
-    },
-    publicRuntimeConfig: {
-      // Will be available on both server and client
-      DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
-      DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET,
-      DROPBOX_PUBLIC_TOKEN: process.env.DROPBOX_PUBLIC_TOKEN,
-      IS_DEV,
-    },
-    webpack: config => {
+  withManifest(
+    withOffline({
+      target: "server",
+      manifest,
+      workboxOpts: {
+        swDest: path.join(__dirname, "public/service-worker.js"),
+      },
+      publicRuntimeConfig: {
+        // Will be available on both server and client
+        DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
+        DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET,
+        DROPBOX_PUBLIC_TOKEN: process.env.DROPBOX_PUBLIC_TOKEN,
+        IS_DEV,
+      },
+      webpack: config => {
+        /*
       config.plugins.push(
         new WebpackPwaManifest({
           //filename: path.join(__dirname, "public", "manifest.json"),
-          filename: "manifest.json",
-          output: path.join(__dirname, "public"),
           name: APP_NAME,
           short_name: APP_NAME,
           description: `${APP_NAME} lets you create and share sheet music with your friends.`,
@@ -47,64 +67,66 @@ module.exports = withCSS(
           icons: [
             {
               src: path.resolve("public/logo-1180.png"),
-              sizes: [96, 128, 144, 192, 256, 384, 512],
+              sizes: [96, 256, 512],
               destination: path.join(__dirname, "public"),
             },
           ],
         }),
       );
+      */
 
-      config.plugins.push(
-        new MonacoWebpackPlugin({
-          output: path.join(__dirname, "public"),
-          languages: ["markdown"],
-          features: [
-            //"accessibilityHelp",
-            "bracketMatching",
-            //"caretOperations",
-            "clipboard",
-            "codeAction",
-            //"codelens",
-            "colorDetector",
-            "comment",
-            //"contextmenu",
-            "coreCommands",
-            "cursorUndo",
-            //"dnd",
-            //"find",
-            "folding",
-            //"fontZoom",
-            "format",
-            //"goToDefinitionCommands",
-            //"goToDefinitionMouse",
-            //"gotoError",
-            //"gotoLine",
-            //"hover",
-            //"inPlaceReplace",
-            //"inspectTokens",
-            "iPadShowKeyboard",
-            //"linesOperations",
-            //"links",
-            //"multicursor",
-            //"parameterHints",
-            //"quickCommand",
-            //"quickOutline",
-            //"referenceSearch",
-            //"rename",
-            //"smartSelect",
-            //"snippets",
-            //"suggest",
-            //"toggleHighContrast",
-            //"toggleTabFocusMode",
-            //"transpose",
-            //"wordHighlighter",
-            //"wordOperations",
-            //"wordPartOperations",
-          ],
-        }),
-      );
+        config.plugins.push(
+          new MonacoWebpackPlugin({
+            output: path.join(__dirname, "public"),
+            languages: ["markdown"],
+            features: [
+              //"accessibilityHelp",
+              "bracketMatching",
+              //"caretOperations",
+              "clipboard",
+              "codeAction",
+              //"codelens",
+              "colorDetector",
+              "comment",
+              //"contextmenu",
+              "coreCommands",
+              "cursorUndo",
+              //"dnd",
+              //"find",
+              "folding",
+              //"fontZoom",
+              "format",
+              //"goToDefinitionCommands",
+              //"goToDefinitionMouse",
+              //"gotoError",
+              //"gotoLine",
+              //"hover",
+              //"inPlaceReplace",
+              //"inspectTokens",
+              "iPadShowKeyboard",
+              //"linesOperations",
+              //"links",
+              //"multicursor",
+              //"parameterHints",
+              //"quickCommand",
+              //"quickOutline",
+              //"referenceSearch",
+              //"rename",
+              //"smartSelect",
+              //"snippets",
+              //"suggest",
+              //"toggleHighContrast",
+              //"toggleTabFocusMode",
+              //"transpose",
+              //"wordHighlighter",
+              //"wordOperations",
+              //"wordPartOperations",
+            ],
+          }),
+        );
 
-      return config;
-    },
-  }),
+        return config;
+      },
+    }),
+  ),
 );

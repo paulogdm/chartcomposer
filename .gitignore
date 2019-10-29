@@ -3,7 +3,6 @@ node_modules
 secrets.js
 dev.js
 dev.sh
-public/icon_*
 public/service-worker.js
 public/manifest.json
 public/editor.worker.*
