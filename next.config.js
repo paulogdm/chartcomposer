@@ -3,8 +3,6 @@ const withCSS = require("@zeit/next-css");
 const withOffline = require("next-offline");
 const withManifest = require("next-manifest");
 
-//const SWPrecacheWebpackPlugin = require("sw-precache-webpack-plugin");
-//const WebpackPwaManifest = require("webpack-pwa-manifest");
 const MonacoWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 // TODO: how to import from utils/constants?
@@ -14,7 +12,8 @@ const IS_DEV = process.env.NODE_ENV === "development";
 
 const manifest = {
   output: path.join(__dirname, "public"),
-  name: "SongDocs",
+  name: APP_NAME,
+  start_url: "/?utm_source=web_app_manifest",
   description: `${APP_NAME} lets you create and share sheet music with your friends.`,
   icons: [
     {
@@ -46,38 +45,11 @@ module.exports = withCSS(
         IS_DEV,
       },
       webpack: config => {
-        /*
-      config.plugins.push(
-        new WebpackPwaManifest({
-          //filename: path.join(__dirname, "public", "manifest.json"),
-          name: APP_NAME,
-          short_name: APP_NAME,
-          description: `${APP_NAME} lets you create and share sheet music with your friends.`,
-          background_color: "#ffffff",
-          theme_color: "#eeeeee",
-          display: "standalone",
-          orientation: "portrait",
-          fingerprints: false,
-          inject: false,
-          start_url: "/",
-          ios: {
-            "apple-mobile-web-app-title": APP_NAME,
-            "apple-mobile-web-app-status-bar-style": "#eeeeee",
-          },
-          icons: [
-            {
-              src: path.resolve("public/logo-1180.png"),
-              sizes: [96, 256, 512],
-              destination: path.join(__dirname, "public"),
-            },
-          ],
-        }),
-      );
-      */
-
         config.plugins.push(
           new MonacoWebpackPlugin({
-            output: path.join(__dirname, "public"),
+            output: {
+              path: path.resolve(__dirname, "public"),
+            },
             languages: ["markdown"],
             features: [
               //"accessibilityHelp",
