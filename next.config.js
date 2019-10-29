@@ -12,8 +12,7 @@ const IS_DEV = process.env.NODE_ENV === "development";
 
 const manifest = {
   output: path.join(__dirname, "public"),
-  name: APP_NAME,
-  start_url: "/?utm_source=web_app_manifest",
+  name: "SongDocs",
   description: `${APP_NAME} lets you create and share sheet music with your friends.`,
   icons: [
     {
@@ -47,9 +46,7 @@ module.exports = withCSS(
       webpack: config => {
         config.plugins.push(
           new MonacoWebpackPlugin({
-            output: {
-              path: path.resolve(__dirname, "public"),
-            },
+            output: path.join(__dirname, "public"),
             languages: ["markdown"],
             features: [
               //"accessibilityHelp",

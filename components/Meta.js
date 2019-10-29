@@ -17,7 +17,7 @@ const Meta = () => (
         content="width=device-width, initial-scale=1, user-scalable=no"
       />
       <meta name="theme-color" content="#eeeeee" />
-      <link rel="icon" href="/favicon.ico" />
+      <link rel="shortcut icon" href="/favicon.ico" />
       <link rel="manifest" href="/manifest.json" />
       <link rel="stylesheet" href="/bootstrap.min.css" />
       <link rel="stylesheet" href="/SongView.css" />
