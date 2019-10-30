@@ -46,7 +46,7 @@ module.exports = withCSS(
       webpack: config => {
         config.plugins.push(
           new MonacoWebpackPlugin({
-            output: path.resolve(__dirname, "public"),
+            output: path.join(__dirname, "public"),
             languages: ["markdown"],
             features: [
               //"accessibilityHelp",
