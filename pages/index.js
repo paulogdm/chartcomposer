@@ -325,6 +325,7 @@ class IndexPage extends React.Component {
               width: 100% !important;
               border-top: 0 !important;
               border-left: 0 !important;
+              padding-left: 125px !important;
             }
             .panel-container {
               height: auto;
