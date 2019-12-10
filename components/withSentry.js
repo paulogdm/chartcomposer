@@ -1,5 +1,5 @@
 import React from "react";
-import Raven from "raven-js";
+import { init, captureException } from "@sentry/browser";
 import getConfig from "next/config";
 
 import { SENTRY_DSN } from "../utils/constants";
@@ -21,14 +21,14 @@ function withSentry(Child) {
         error: null,
       };
       if (!IS_DEV) {
-        Raven.config(SENTRY_DSN).install();
+        init({ dsn: SENTRY_DSN });
       }
     }
 
     componentDidCatch(error, errorInfo) {
       this.setState({ error });
       if (!IS_DEV) {
-        Raven.captureException(error, { extra: errorInfo });
+        captureException(error, { extra: errorInfo });
       }
     }
 

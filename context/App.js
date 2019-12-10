@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import Raven from "raven-js";
+import { configureScope } from "@sentry/browser";
 import dropbox from "dropbox";
 import _ from "lodash";
 import fetch from "fetch-everywhere";
@@ -235,11 +235,13 @@ export default class App extends React.Component {
           //console.debug("dropboxInitialize got dropbox user");
           this.setState({ user });
           if (accessToken !== DROPBOX_PUBLIC_TOKEN) {
-            Raven.setUserContext({
-              name: user.display_name,
-              email: user.email,
-              id: user.account_id,
-              country: user.country,
+            configureScope(scope => {
+              scope.setUser({
+                name: user.display_name,
+                email: user.email,
+                id: user.account_id,
+                country: user.country,
+              });
             });
           }
         })

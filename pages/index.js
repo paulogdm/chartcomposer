@@ -4,7 +4,7 @@ import classNames from "classnames";
 import FaBars from "react-icons/lib/fa/bars";
 import FaEdit from "react-icons/lib/fa/edit";
 import FaMusic from "react-icons/lib/fa/music";
-import Raven from "raven-js";
+import { configureScope } from "@sentry/browser";
 import { withRouter } from "next/router";
 import _ from "lodash";
 
@@ -221,7 +221,9 @@ class IndexPage extends React.Component {
 
   signOut = async () => {
     await storage.clear();
-    Raven.setUserContext();
+    configureScope(scope => {
+      scope.setUser({});
+    });
     window.location.href = "/";
   };
 

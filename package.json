@@ -17,6 +17,7 @@
   "author": "Lindsey Simon <elsigh@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@sentry/browser": "^5.10.2",
     "@zeit/next-css": "^1.0.1",
     "acorn": "^6.1.1",
     "classnames": "^2.2.6",
@@ -33,7 +34,6 @@
     "next-manifest": "^3.0.1",
     "next-offline": "^4.0.6",
     "prop-types": "^15.6.2",
-    "raven-js": "^3.27.2",
     "raw-loader": "^0.5.1",
     "react": "^16.10.2",
     "react-bootstrap": "^0.32.4",
