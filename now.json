@@ -1,5 +1,6 @@
 {
   "name": "chartcomposer-static",
+  "public": true,
   "github": {
     "enabled": true,
     "autoAlias": true

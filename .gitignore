@@ -5,3 +5,5 @@ dev.js
 dev.sh
 public/service-worker.js
 public/manifest.json
+editor.worker.js
+editor.worker.js.map
