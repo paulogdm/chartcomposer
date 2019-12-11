@@ -12,8 +12,8 @@ class AuthReceiverPage extends React.Component {
   constructor() {
     super();
     console.debug("AuthReceiverPage constructor", {
-      process.env.DROPBOX_APP_KEY,
-      process.env.IS_DEV,
+      DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
+      IS_DEV: process.env.IS_DEV,
     });
   }
 
