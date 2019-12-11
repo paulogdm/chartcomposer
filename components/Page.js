@@ -42,7 +42,9 @@ const SignInAsGuest = () => (
   <a
     href="/"
     onClick={async () => {
-      console.debug("login as guest", { process.env.DROPBOX_PUBLIC_TOKEN });
+      console.debug("login as guest", {
+        DROPBOX_PUBLIC_TOKEN: process.env.DROPBOX_PUBLIC_TOKEN,
+      });
       await storage.setAccessToken(process.env.DROPBOX_PUBLIC_TOKEN);
       // href is "/" so letting default event go through here = refresh
     }}
