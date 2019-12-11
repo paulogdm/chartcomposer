@@ -6,18 +6,14 @@ import { AppContext } from "./../context/App.js";
 import Page, { Receiver } from "./../components/Page";
 import LoadingIndicator from "./../components/LoadingIndicator";
 
-import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
-
-const { DROPBOX_APP_KEY, IS_DEV } = publicRuntimeConfig;
-
 class AuthReceiverPage extends React.Component {
   static contextType = AppContext;
 
   constructor() {
     super();
     console.debug("AuthReceiverPage constructor", {
-      DROPBOX_APP_KEY,
-      IS_DEV,
+      process.env.DROPBOX_APP_KEY,
+      process.env.IS_DEV,
     });
   }
 

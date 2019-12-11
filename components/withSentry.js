@@ -4,9 +4,6 @@ import getConfig from "next/config";
 
 import { SENTRY_DSN } from "../utils/constants";
 
-const { publicRuntimeConfig } = getConfig();
-const { IS_DEV } = publicRuntimeConfig;
-
 function withSentry(Child) {
   return class WrappedComponent extends React.Component {
     static getInitialProps(context) {
@@ -20,14 +17,14 @@ function withSentry(Child) {
       this.state = {
         error: null,
       };
-      if (!IS_DEV) {
+      if (!process.env.IS_DEV) {
         init({ dsn: SENTRY_DSN });
       }
     }
 
     componentDidCatch(error, errorInfo) {
       this.setState({ error });
-      if (!IS_DEV) {
+      if (!process.env.IS_DEV) {
         captureException(error, { extra: errorInfo });
       }
     }

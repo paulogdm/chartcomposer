@@ -5,9 +5,6 @@ import FaFolderOpen from "react-icons/lib/fa/folder-open";
 
 import ButtonToolbarGroup from "./ButtonToolbarGroup";
 import DropboxChooser from "./DropboxChooser";
-import publicRuntimeConfig from "./../utils/publicRuntimeConfig";
-
-const { DROPBOX_APP_KEY } = publicRuntimeConfig;
 
 const AddFolder = ({ dbx, dropboxLoadLink }) => {
   let buttons = [];
@@ -16,7 +13,7 @@ const AddFolder = ({ dbx, dropboxLoadLink }) => {
       title: "Choose a folder on Dropbox",
       content: (
         <DropboxChooser
-          appKey={DROPBOX_APP_KEY}
+          appKey={process.env.DROPBOX_APP_KEY}
           success={choices => {
             console.debug("DropboxChooser success", { choices });
             const folder = choices[0];
