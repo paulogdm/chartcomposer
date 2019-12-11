@@ -133,7 +133,8 @@ const SongFolder = ({
           {isOpen ? <FaFolderOpen /> : <FaFolder />}
         </div>
         <div style={{ flex: 1 }}>
-          {folder.name} ({Object.keys(folder.songs).length})
+          {folder.name} (
+          {folder.songs ? Object.keys(folder.songs).length : null})
         </div>
 
         <DropdownButton
