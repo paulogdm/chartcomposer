@@ -1,5 +1,6 @@
 {
   "name": "chartcomposer-static",
+  "version": 2,
   "public": true,
   "github": {
     "enabled": true,
