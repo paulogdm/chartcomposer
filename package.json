@@ -10,7 +10,6 @@
     "dev": "NODE_ENV=development next dev",
     "start": "NODE_ENV=production next start",
     "deploy": "now --team chartcomposer --token=$NOW_TOKEN",
-    "alias": "now alias --team chartcomposer --token=$NOW_TOKEN",
     "dev_server": "NODE_ENV=development node server/server.js",
     "start_server": "NODE_ENV=production node server/server.js"
   },
@@ -52,6 +51,6 @@
     "eslint-plugin-react": "^7.14.2",
     "jest": "^25.0.0",
     "load-script": "^1.0.0",
-    "now": "^11.4.6"
+    "now": "latest"
   }
 }

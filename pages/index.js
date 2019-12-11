@@ -522,10 +522,6 @@ class IndexPage extends React.Component {
 }
 
 class IndexPageWrapper extends React.Component {
-  static async getInitialProps() {
-    return {};
-  }
-
   render() {
     return (
       <Page>

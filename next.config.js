@@ -31,12 +31,11 @@ const manifest = {
 module.exports = withCSS(
   withManifest(
     withOffline({
-      target: "server",
       manifest,
       workboxOpts: {
         swDest: path.join(__dirname, "public/service-worker.js"),
       },
-      publicRuntimeConfig: {
+      env: {
         // Will be available on both server and client
         DROPBOX_APP_KEY: process.env.DROPBOX_APP_KEY,
         DROPBOX_APP_SECRET: process.env.DROPBOX_APP_SECRET,
